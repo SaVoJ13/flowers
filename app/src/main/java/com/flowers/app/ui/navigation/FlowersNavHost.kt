@@ -148,7 +148,7 @@ fun FlowersApp(application: FlowersApplication) {
 
             // Settings Screen
             composable(Screen.Settings.route) {
-                SettingsScreen()
+                SettingsScreen(userPreferences = repository.userPreferences)
             }
         }
     }

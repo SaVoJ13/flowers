@@ -15,21 +15,29 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -44,6 +52,7 @@ fun CatalogScreen(
     viewModel: CatalogViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showAiDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -54,6 +63,15 @@ fun CatalogScreen(
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
+                },
+                actions = {
+                    IconButton(onClick = { showAiDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Default.AutoAwesome,
+                            contentDescription = "ШІ-генератор картки рослини",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             )
         }
@@ -86,6 +104,31 @@ fun CatalogScreen(
                 )
             }
 
+            // AI Generation Progress Banner
+            if (uiState.isGenerating) {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f))
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "🤖 Gemini ШІ створює картку догляду...",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                        }
+                    }
+                }
+            }
+
             // General Beginner Care Pods
             if (uiState.generalPods.isNotEmpty() && uiState.searchQuery.isBlank()) {
                 item {
@@ -107,18 +150,28 @@ fun CatalogScreen(
 
             // Plants List Section
             item {
-                Text(
-                    text = if (uiState.searchQuery.isBlank()) {
-                        "Популярні кімнатні види (${uiState.plants.size})"
-                    } else {
-                        "Знайдено видів (${uiState.plants.size})"
-                    },
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (uiState.searchQuery.isBlank()) {
+                            "Популярні кімнатні види (${uiState.plants.size})"
+                        } else {
+                            "Знайдено видів (${uiState.plants.size})"
+                        },
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    TextButton(onClick = { showAiDialog = true }) {
+                        Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.padding(end = 4.dp))
+                        Text("ШІ-пошук")
+                    }
+                }
             }
 
-            if (uiState.plants.isEmpty() && uiState.searchQuery.isNotBlank()) {
+            if (uiState.plants.isEmpty() && uiState.searchQuery.isNotBlank() && !uiState.isGenerating) {
                 item {
                     Card(
                         modifier = Modifier
@@ -136,17 +189,26 @@ fun CatalogScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "🔍 Нічого не знайдено",
+                                text = "🔍 У базовому каталозі не знайдено",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                             Spacer(modifier = Modifier.height(6.dp))
                             Text(
-                                text = "За запитом «${uiState.searchQuery}» рослин не знайдено.\nСпробуйте іншу назву (наприклад, «фікус», «монстера», «алое», «щучий хвіст»).",
+                                text = "Рослини «${uiState.searchQuery}» ще немає в базі.\nБажаєте згенерувати повну картку догляду з правилами поливу за допомогою ШІ?",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center
                             )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = { viewModel.generatePlantWithAi(uiState.searchQuery) },
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(Icons.Default.AutoAwesome, contentDescription = null)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("✨ Згенерувати картку через ШІ")
+                            }
                         }
                     }
                 }
@@ -156,6 +218,70 @@ fun CatalogScreen(
                 }
             }
         }
+    }
+
+    // AI Generation Dialog
+    if (showAiDialog) {
+        var queryInput by remember { mutableStateOf(uiState.searchQuery) }
+        AlertDialog(
+            onDismissRequest = { showAiDialog = false },
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("ШІ-генератор рослин")
+                }
+            },
+            text = {
+                Column {
+                    Text(
+                        text = "Введіть назву будь-якої кімнатної рослини (напр. «Філодендрон Біркін», «Стреліція», «Калатея Медальйон», «Бонсай»). Google Gemini сформує персональну картку з точним інтервалом перевірки ґрунту, світлом, поливом і токсичністю.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = queryInput,
+                        onValueChange = { queryInput = it },
+                        label = { Text("Назва рослини") },
+                        placeholder = { Text("Напр. Філодендрон Біркін") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (queryInput.isNotBlank()) {
+                            viewModel.generatePlantWithAi(queryInput)
+                            showAiDialog = false
+                        }
+                    },
+                    enabled = queryInput.isNotBlank() && !uiState.isGenerating
+                ) {
+                    Text("Згенерувати")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAiDialog = false }) {
+                    Text("Скасувати")
+                }
+            }
+        )
+    }
+
+    // Error Dialog
+    if (uiState.generationError != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.clearGenerationError() },
+            title = { Text("Повідомлення ШІ") },
+            text = { Text(uiState.generationError!!) },
+            confirmButton = {
+                Button(onClick = { viewModel.clearGenerationError() }) {
+                    Text("Зрозуміло")
+                }
+            }
+        )
     }
 }
 

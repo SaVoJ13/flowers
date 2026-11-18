@@ -10,6 +10,9 @@ import com.flowers.app.data.local.entity.CarePodEntity
 import com.flowers.app.data.local.entity.CatalogPlantEntity
 import com.flowers.app.data.local.entity.PlantEntity
 import com.flowers.app.data.model.SymptomTreeRoot
+import com.flowers.app.data.preferences.UserPreferences
+import com.flowers.app.data.remote.GeminiPlantService
+import com.flowers.app.data.remote.GeneratePlantResult
 import com.flowers.app.domain.ReminderCalculator
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -28,6 +31,8 @@ class FlowersRepositoryImpl(
     private val context: Context
 ) : FlowersRepository {
 
+    override val userPreferences: UserPreferences = UserPreferences(context)
+    private val geminiPlantService = GeminiPlantService(catalogDao, carePodDao)
     private var cachedSymptomTree: SymptomTreeRoot? = null
 
     init {
@@ -157,6 +162,13 @@ class FlowersRepositoryImpl(
                 timestamp = now,
                 notes = "Пропущено в цьому циклі"
             )
+        )
+    }
+
+    override suspend fun generatePlantWithAi(plantQuery: String): GeneratePlantResult {
+        return geminiPlantService.generatePlantCareCard(
+            plantQuery = plantQuery,
+            apiKey = userPreferences.geminiApiKey
         )
     }
 }

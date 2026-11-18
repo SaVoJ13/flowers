@@ -20,6 +20,7 @@
 ---
 
 ## Завершено (Done)
+- [x] `TASK-017` [Етап 8] Інтеграція ШІ-генератора догляду (Gemini Flash), Freemium-архітектури та розширення каталогу (QA Verified)
 - [x] `TASK-016` [Hotfix] Виправлення вибору ботанічного виду та завантаження каталогу (Gson `@SerializedName`, pre-population) (QA Verified)
 - [x] `TASK-015` [Hotfix] Виправлення пошуку рослин у вкладці Довідник (кирилиця, case-insensitivity, UI-фільтрація) (QA Verified)
 - [x] `TASK-000` [Етап 0] Аудит репозиторію, середовища та розгортання Governance-контуру v2.0 (Агент 0, Owner Approved)

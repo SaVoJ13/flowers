@@ -6,17 +6,17 @@
 
 ## 1. Загальний огляд
 - **Проєкт:** Flowers (Android-застосунок для догляду за кімнатними рослинами)
-- **Поточний етап:** **MVP завершено, виправлено Hotfixes TASK-015 (пошук у довіднику) та TASK-016 (вибір ботанічного виду та ініціалізація каталогу).** Оновлений додаток успішно розгорнуто та верифіковано на фізичному пристрої.
+- **Поточний етап:** **Етап 8 завершено (Freemium + Gemini AI Plant Generator).** Оновлений додаток v1.1.0 розгорнуто та верифіковано на фізичному пристрої.
 - **Головна гілка:** `main`.
-- **Остання зміна:** Виправлення завантаження каталогу з JSON (анотації `@SerializedName` для snake_case ключів, самовідновлення БД) та вибору ботанічного виду з каталогу в `AddEditPlantScreen` (TASK-016, QA Verified). Додано 2 нових тести пре-популяції (разом 16/16 зелених тестів).
+- **Остання зміна:** Реалізація моделі Freemium та інтеграція сервісу Google Gemini Flash для створення карток догляду за рослинами на льоту (TASK-017, QA Verified). Додано 1 новий тест (всього 17/17 тестів зелених).
 
 ---
 
 ## 2. Стан коду та артефактів
-- **Код застосунку:** Повністю реалізовано в `app/src/main/java/com/flowers/app/` (Clean Architecture, Jetpack Compose, Material 3, Room, WorkManager, Coroutines).
-- **Збірка:** Успішно зібрано `app/build/outputs/apk/debug/app-debug.apk`.
-- **Тести:** 16/16 юніт-тестів пройдено успішно (ReminderCalculator, SymptomCorrelationEngine, CatalogSearch, CatalogPrepopulation).
-- **Фізичний пристрій:** Застосунок оновлено через ADB (`adb install -r`) на смартфоні Власника Samsung Galaxy S24 Ultra (`SM-S928B`, `RZCX326349A`). Вибір ботанічного виду з каталогу, автопідстановка назви та інтервалу перевірки підтверджені на пристрої з контрольними скриншотами.
+- **Код застосунку:** Повністю реалізовано в `app/src/main/java/com/flowers/app/` (Clean Architecture, Jetpack Compose, Material 3, Room, WorkManager, Coroutines, Gemini AI Service, UserPreferences).
+- **Збірка:** Успішно зібрано `app/build/outputs/apk/debug/app-debug.apk` (v1.1.0).
+- **Тести:** 17/17 юніт-тестів пройдено успішно (ReminderCalculator, SymptomCorrelationEngine, CatalogSearch, CatalogPrepopulation, GeminiPlantService).
+- **Фізичний пристрій:** Застосунок оновлено через ADB (`adb install -r`) на смартфоні Власника Samsung Galaxy S24 Ultra (`SM-S928B`, `RZCX326349A`). Вікно ШІ-генератора рослин та блок Flowers Premium протестовані на пристрої.
 
 ---
 

@@ -40,7 +40,7 @@
   3. Створено структуру папок `docs/governance/`, `docs/tasks/`, `docs/roadmap/`, `docs/reports/`, `docs/templates/`.
   4. Скопійовано конституції v2.0.
   5. Створено `PROJECT_PROFILE.md`, `DEFINITION_OF_DONE.md`, `CURRENT_STATE.md`, `TASK_BOARD.md`, `SESSION_LOG.md`, `DECISIONS.md`, `OWNER_INBOX.md`, `ROADMAP.md`, `THIRD_PARTY.md`.
-- **Стан:** Гілка `main`, файли підготовлені до коміту.
+- **Стан:** Гілка `main` @ `814edbb`.
 - **Зупинився на:** Очікування рішення Власника щодо `Owner Approved` для результатів Етапу 0.
 - **Наступний крок:** Отримати рішення Власника щодо ліцензії та переходу до Етапу 1; призначити Агента дослідження продукту для `TASK-001`.
 - **Увага / пастки:** Глобальна змінна `JAVA_HOME` потребує налаштування на шлях до JBR Android Studio при збірці проекту.

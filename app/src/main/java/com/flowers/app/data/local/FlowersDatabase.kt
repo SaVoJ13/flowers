@@ -60,27 +60,39 @@ abstract class FlowersDatabase : RoomDatabase() {
     ) : RoomDatabase.Callback() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
+            populateIfEmpty(context)
+        }
+
+        override fun onOpen(db: SupportSQLiteDatabase) {
+            super.onOpen(db)
+            populateIfEmpty(context)
+        }
+
+        private fun populateIfEmpty(context: Context) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val database = getInstance(context)
                     val gson = Gson()
 
-                    // 1. Prepopulate Catalog Plants
-                    val catalogJson = context.assets.open("content/PLANT_CATALOG.json")
-                        .bufferedReader().use { it.readText() }
-                    val catalogType = object : TypeToken<List<CatalogPlantEntity>>() {}.type
-                    val catalogList: List<CatalogPlantEntity> = gson.fromJson(catalogJson, catalogType)
-                    database.catalogDao().insertAll(catalogList)
+                    // 1. Prepopulate Catalog Plants if empty
+                    if (database.catalogDao().count() == 0) {
+                        val catalogJson = context.assets.open("content/PLANT_CATALOG.json")
+                            .bufferedReader().use { it.readText() }
+                        val catalogType = object : TypeToken<List<CatalogPlantEntity>>() {}.type
+                        val catalogList: List<CatalogPlantEntity> = gson.fromJson(catalogJson, catalogType)
+                        database.catalogDao().insertAll(catalogList)
+                    }
 
-                    // 2. Prepopulate Care Pods
-                    val podsJson = context.assets.open("content/CARE_PODS.json")
-                        .bufferedReader().use { it.readText() }
-                    val podsType = object : TypeToken<List<CarePodEntity>>() {}.type
-                    val podsList: List<CarePodEntity> = gson.fromJson(podsJson, podsType)
-                    database.carePodDao().insertAll(podsList)
-
+                    // 2. Prepopulate Care Pods if empty
+                    if (database.carePodDao().count() == 0) {
+                        val podsJson = context.assets.open("content/CARE_PODS.json")
+                            .bufferedReader().use { it.readText() }
+                        val podsType = object : TypeToken<List<CarePodEntity>>() {}.type
+                        val podsList: List<CarePodEntity> = gson.fromJson(podsJson, podsType)
+                        database.carePodDao().insertAll(podsList)
+                    }
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    android.util.Log.e("FlowersDatabase", "Failed to populate database", e)
                 }
             }
         }

@@ -12,9 +12,12 @@ import com.flowers.app.data.local.entity.PlantEntity
 import com.flowers.app.data.model.SymptomTreeRoot
 import com.flowers.app.domain.ReminderCalculator
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class FlowersRepositoryImpl(
@@ -26,6 +29,33 @@ class FlowersRepositoryImpl(
 ) : FlowersRepository {
 
     private var cachedSymptomTree: SymptomTreeRoot? = null
+
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            ensurePopulated()
+        }
+    }
+
+    private suspend fun ensurePopulated() {
+        try {
+            if (catalogDao.count() == 0) {
+                val catalogJson = context.assets.open("content/PLANT_CATALOG.json")
+                    .bufferedReader().use { it.readText() }
+                val catalogType = object : TypeToken<List<CatalogPlantEntity>>() {}.type
+                val catalogList: List<CatalogPlantEntity> = Gson().fromJson(catalogJson, catalogType)
+                catalogDao.insertAll(catalogList)
+            }
+            if (carePodDao.count() == 0) {
+                val podsJson = context.assets.open("content/CARE_PODS.json")
+                    .bufferedReader().use { it.readText() }
+                val podsType = object : TypeToken<List<CarePodEntity>>() {}.type
+                val podsList: List<CarePodEntity> = Gson().fromJson(podsJson, podsType)
+                carePodDao.insertAll(podsList)
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("FlowersRepository", "Failed to populate catalog/pods", e)
+        }
+    }
 
     override fun getAllActivePlants(): Flow<List<PlantEntity>> = plantDao.getAllActivePlants()
 

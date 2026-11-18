@@ -24,12 +24,14 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -58,6 +60,22 @@ fun AddEditPlantScreen(
     var lightLevel by remember { mutableStateOf("INDIRECT") }
     var checkIntervalDays by remember { mutableFloatStateOf(7f) }
     var isExpanded by remember { mutableStateOf(false) }
+
+    LaunchedEffect(plantId, catalogPlants) {
+        if (plantId != null) {
+            val plant = repository.getPlantById(plantId)
+            if (plant != null) {
+                customName = plant.customName
+                roomLocation = plant.roomLocation
+                lightLevel = plant.lightLevel
+                checkIntervalDays = plant.checkIntervalDays.toFloat()
+                if (plant.speciesId != null) {
+                    selectedSpecies = catalogPlants.find { it.id == plant.speciesId }
+                        ?: repository.getCatalogPlantById(plant.speciesId)
+                }
+            }
+        }
+    }
 
     val commonRooms = listOf("Вітальня", "Спальня", "Кухня", "Балкон", "Кабінет")
 
@@ -94,17 +112,18 @@ fun AddEditPlantScreen(
             // 2. Select Species from Catalog
             ExposedDropdownMenuBox(
                 expanded = isExpanded,
-                onExpandedChange = { isExpanded = !isExpanded },
+                onExpandedChange = { isExpanded = it },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
-                    value = selectedSpecies?.nameUk ?: "Оберіть вид із каталогу (необов'язково)",
+                    value = selectedSpecies?.let { "${it.nameUk} (${it.nameLatin})" } ?: "",
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Ботанічний вид") },
+                    label = { Text("Ботанічний вид із каталогу") },
+                    placeholder = { Text("Оберіть вид із каталогу (необов'язково)") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
                     modifier = Modifier
-                        .menuAnchor()
+                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                         .fillMaxWidth()
                 )
                 ExposedDropdownMenu(

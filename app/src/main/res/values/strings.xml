@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Flowers</string>
+    <string name="app_subtitle">Догляд за кімнатними рослинами</string>
+    <string name="nav_today">Сьогодні</string>
+    <string name="nav_plants">Мої рослини</string>
+    <string name="nav_catalog">Довідник</string>
+    <string name="nav_settings">Налаштування</string>
+</resources>

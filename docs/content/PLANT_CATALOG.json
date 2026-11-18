@@ -1,0 +1,222 @@
+[
+  {
+    "id": "zamioculcas",
+    "name_uk": "Заміокулькас",
+    "name_latin": "Zamioculcas zamiifolia",
+    "popular_name": "Доларове дерево",
+    "difficulty": "Дуже легко",
+    "light": "Тінь або розсіяне світло (витримує слабке освітлення)",
+    "default_check_interval_days": 14,
+    "soil_type": "Легкий, пухкий, із великою кількістю перліту та піску (для сукулентів)",
+    "toxic_to_pets": true
+  },
+  {
+    "id": "sansevieria",
+    "name_uk": "Сансевієрія",
+    "name_latin": "Dracaena trifasciata",
+    "popular_name": "Тещин язик / Щучий хвіст",
+    "difficulty": "Дуже легко",
+    "light": "Будь-яке: від глибокої тіні до яскравого сонця",
+    "default_check_interval_days": 14,
+    "soil_type": "Добре дренований субстрат для кактусів і сукулентів",
+    "toxic_to_pets": true
+  },
+  {
+    "id": "epipremnum",
+    "name_uk": "Епіпремнум золотистий",
+    "name_latin": "Epipremnum aureum",
+    "popular_name": "Потос",
+    "difficulty": "Легко",
+    "light": "Яскраве розсіяне світло або напівтінь",
+    "default_check_interval_days": 7,
+    "soil_type": "Універсальний торф'яний субстрат із додаванням перліту",
+    "toxic_to_pets": true
+  },
+  {
+    "id": "monstera",
+    "name_uk": "Монстера делікатесна",
+    "name_latin": "Monstera deliciosa",
+    "popular_name": "Монстера",
+    "difficulty": "Легко",
+    "light": "Яскраве розсіяне світло (без прямого полуденного сонця)",
+    "default_check_interval_days": 7,
+    "soil_type": "Пухкий повітропроникний субстрат (торф, кора, перліт, кокосові чіпси)",
+    "toxic_to_pets": true
+  },
+  {
+    "id": "spathiphyllum",
+    "name_uk": "Спатифілум",
+    "name_latin": "Spathiphyllum wallisii",
+    "popular_name": "Жіноче щастя",
+    "difficulty": "Легко",
+    "light": "Розсіяне світло або напівтінь (не любить пряме сонце)",
+    "default_check_interval_days": 5,
+    "soil_type": "Поживний, вологоємний, але повітропроникний ґрунт",
+    "toxic_to_pets": true
+  },
+  {
+    "id": "chlorophytum",
+    "name_uk": "Хлорофітум чубатий",
+    "name_latin": "Chlorophytum comosum",
+    "popular_name": "Хлорофітум",
+    "difficulty": "Дуже легко",
+    "light": "Яскраве розсіяне або напівтінь",
+    "default_check_interval_days": 6,
+    "soil_type": "Універсальний ґрунт із гарним дренажем",
+    "toxic_to_pets": false
+  },
+  {
+    "id": "crassula",
+    "name_uk": "Красула (Товстянка)",
+    "name_latin": "Crassula ovata",
+    "popular_name": "Грошове дерево",
+    "difficulty": "Легко",
+    "light": "Яскраве світло, переносить кілька годин прямого сонця",
+    "default_check_interval_days": 10,
+    "soil_type": "Субстрат для кактусів і сукулентів із високим вмістом піску/перліту",
+    "toxic_to_pets": true
+  },
+  {
+    "id": "ficus_elastica",
+    "name_uk": "Фікус каучуконосний",
+    "name_latin": "Ficus elastica",
+    "popular_name": "Фікус еластика",
+    "difficulty": "Середньо",
+    "light": "Яскраве розсіяне світло без протягів",
+    "default_check_interval_days": 7,
+    "soil_type": "Універсальний родючий субстрат із дренажем",
+    "toxic_to_pets": true
+  },
+  {
+    "id": "ficus_benjamina",
+    "name_uk": "Фікус Бенджаміна",
+    "name_latin": "Ficus benjamina",
+    "popular_name": "Бенджамін",
+    "difficulty": "Середньо",
+    "light": "Яскраве розсіяне світло, погано переносить перестановку і протяги",
+    "default_check_interval_days": 6,
+    "soil_type": "Пухкий ґрунт із дернової землі, торфу та піску",
+    "toxic_to_pets": true
+  },
+  {
+    "id": "dracaena_marginata",
+    "name_uk": "Драцена облямована",
+    "name_latin": "Dracaena marginata",
+    "popular_name": "Драцена",
+    "difficulty": "Легко",
+    "light": "Розсіяне світло або легка напівтінь",
+    "default_check_interval_days": 8,
+    "soil_type": "Легкий слабокислий субстрат для пальм і драцен",
+    "toxic_to_pets": true
+  },
+  {
+    "id": "peperomia",
+    "name_uk": "Пеперомія туполиста",
+    "name_latin": "Peperomia obtusifolia",
+    "popular_name": "Пеперомія",
+    "difficulty": "Легко",
+    "light": "Яскраве розсіяне або помірне світло",
+    "default_check_interval_days": 8,
+    "soil_type": "Пухка суміш листової землі, торфу та перліту",
+    "toxic_to_pets": false
+  },
+  {
+    "id": "aglaonema",
+    "name_uk": "Аглаонема",
+    "name_latin": "Aglaonema commutatum",
+    "popular_name": "Аглаонема",
+    "difficulty": "Легко",
+    "light": "Тінь або напівтінь (сорти з червоним листям потребують більше світла)",
+    "default_check_interval_days": 8,
+    "soil_type": "Повітропроникна суміш на основі торфу та кори",
+    "toxic_to_pets": true
+  },
+  {
+    "id": "philodendron",
+    "name_uk": "Філодендрон лазячий",
+    "name_latin": "Philodendron hederaceum",
+    "popular_name": "Серцелистий філодендрон",
+    "difficulty": "Легко",
+    "light": "Помірне або розсіяне світло",
+    "default_check_interval_days": 7,
+    "soil_type": "Ароїдний мікс: торф, кокосове волокно, перліт",
+    "toxic_to_pets": true
+  },
+  {
+    "id": "syngonium",
+    "name_uk": "Сингоніум",
+    "name_latin": "Syngonium podophyllum",
+    "popular_name": "Стрілоподібна ліана",
+    "difficulty": "Легко",
+    "light": "Яскраве розсіяне світло без прямих променів",
+    "default_check_interval_days": 6,
+    "soil_type": "Слабокислий легкий поживний субстрат",
+    "toxic_to_pets": true
+  },
+  {
+    "id": "aloe_vera",
+    "name_uk": "Алое вера",
+    "name_latin": "Aloe barbadensis",
+    "popular_name": "Алое",
+    "difficulty": "Дуже легко",
+    "light": "Багато прямого або яскравого сонця (південне вікно)",
+    "default_check_interval_days": 14,
+    "soil_type": "Бідний супіщаний субстрат із відмінним дренажем",
+    "toxic_to_pets": true
+  },
+  {
+    "id": "tradescantia",
+    "name_uk": "Традесканція зебрина",
+    "name_latin": "Tradescantia zebrina",
+    "popular_name": "Зебрина",
+    "difficulty": "Дуже легко",
+    "light": "Яскраве розсіяне світло для збереження смугастого забарвлення",
+    "default_check_interval_days": 5,
+    "soil_type": "Універсальний ґрунт із додаванням вермикуліту",
+    "toxic_to_pets": true
+  },
+  {
+    "id": "maranta",
+    "name_uk": "Маранта триколірна",
+    "name_latin": "Maranta leuconeura",
+    "popular_name": "Молитовна рослина",
+    "difficulty": "Середньо",
+    "light": "М'яка напівтінь або розсіяне світло; боїться сухого повітря",
+    "default_check_interval_days": 5,
+    "soil_type": "Вологоємний, слабокислий, пухкий субстрат",
+    "toxic_to_pets": false
+  },
+  {
+    "id": "schefflera",
+    "name_uk": "Шефлера деревоподібна",
+    "name_latin": "Schefflera arboricola",
+    "popular_name": "Парасолькове дерево",
+    "difficulty": "Легко",
+    "light": "Яскраве розсіяне світло",
+    "default_check_interval_days": 7,
+    "soil_type": "Дерновий субстрат із піском і торфом",
+    "toxic_to_pets": true
+  },
+  {
+    "id": "calathea",
+    "name_uk": "Калатея Макоя",
+    "name_latin": "Calathea makoyana",
+    "popular_name": "Калатея павичева",
+    "difficulty": "Вимагає уваги",
+    "light": "Стабільне розсіяне світло без перепадів температур",
+    "default_check_interval_days": 5,
+    "soil_type": "Спеціальний пухкий субстрат для марантових",
+    "toxic_to_pets": false
+  },
+  {
+    "id": "begonia",
+    "name_uk": "Бегонія плямиста",
+    "name_latin": "Begonia maculata",
+    "popular_name": "Бегонія в горошок",
+    "difficulty": "Середньо",
+    "light": "Яскраве непряме світло",
+    "default_check_interval_days": 6,
+    "soil_type": "Поживний легкий торф'яний субстрат із перлітом",
+    "toxic_to_pets": true
+  }
+]

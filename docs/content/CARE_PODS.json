@@ -1,0 +1,146 @@
+[
+  {
+    "id": "pod_gen_finger_test",
+    "plant_id": "general_beginner",
+    "category": "moisture_check",
+    "title_uk": "Тест пальцем на 2 см",
+    "content_uk": "Занурте вказівний палець у ґрунт на дві фаланги. Якщо відчуваєте прохолоду й на шкірі лишаються вологі грудочки — поливати зарано!",
+    "icon": "fingerprint"
+  },
+  {
+    "id": "pod_gen_drainage",
+    "plant_id": "general_beginner",
+    "category": "common_mistake",
+    "title_uk": "Дренажний отвір — це життя",
+    "content_uk": "Ніколи не садіть рослини в горщики без отвору на дні. Застійна вода на дні за 5-7 днів призводить до безповоротного гниття коренів.",
+    "icon": "warning"
+  },
+  {
+    "id": "pod_gen_water_quality",
+    "plant_id": "general_beginner",
+    "category": "general_rule",
+    "title_uk": "Якою водою поливати?",
+    "content_uk": "Тільки відстояною водою кімнатної температури (20-23°C). Холодна хлорована вода з-під крана спричиняє температурний шок та чорні плями.",
+    "icon": "water_drop"
+  },
+  {
+    "id": "pod_gen_indirect_light",
+    "plant_id": "general_beginner",
+    "category": "light_placement",
+    "title_uk": "Що таке «розсіяне світло»?",
+    "content_uk": "Місце, де достатньо світло читати книгу без лампи, але прямі сонячні промені не падають на листя крізь скло. Оптимально: 1-1.5 м від вікна.",
+    "icon": "wb_sunny"
+  },
+  {
+    "id": "pod_zamio_moisture",
+    "plant_id": "zamioculcas",
+    "category": "moisture_check",
+    "title_uk": "Як перевіряти ґрунт заміокулькаса",
+    "content_uk": "Ґрунт у горщику має повністю просохнути аж до самого дна перед наступним поливом. Бульби накопичують воду на місяць наперед.",
+    "icon": "water_drop"
+  },
+  {
+    "id": "pod_zamio_light",
+    "plant_id": "zamioculcas",
+    "category": "light_placement",
+    "title_uk": "Світло для заміокулькаса",
+    "content_uk": "Росте навіть у глибині кімнати та при штучному світлі. Пряме пекуче сонце спалює листя, утворюючи сухі жовті плями.",
+    "icon": "lightbulb"
+  },
+  {
+    "id": "pod_zamio_mistake",
+    "plant_id": "zamioculcas",
+    "category": "common_mistake",
+    "title_uk": "Головна помилка — часті поливи",
+    "content_uk": "Краще забути полити його на 4 тижні, ніж полити двічі за 10 днів. Від переливу його бульби миттєво загнивають.",
+    "icon": "error_outline"
+  },
+  {
+    "id": "pod_sansev_moisture",
+    "plant_id": "sansevieria",
+    "category": "moisture_check",
+    "title_uk": "Перевірка ґрунту сансевієрії",
+    "content_uk": "Перевіряйте дерев'яною шпажкою: вона повинна виходити з глибини сухою та чистою. Взимку достатньо перевіряти раз на 3 тижні.",
+    "icon": "water_drop"
+  },
+  {
+    "id": "pod_sansev_mistake",
+    "plant_id": "sansevieria",
+    "category": "common_mistake",
+    "title_uk": "Вода в розетку листя",
+    "content_uk": "Лийте воду по краю горщика. Вода, що потрапила всередину розетки листя, викликає гниль точки росту.",
+    "icon": "warning"
+  },
+  {
+    "id": "pod_spathi_moisture",
+    "plant_id": "spathiphyllum",
+    "category": "moisture_check",
+    "title_uk": "Спатифілум сам подає сигнал",
+    "content_uk": "Поливайте, коли верхній шар (1.5-2 см) підсохне, а листя ледь-ледь почне втрачати пружність. Не доводьте до повного падіння пагонів.",
+    "icon": "notifications_active"
+  },
+  {
+    "id": "pod_spathi_mistake",
+    "plant_id": "spathiphyllum",
+    "category": "common_mistake",
+    "title_uk": "Чорні кінчики листя",
+    "content_uk": "Чорні кінчики свідчать або про застій води в піддоні, або про занадто сухе повітря біля батареї. Зливайте воду з тарілки після поливу!",
+    "icon": "error_outline"
+  },
+  {
+    "id": "pod_monstera_moisture",
+    "plant_id": "monstera",
+    "category": "moisture_check",
+    "title_uk": "Перевірка ґрунту монстери",
+    "content_uk": "Верхні 3-4 см ґрунту мають просохнути між поливами. Ґрунт всередині має залишатися злегка вологим, але не болотистим.",
+    "icon": "water_drop"
+  },
+  {
+    "id": "pod_monstera_aerial_roots",
+    "plant_id": "monstera",
+    "category": "general_rule",
+    "title_uk": "Повітряні корені не обрізати!",
+    "content_uk": "Довгі темні вуса монстери вбирають вологу з повітря. Не зрізайте їх — краще направте їх назад у горщик або до мохової опори.",
+    "icon": "eco"
+  },
+  {
+    "id": "pod_epipremnum_moisture",
+    "plant_id": "epipremnum",
+    "category": "moisture_check",
+    "title_uk": "Перевірка епіпремнума",
+    "content_uk": "Поливайте, коли просохне верхня половина горщика. Якщо листя трохи втратило блиск і м'якшає — час напоїти рослину.",
+    "icon": "water_drop"
+  },
+  {
+    "id": "pod_crassula_moisture",
+    "plant_id": "crassula",
+    "category": "moisture_check",
+    "title_uk": "Тест м'якості листя товстянки",
+    "content_uk": "Легко стисніть нижній листочок пальцями: якщо він твердий, поливати категорично не можна! Поливайте, коли лист стає злегка підв'ялим.",
+    "icon": "touch_app"
+  },
+  {
+    "id": "pod_crassula_mistake",
+    "plant_id": "crassula",
+    "category": "common_mistake",
+    "title_uk": "Темний куток — ворог",
+    "content_uk": "При браку світла грошове дерево витягується, стебла стоншуються, а гілки ламаються під власною вагою. Тільки сонячне підвіконня!",
+    "icon": "wb_sunny"
+  },
+  {
+    "id": "pod_ficus_benjamina_drop",
+    "plant_id": "ficus_benjamina",
+    "category": "common_mistake",
+    "title_uk": "Чому фікус скидає листя?",
+    "content_uk": "Фікус Бенджаміна скидає зелене листя від протягу або зміни місця. Не рухайте горщик і тримайте подалі від відкритих кватирок взимку.",
+    "icon": "warning"
+  },
+  {
+    "id": "pod_chlorophytum_air",
+    "plant_id": "chlorophytum",
+    "category": "general_rule",
+    "title_uk": "Найвитриваліший фільтр повітря",
+    "content_uk": "Хлорофітум прощає недоливи завдяки м'ясистим бульбовим кореням. Коричневі кінчики листя з'являються від дуже сухого повітря.",
+    "icon": "air"
+  }
+]

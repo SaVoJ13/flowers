@@ -14,6 +14,7 @@ import com.flowers.app.domain.ReminderCalculator
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class FlowersRepositoryImpl(
@@ -54,7 +55,15 @@ class FlowersRepositoryImpl(
         catalogDao.getAllCatalogPlants()
 
     override fun searchCatalog(query: String): Flow<List<CatalogPlantEntity>> =
-        catalogDao.searchCatalog(query)
+        catalogDao.getAllCatalogPlants().map { plants ->
+            val trimmed = query.trim()
+            if (trimmed.isBlank()) plants
+            else plants.filter { plant ->
+                plant.nameUk.contains(trimmed, ignoreCase = true) ||
+                plant.nameLatin.contains(trimmed, ignoreCase = true) ||
+                plant.popularName.contains(trimmed, ignoreCase = true)
+            }
+        }
 
     override suspend fun getCatalogPlantById(speciesId: String): CatalogPlantEntity? =
         catalogDao.getCatalogPlantById(speciesId)

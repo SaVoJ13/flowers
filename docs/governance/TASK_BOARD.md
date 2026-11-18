@@ -20,6 +20,7 @@
 ---
 
 ## Завершено (Done)
+- [x] `TASK-015` [Hotfix] Виправлення пошуку рослин у вкладці Довідник (кирилиця, case-insensitivity, UI-фільтрація) (QA Verified)
 - [x] `TASK-000` [Етап 0] Аудит репозиторію, середовища та розгортання Governance-контуру v2.0 (Агент 0, Owner Approved)
 - [x] `TASK-001` [Етап 1] Дослідження ринку, аналіз відгуків Google Play, формування PRD (QA Verified, Owner Approved)
 - [x] `TASK-003` [Етап 2] Проєктування User Flows, навігації та макетів екранів MVP (QA Verified, Owner Approved)

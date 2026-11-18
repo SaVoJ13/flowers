@@ -15,11 +15,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -31,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.flowers.app.data.local.entity.CatalogPlantEntity
 import com.flowers.app.ui.components.CarePodCard
@@ -70,6 +73,13 @@ fun CatalogScreen(
                     onValueChange = { viewModel.onSearchQueryChanged(it) },
                     placeholder = { Text("Пошук за назвою (напр. Монстера, Фікус)") },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    trailingIcon = {
+                        if (uiState.searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { viewModel.clearSearchQuery() }) {
+                                Icon(Icons.Default.Clear, contentDescription = "Очистити")
+                            }
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
                     singleLine = true
@@ -98,14 +108,52 @@ fun CatalogScreen(
             // Plants List Section
             item {
                 Text(
-                    text = "Популярні кімнатні види (${uiState.plants.size})",
+                    text = if (uiState.searchQuery.isBlank()) {
+                        "Популярні кімнатні види (${uiState.plants.size})"
+                    } else {
+                        "Знайдено видів (${uiState.plants.size})"
+                    },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
             }
 
-            items(uiState.plants, key = { it.id }) { plant ->
-                CatalogPlantCard(plant = plant)
+            if (uiState.plants.isEmpty() && uiState.searchQuery.isNotBlank()) {
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        ),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "🔍 Нічого не знайдено",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = "За запитом «${uiState.searchQuery}» рослин не знайдено.\nСпробуйте іншу назву (наприклад, «фікус», «монстера», «алое», «щучий хвіст»).",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+            } else {
+                items(uiState.plants, key = { it.id }) { plant ->
+                    CatalogPlantCard(plant = plant)
+                }
             }
         }
     }

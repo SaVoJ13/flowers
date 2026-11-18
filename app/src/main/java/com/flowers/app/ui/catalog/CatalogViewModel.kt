@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 
 data class CatalogUiState(
@@ -25,21 +24,26 @@ class CatalogViewModel(
 
     private val _searchQuery = MutableStateFlow("")
 
-    val uiState: StateFlow<CatalogUiState> = _searchQuery.flatMapLatest { query ->
-        val plantsFlow = if (query.isBlank()) {
-            repository.getAllCatalogPlants()
+    val uiState: StateFlow<CatalogUiState> = combine(
+        repository.getAllCatalogPlants(),
+        repository.getGeneralPods(),
+        _searchQuery
+    ) { allPlants, pods, query ->
+        val trimmed = query.trim()
+        val filteredPlants = if (trimmed.isBlank()) {
+            allPlants
         } else {
-            repository.searchCatalog(query)
+            allPlants.filter { plant ->
+                plant.nameUk.contains(trimmed, ignoreCase = true) ||
+                plant.nameLatin.contains(trimmed, ignoreCase = true) ||
+                plant.popularName.contains(trimmed, ignoreCase = true)
+            }
         }
-        val podsFlow = repository.getGeneralPods()
-
-        combine(plantsFlow, podsFlow) { plants, pods ->
-            CatalogUiState(
-                plants = plants,
-                generalPods = pods,
-                searchQuery = query
-            )
-        }
+        CatalogUiState(
+            plants = filteredPlants,
+            generalPods = pods,
+            searchQuery = query
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -48,6 +52,10 @@ class CatalogViewModel(
 
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
+    }
+
+    fun clearSearchQuery() {
+        _searchQuery.value = ""
     }
 
     class Factory(private val repository: FlowersRepository) : ViewModelProvider.Factory {

@@ -35,7 +35,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import com.flowers.app.ui.components.AiDisclaimerText
 import com.flowers.app.ui.components.AiTexts
-import com.flowers.app.ui.components.isAiGenerated
+import com.flowers.app.ui.components.AiSafetyNotice
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -352,12 +352,12 @@ fun CatalogPlantCard(plant: CatalogPlantEntity) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            if (plant.isAiGenerated()) {
+            if (plant.isAiGenerated) {
                 Spacer(modifier = Modifier.height(6.dp))
                 AiDisclaimerText()
-            }
-
-            if (plant.toxicToPets) {
+                Spacer(modifier = Modifier.height(2.dp))
+                AiSafetyNotice()
+            } else if (plant.toxicToPets) {
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = "🐾 Увага: токсична для котів та собак при жуванні",

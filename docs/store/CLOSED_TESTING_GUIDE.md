@@ -1,6 +1,6 @@
 # ПОСІБНИК ЗАКРИТОГО ТЕСТУВАННЯ GOOGLE PLAY (CLOSED TESTING GUIDE)
 
-- **Застосунок:** Flowers (`com.flowers.app`)
+- **Застосунок:** Flowers (`com.savoj.flowers`)
 - **Етап:** Етап 6 — Підготовка до Google Play
 
 ---

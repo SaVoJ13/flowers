@@ -1,7 +1,7 @@
 # МАТЕРІАЛИ ДЛЯ GOOGLE PLAY (STORE LISTING) — FLOWERS
 
 - **Застосунок:** Flowers: Догляд за рослинами
-- **Пакет:** `com.flowers.app`
+- **Пакет:** `com.savoj.flowers`
 - **Версія:** 1.0.0 (MVP)
 - **Категорія:** Дім і сад (House & Home) / Стиль життя (Lifestyle)
 

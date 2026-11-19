@@ -5,7 +5,7 @@
 ---
 
 ## Беклог / Заплановано
-- [ ] `TASK-019` [Платна версія] Перехід ШІ-генерації на Firebase AI Logic + App Check (ключ Gemini не зберігається в застосунку). Відома проблема ADR-008, рішення ADR-009. **План готовий** (`docs/tasks/TASK-019-firebase-ai-logic.md`); очікує дій Власника в консолі Firebase за `docs/tasks/TASK-019-owner-firebase-guide.md` (підзавдання 019-A), далі реалізація 019-B…E.
+- [ ] `TASK-019` [Платна версія] Перехід ШІ-генерації на Firebase AI Logic + App Check (ключ Gemini не зберігається в застосунку). Відома проблема ADR-008, рішення ADR-009. **План готовий; applicationId змінено на `com.savoj.flowers` (ADR-010)** (`docs/tasks/TASK-019-firebase-ai-logic.md`); очікує дій Власника в консолі Firebase за `docs/tasks/TASK-019-owner-firebase-guide.md` (підзавдання 019-A), далі реалізація 019-B…E.
 - *(Усі інші заплановані завдання MVP виконано!)*
 
 ---

@@ -10,7 +10,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.flowers.app"
+        applicationId = "com.savoj.flowers"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

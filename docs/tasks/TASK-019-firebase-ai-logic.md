@@ -17,7 +17,7 @@
 | UI | `SettingsScreen.kt` (картка «Google Gemini API Ключ»: поле, кнопка «Зберегти», стан `isKeySaved`); `CatalogScreen.kt` (діалог генерації, тексти про Gemini); `CatalogViewModel` (`isPremium`) |
 | Збереження результату | Room: `catalogDao.insertAll`, `carePodDao.insertAll` (не змінюється) |
 | Тести | `GeminiPlantServiceTest` (парсинг відповіді), `GeminiConfigTest` |
-| Збірка | `applicationId = com.flowers.app`, minSdk 26, compileSdk/targetSdk 35, AGP 8.7.3, Kotlin 2.0.21, JDK 21 (L-004) |
+| Збірка | `applicationId = com.savoj.flowers` (змінено з `com.flowers.app`, ADR-010; `namespace` і Kotlin-пакети лишаються `com.flowers.app`), minSdk 26, compileSdk/targetSdk 35, AGP 8.7.3, Kotlin 2.0.21, JDK 21 (L-004) |
 
 ## 3. Що кажуть чинні офіційні джерела (звірено 2026-11-19)
 Джерела: firebase.google.com/docs/ai-logic (get-started, app-check, faq-and-troubleshooting, quotas, models), firebase.google.com/docs/app-check/android/play-integrity-provider, firebase.google.com/docs/android/setup, docs.cloud.google.com/billing/docs/how-to/budgets, aistudio.google.com/docs/rate-limits.
@@ -53,6 +53,13 @@
 ### 4.3. Документація приватності (обов'язково перед публікацією)
 `docs/privacy/PRIVACY_POLICY.md`, `DATA_SAFETY.md`, `docs/architecture/PERMISSIONS.md`: назва рослини, яку вводить користувач, передається в Google (Firebase AI Logic / Gemini); App Check/Play Integrity передає токен пристрою; оновити суперечливий п. PRD «жодних викликів Gemini» (docs/product/PRD.md:121). Це розширення збору даних → за п. 3.2 конституції потребує затвердження Власника.
 
+### 4.4. CI та `google-services.json`
+У репозиторії **немає CI**: каталогу `.github/` нема, workflow-файлів GitHub Actions чи іншого CI немає. Збірка виконується локально (JDK 21, `./gradlew.bat`). Тому наразі `google-services.json` лежить лише в `app/` на комп'ютері Власника. **Якщо CI з'явиться** (наприклад, GitHub Actions), порядок такий:
+1. Власник кодує файл у base64 (PowerShell: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("app\google-services.json"))`) і додає результат як **GitHub Secret** `GOOGLE_SERVICES_JSON_BASE64` (репозиторій → Settings → Secrets and variables → Actions → New repository secret). Секрети репозиторію належать до п. 3.2 конституції, тож це робить Власник.
+2. Крок workflow перед збіркою: `echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 -d > app/google-services.json`.
+3. Якщо CI лише компілює й проганяє юніт-тести, debug-токен App Check не потрібен; для інструментальних тестів із Firebase знадобиться окремий debug-токен у секреті.
+4. Без секрету збірка падає на плагіні `google-services` (файл відсутній). На pull request із форків секрети недоступні, тому такі збірки треба робити без Firebase (окремий flavor або заглушка).
+
 ## 5. Тестування
 1. Юніт: парсинг (`GeminiPlantServiceTest`) без змін; тест сталості `GEMINI_MODEL`; нових мережевих юніт-тестів не пишемо (мок Firebase SDK надлишковий).
 2. Збірка: `assembleDebug` і `assembleRelease` (JDK 21) без помилок; `google-services.json` присутній лише локально.
@@ -86,3 +93,4 @@
 ## 9. Журнал виконання (Append-only)
 - `2026-11-19`: Створено картку TASK-019. Власник вирівняв локальну `main` з `origin/main` (резервна гілка `backup/local-main-2026-11-19`). Вивчено поточну інтеграцію, звірено чинну офіційну документацію Firebase AI Logic, App Check, Play Integrity, білінгу. Написано план та інструкцію Власника. Код не змінювався.
 - Наступний крок: Власник виконує інструкцію (`docs/tasks/TASK-019-owner-firebase-guide.md`) і надсилає `google-services.json`.
+- `2026-11-19`: Блокер від Власника: `com.flowers.app` зайнятий у Google Play. Рішення Власника: новий applicationId `com.savoj.flowers` (ADR-010). Інструкцію Власника оновлено (крок 6.3 за security checklist), CI в репозиторії немає (§4.4). Реєстрацію в Firebase робити лише з новим ID.

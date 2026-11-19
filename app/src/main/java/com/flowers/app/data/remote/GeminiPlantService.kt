@@ -82,16 +82,16 @@ class GeminiPlantService(
             }
         """.trimIndent()
 
-        val models = listOf("gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash")
         var lastErrorMessage = ""
 
-        for (model in models) {
+        // Єдина модель з GeminiConfig; ключ передається в заголовку, а не в URL (щоб не потрапляв у логи).
+        run {
             try {
-                val urlString = "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$trimmedKey"
-                val url = URL(urlString)
+                val url = URL(geminiGenerateContentUrl())
                 val conn = url.openConnection() as HttpURLConnection
                 conn.requestMethod = "POST"
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+                conn.setRequestProperty("x-goog-api-key", trimmedKey)
                 conn.connectTimeout = 15000
                 conn.readTimeout = 20000
                 conn.doOutput = true

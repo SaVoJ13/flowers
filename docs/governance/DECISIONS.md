@@ -77,3 +77,12 @@
   6. Назву моделі пізніше винести у Firebase Remote Config (рекомендація документації); поки лишається `GEMINI_MODEL`.
 - **Не підтверджено документацією:** розмір безкоштовних лімітів; чи потрібен Blaze саме в консолі проєкту; поведінка Play Integrity для APK, встановленого через adb; сумісність `firebase-ai` 18.2.0 з AGP 8.7.3 / Kotlin 2.0.21.
 - **Наслідки:** Зміни в збірці, приватності (дані йдуть у Google/Firebase, App Check) і витратах належать до п. 3.2 конституції: потрібне схвалення Власника перед реалізацією та публікацією. Відкат: тег `pre-task-019` + `git revert` + App Check «Unenforced». План: `docs/tasks/TASK-019-firebase-ai-logic.md`; інструкція Власнику: `docs/tasks/TASK-019-owner-firebase-guide.md`.
+
+## [ADR-010] 2026-11-19 — Зміна applicationId на `com.savoj.flowers`
+- **Статус:** Рішення Власника (`Owner Approved`).
+- **Контекст:** `com.flowers.app` уже зайнятий у Google Play (застосунок «Flowers App» від Flowers-Software GmbH). ID у Google Play унікальний і незмінний після публікації та фіксується при реєстрації в Firebase, тому змінити його треба ДО реєстрації в Firebase (TASK-019).
+- **Рішення:**
+  1. `applicationId = "com.savoj.flowers"` у `app/build.gradle.kts`.
+  2. `namespace` і Kotlin-пакети (`com.flowers.app.*`) **не перейменовуємо**: namespace не впливає на ідентичність застосунку в системі та Google Play, а перейменування всіх пакетів дало б лише ризик без користі. Маніфест використовує відносні імена (`.MainActivity` тощо); провайдерів, FileProvider і deep link немає.
+  3. Оновлено `docs/store/STORE_LISTING.md` і `CLOSED_TESTING_GUIDE.md`; історичні звіти й журнали попередніх завдань не змінюються (append-only).
+- **Наслідки:** Для системи це новий застосунок: на телефоні Власника старий `com.flowers.app` видалено, дані (рослини, налаштування, API-ключ) не перенесено. Усі реєстрації (Firebase, App Check, Play Console, обмеження ключа) робляться з новим ID.

@@ -113,3 +113,10 @@
   - Створено `docs/tasks/TASK-019-firebase-ai-logic.md` (план, тести, відкат) та `docs/tasks/TASK-019-owner-firebase-guide.md` (інструкція Власника зі значеннями `com.flowers.app` і SHA debug-ключа).
   - Додано ADR-009, оновлено TASK_BOARD і CURRENT_STATE.
 - **Підсумок:** план готовий; блокер для реалізації — дії Власника в консолі Firebase та `google-services.json`.
+
+---
+
+## Сесія 010 — 2026-11-19 — Агент 0
+- **Мета:** усунути блокер TASK-019: `com.flowers.app` зайнятий у Google Play.
+- **Результати:** `applicationId` → `com.savoj.flowers` (ADR-010); namespace і пакети без змін. Debug-збірка успішна, 19/19 тестів. На Samsung `RZCX326349A` видалено `com.flowers.app`, встановлено `com.savoj.flowers`, застосунок запущено (фокус вікна на `com.savoj.flowers/com.flowers.app.MainActivity`, збоїв у crash-буфері немає). Дані старої версії (рослини, налаштування, ключ) не перенесено. Оновлено інструкцію Власника (ID, крок 6.3), план TASK-019 (розділ CI: CI немає), store-документи.
+- **Підсумок:** можна реєструвати застосунок у Firebase з `com.savoj.flowers`.

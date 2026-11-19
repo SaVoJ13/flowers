@@ -1,10 +1,11 @@
 # Інструкція для Власника: налаштування Firebase для застосунку Flowers (TASK-019)
 
 > Для людини без програмістського досвіду. Робіть по одному кроку й нічого не пропускайте. Якщо екран у консолі виглядає трохи інакше (Google інколи перейменовує кнопки), шукайте пункт із такою ж назвою. Якщо застрягли, надішліть мені скриншот або текст екрана, не секретні значення.
+> **Важливо:** попередній applicationId `com.flowers.app` зайнятий у Google Play іншим розробником, тому застосунок Flowers тепер має ID `com.savoj.flowers` (ADR-010). Використовуйте лише його: після реєстрації в Firebase ID змінити не можна.
 > Орієнтовний час: 30–40 хвилин. Підготовка: комп'ютер, браузер з вашим Google-акаунтом (тим, де є Firebase), телефон Samsung під рукою.
 
 ## Ваші дані (вже підставлені)
-- **Назва пакета застосунку (applicationId):** `com.flowers.app`
+- **Назва пакета застосунку (applicationId):** `com.savoj.flowers`
 - **SHA-1 debug-ключа:** `36:F4:97:81:DB:F7:6A:7E:F2:3C:2D:D0:60:A5:FB:8D:8D:5A:97:CA`
 - **SHA-256 debug-ключа:** `41:70:D6:04:C7:74:1C:FD:EE:1E:2A:EA:50:10:26:36:04:79:8C:0D:9B:B7:5B:D4:43:00:ED:0C:D0:E1:9D:17`
 - Це відбитки (отримані командою `keytool -list -v` з файлу `C:\Users\cocro\.android\debug.keystore`) ключа, яким підписуються тестові збірки. Вони НЕ є паролем і не дають доступу, їх безпечно вставляти в консоль.
@@ -18,7 +19,7 @@
 
 ## Крок 2. Додайте Android-застосунок
 1. На головній сторінці проєкту натисніть іконку Android (зелений робот) або **Add app → Android**.
-2. **Android package name:** вставте точно `com.flowers.app` (без пробілів).
+2. **Android package name:** вставте точно `com.savoj.flowers` (без пробілів).
 3. **App nickname:** `Flowers` (необов'язково).
 4. **Debug signing certificate SHA-1:** вставте `36:F4:97:81:DB:F7:6A:7E:F2:3C:2D:D0:60:A5:FB:8D:8D:5A:97:CA`.
 5. Натисніть **Register app**.
@@ -31,7 +32,7 @@
 
 ## Крок 3. Додайте SHA-256 до застосунку
 1. Шестерня біля «Project Overview» → **Project settings** → вкладка **General**.
-2. Прокрутіть до **Your apps** → ваш застосунок `com.flowers.app`.
+2. Прокрутіть до **Your apps** → ваш застосунок `com.savoj.flowers`.
 3. У блоці **SHA certificate fingerprints** натисніть **Add fingerprint**.
 4. Вставте SHA-256: `41:70:D6:04:C7:74:1C:FD:EE:1E:2A:EA:50:10:26:36:04:79:8C:0D:9B:B7:5B:D4:43:00:ED:0C:D0:E1:9D:17` → **Save**. (SHA-1 з кроку 2 там уже має бути; якщо ні, додайте й його.)
 
@@ -53,7 +54,13 @@
 ## Крок 6. Обмеження ключів і доступу
 1. Ключ Gemini з AI Studio, яким ви користувалися в застосунку раніше, більше не потрібен. Відкрийте https://aistudio.google.com/apikey і **видаліть** його (або перегенеруйте), після того як нова версія застосунку запрацює. Це прибере зайвий витік.
 2. Не видаляйте ключі з приписками «(auto created by Firebase)» і не копіюйте їх нікуди. Усередині застосунку Gemini-ключа більше не буде: Google використовує свій службовий акаунт.
-3. У Google Cloud console (https://console.cloud.google.com, обрати проєкт Flowers) → **APIs & Services → Credentials**: у ключа «Browser/Android key (auto created by Firebase)» у розділі **API restrictions** НЕ повинно бути «Generative Language API» / «Gemini Developer API». Якщо є, зніміть цю позначку й збережіть. Якщо сумніваєтесь, надішліть мені скриншот.
+3. У Google Cloud console (https://console.cloud.google.com, обрати проєкт Flowers) → **APIs & Services → Credentials** → ключ **«Android key (auto created by Firebase)»** → розділ **API restrictions** («Restrict key»):
+   - **Обов'язково має бути дозволено** (у списку Selected APIs) **Firebase AI Logic API** (технічна назва `firebasevertexai.googleapis.com`). Якщо його немає, додайте (випадаючий список → знайти «Firebase AI Logic API» → OK) і натисніть **Save**.
+   - Інші дозволені API мають бути лише Firebase-службами, які справді потрібні застосунку; зайвого не додавайте.
+   - **Generative Language API** (він же Gemini Developer API) у цьому списку бути **не повинно**; якщо є, приберіть і збережіть.
+   - **Application restrictions** («Android apps»): додайте пакет `com.savoj.flowers` і SHA-1 `36:F4:97:81:DB:F7:6A:7E:F2:3C:2D:D0:60:A5:FB:8D:8D:5A:97:CA`. Пізніше, коли з'явиться release-ключ, додайте ще одну пару (пакет + SHA-1 release-підпису).
+   - Це відповідає чинному Firebase AI Logic security checklist (firebase.google.com/docs/ai-logic/security-checklist: у списку дозволених має бути Firebase AI Logic API, решта лише потрібні Firebase-служби, обмеження за пакетом і SHA-1) та FAQ (не додавати Gemini Developer API до списку дозволів Firebase-ключа). Зміни ключа можуть почати діяти за кілька хвилин.
+   - Якщо сумніваєтесь, надішліть мені скриншот цього екрана.
 
 ## Крок 7. Бюджетні сповіщення і ліміти (щоб не було несподіваного рахунку)
 > Важливо: бюджетне сповіщення лише **попереджає листом, але НЕ зупиняє витрати**, лист може прийти із запізненням у кілька годин. Тому ми додатково знижуємо ліміти (пункт 4) і захищаємо запити App Check.

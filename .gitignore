@@ -10,3 +10,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Google Services / Firebase (TASK-019)
+google-services.json
+app/google-services.json

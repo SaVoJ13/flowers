@@ -145,3 +145,21 @@
   - Отримано App Check debug secret з Logcat для подальшої реєстрації Власником у консолі Firebase.
   - Створено коміт та відкрито PR на GitHub (без злиття, очікує QA та підтвердження Власника).
 - **Підсумок:** підзавдання TASK-019-B виконано. PR відкрито для незалежної QA-перевірки.
+
+---
+
+## Сесія 012 — 2026-11-19 — Antigravity (незалежний QA-агент, модель Antigravity / Gemini)
+- **Мета:** незалежний аудит якості PR #5 (гілка `feat/task-019-firebase-ai-logic`, TASK-019-B) за чеклістом QA.
+- **Результати:**
+  - Робоча копія перевірена — чиста; гілку PR синхронізовано.
+  - Проведено повну перевірку збірки й тестів: `cleanTestDebugUnitTest`, `testDebugUnitTest` (18/18 зелені), `assembleDebug`, `assembleRelease` — BUILD SUCCESSFUL.
+  - З'ясовано різницю 19 → 18 тестів: видалено тест прямої URL-побудови `url is built from the single model constant and carries no key`, оскільки допоміжна функція `geminiGenerateContentUrl()` видалена разом із переходом на Firebase AI Logic SDK; константу моделі закріплено тестом `gemini model is constant and uses supported flash lite family`. Оформлено зауваження QA щодо необхідності покрити юніт-тестами метод `mapExceptionToHumanReadableMessage` у наступній технічній задачі.
+  - Секрети перевірено: `google-services.json` у `.gitignore` першим комітом (`125ab90`) і відсутній у всій історії git; debug-секрет App Check відсутній у коді, документації та git; нових ключів `AIza`, `apiKey`, `key=` у diff немає.
+  - App Check: debug-провайдер ізольовано в `src/debug` та `debugImplementation`; у dex релізного APK сліди `DebugAppCheckProviderFactory` відсутні. Ініціалізація в `FlowersApplication.onCreate()` виконується до звернень до Firebase.
+  - Код та UI: `GeminiPlantService` використовує `Firebase.ai` з `GenerativeBackend.googleAI()` та `GEMINI_MODEL`; парсинг і Room-збереження не зламано; помилки показуються українською без сирого JSON; у Налаштуваннях немає поля ключа; збережений ключ стирається з `SharedPreferences`.
+  - Документація: `docs/THIRD_PARTY.md` містить залежності Firebase SDK (Apache 2.0); зміни в `docs/governance/` дотримуються принципу append-only.
+  - Live-перевірка: враховано фактичне підтвердження Власника від 2026-11-19 11:52 (генерація картки працює на Samsung Galaxy S24 Ultra).
+  - Опубліковано коментар «QA Verified» у PR #5.
+  - PR #5 злито (squash) у гілку `main`, локальну робочу копію переключено на `main` та синхронізовано (`git pull origin main`).
+  - Оновлено `CURRENT_STATE.md` та `TASK_BOARD.md`.
+- **Підсумок:** підзавдання TASK-019-B успішно верифіковано (`QA Verified`) та злито в `main`.

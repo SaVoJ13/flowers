@@ -167,8 +167,7 @@ class FlowersRepositoryImpl(
 
     override suspend fun generatePlantWithAi(plantQuery: String): GeneratePlantResult {
         return geminiPlantService.generatePlantCareCard(
-            plantQuery = plantQuery,
-            apiKey = userPreferences.geminiApiKey
+            plantQuery = plantQuery
         )
     }
 }

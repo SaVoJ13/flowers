@@ -10,7 +10,13 @@
 - **Головна гілка:** `main`.
 - **Остання зміна (2026-11-19):** Hotfix TASK-018: вимкнену Google модель `gemini-1.5-flash` замінено на `gemini-3.5-flash-lite`, назву моделі винесено в константу `GEMINI_MODEL` (`data/remote/GeminiConfig.kt`), каскад моделей прибрано, ключ передається заголовком `x-goog-api-key`. PR #1 злито в `main`. Власник перевірив генерацію картки на телефоні: працює, 404 немає. Тести: 19/19.
 - **applicationId (2026-11-19):** змінено на `com.savoj.flowers` (ADR-010), бо `com.flowers.app` зайнятий у Google Play. Kotlin-пакети та namespace без змін. На телефоні Власника встановлено нову версію, стару видалено разом із даними. CI в репозиторії немає.
-- **Планування (2026-11-19):** TASK-019 — підготовлено план міграції на Firebase AI Logic + App Check (ADR-009) та інструкцію для Власника; код не змінювався. Локальну `main` вирівняно з `origin/main` (резервна гілка `backup/local-main-2026-11-19`).
+- **Планування та реалізація (2026-11-19):** TASK-019 — Власник виконав кроки 1–2 (створив проєкт Firebase «Flowers», надав `google-services.json`). Агент (Antigravity) реалізував підзавдання 019-B:
+  - `google-services.json` першим комітом додано у `.gitignore` (`125ab90`), створено тег `pre-task-019` на `main`.
+  - Підключено Firebase BoM 35.2.0, `firebase-ai` 18.2.0, `firebase-appcheck-playintegrity`, `firebase-appcheck-debug` (debug-only).
+  - Налаштовано App Check з мультисорсовим розділенням (`src/debug` та `src/release`), у релізному APK debug-провайдер відсутній.
+  - `GeminiPlantService` переведено на `Firebase.ai(backend = GenerativeBackend.googleAI())`.
+  - З `SettingsScreen` та `UserPreferences` видалено введення та зберігання API-ключа, додано інформаційну картку про захист через App Check.
+  - Тести пройдено (18/18), `assembleDebug` та `assembleRelease` успішні. Відкрито PR для незалежного QA.
 - **Попередня зміна:** Реалізація моделі Freemium та інтеграція сервісу Google Gemini Flash для створення карток догляду за рослинами на льоту (TASK-017, QA Verified). Додано 1 новий тест (всього 17/17 тестів зелених).
 
 ---

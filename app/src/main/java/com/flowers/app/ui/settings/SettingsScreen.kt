@@ -17,14 +17,11 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.VpnKey
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -46,8 +43,6 @@ fun SettingsScreen(
     userPreferences: UserPreferences
 ) {
     var notificationsEnabled by remember { mutableStateOf(true) }
-    var apiKeyInput by remember { mutableStateOf(userPreferences.geminiApiKey) }
-    var isKeySaved by remember { mutableStateOf(userPreferences.geminiApiKey.isNotBlank()) }
 
     Scaffold(
         topBar = {
@@ -121,7 +116,7 @@ fun SettingsScreen(
                 }
             }
 
-            // 2. Gemini AI Key Card
+            // 2. AI Generator Info Card (Firebase App Check)
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -130,52 +125,23 @@ fun SettingsScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.VpnKey, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Icon(Icons.Default.Security, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
-                            Text("Google Gemini API Ключ", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                            Text("ШІ-генератор догляду", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                             Text(
-                                text = if (isKeySaved) "Ключ налаштовано ✅" else "Потрібен для ШІ-генератора ⚠️",
+                                text = "Захищено Firebase App Check ✅",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = if (isKeySaved) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = apiKeyInput,
-                        onValueChange = {
-                            apiKeyInput = it
-                            isKeySaved = false
-                        },
-                        label = { Text("API Ключ Gemini") },
-                        placeholder = { Text("Вставте AI Studio ключ тут") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
-                    )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Безкоштовно на aistudio.google.com",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Button(
-                            onClick = {
-                                userPreferences.geminiApiKey = apiKeyInput
-                                isKeySaved = apiKeyInput.isNotBlank()
-                            },
-                            enabled = apiKeyInput != userPreferences.geminiApiKey || !isKeySaved,
-                            shape = RoundedCornerShape(10.dp)
-                        ) {
-                            Text("Зберегти")
-                        }
-                    }
+                    Text(
+                        text = "Генерація карток догляду за рослинами через Google Gemini працює автоматично через захищений сервіс Flowers. Вводити чи налаштовувати API-ключ більше не потрібно.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
 

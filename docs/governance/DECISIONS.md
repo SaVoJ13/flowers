@@ -86,3 +86,12 @@
   2. `namespace` і Kotlin-пакети (`com.flowers.app.*`) **не перейменовуємо**: namespace не впливає на ідентичність застосунку в системі та Google Play, а перейменування всіх пакетів дало б лише ризик без користі. Маніфест використовує відносні імена (`.MainActivity` тощо); провайдерів, FileProvider і deep link немає.
   3. Оновлено `docs/store/STORE_LISTING.md` і `CLOSED_TESTING_GUIDE.md`; історичні звіти й журнали попередніх завдань не змінюються (append-only).
 - **Наслідки:** Для системи це новий застосунок: на телефоні Власника старий `com.flowers.app` видалено, дані (рослини, налаштування, API-ключ) не перенесено. Усі реєстрації (Firebase, App Check, Play Console, обмеження ключа) робляться з новим ID.
+
+## [ADR-011] 2026-11-19 — Мультисорсова ізоляція Firebase App Check Debug Provider
+- **Статус:** Прийнято (рішення Розробника за делегуванням, п. 3.1).
+- **Контекст:** Під час реалізації TASK-019 необхідно підключити `DebugAppCheckProviderFactory` для тестування debug-збірок на реальному телефоні та емуляторі через adb, але суворо заборонено допускати витік debug-провайдера або токенів у релізний APK.
+- **Рішення:**
+  1. Залежність `firebase-appcheck-debug` підключено виключно через `debugImplementation`.
+  2. Створено два незалежних source sets: `app/src/debug/java/.../AppCheckHelper.kt` (встановлює `DebugAppCheckProviderFactory`) та `app/src/release/java/.../AppCheckHelper.kt` (встановлює `PlayIntegrityAppCheckProviderFactory`).
+  3. Виконано верифікацію dex релізного APK на відсутність `DebugAppCheckProviderFactory`.
+- **Наслідки:** Чиста архітектура безпеки, релізні збірки компілюються виключно з Play Integrity без тестових артефактів.

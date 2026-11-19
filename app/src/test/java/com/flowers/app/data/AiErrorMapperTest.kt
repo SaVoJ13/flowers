@@ -57,6 +57,14 @@ class AiErrorMapperTest {
     }
 
     @Test
+    fun `rate limit text is the owner approved wording`() {
+        assertEquals(
+            "Безкоштовний ліміт ШІ-генерації зараз вичерпано. Спробуйте пізніше сьогодні або завтра. Решта функцій працює.",
+            AiErrorMapper.map(Exception("429"))
+        )
+    }
+
+    @Test
     fun `resource exhausted quota and rate limit map to rate limit`() {
         assertEquals(AiErrorMapper.MSG_RATE_LIMIT, AiErrorMapper.map(Exception("RESOURCE_EXHAUSTED")))
         assertEquals(AiErrorMapper.MSG_RATE_LIMIT, AiErrorMapper.map(Exception("You exceeded your current quota")))

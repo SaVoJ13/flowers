@@ -50,7 +50,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.flowers.app.data.local.entity.CareEventEntity
+import com.flowers.app.ui.components.AiDisclaimerText
 import com.flowers.app.ui.components.CarePodCard
+import com.flowers.app.ui.components.isAiGenerated
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -200,6 +202,10 @@ fun PlantDetailScreen(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
+                        if (uiState.species?.isAiGenerated() == true) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            AiDisclaimerText()
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
                         LazyRow(
                             horizontalArrangement = Arrangement.spacedBy(12.dp)

@@ -20,6 +20,7 @@
 ---
 
 ## Завершено (Done)
+- [x] `TASK-018` [Hotfix] Заміна вимкненої моделі Gemini на gemini-3.5-flash-lite, константа GEMINI_MODEL (QA Verified; live на пристрої не перевірено)
 - [x] `TASK-017` [Етап 8] Інтеграція ШІ-генератора догляду (Gemini Flash), Freemium-архітектури та розширення каталогу (QA Verified)
 - [x] `TASK-016` [Hotfix] Виправлення вибору ботанічного виду та завантаження каталогу (Gson `@SerializedName`, pre-population) (QA Verified)
 - [x] `TASK-015` [Hotfix] Виправлення пошуку рослин у вкладці Довідник (кирилиця, case-insensitivity, UI-фільтрація) (QA Verified)

@@ -101,3 +101,15 @@
   - Зафіксовано відому проблему (ADR-008): користувач вводить власний ключ Gemini; для платної версії потрібен Firebase AI Logic + App Check.
 - **Підсумок:** Hotfix закрито, перевірку Власником пройдено. Наступне завдання — TASK-019 (потребує рішення Власника).
 - **Примітка:** локальна `main` розійшлася з `origin/main` (на GitHub squash-коміт, локально 13 непушнутих комітів); дерева файлів збігаються.
+
+---
+
+## Сесія 009 — 2026-11-19 — Агент 0 (роль Архітектора)
+- **Мета:** вирівняти локальну `main`; спланувати TASK-019 (Firebase AI Logic + App Check). Код не змінювався.
+- **Результати:**
+  - За дозволом Власника: `git status` чистий → резервна гілка `backup/local-main-2026-11-19` (коміт `7b0f0cb`) → `git fetch` → `git reset --hard origin/main`; `main` = `origin/main` (`c111a83`).
+  - Вивчено поточну інтеграцію (ключ у `UserPreferences`, запит у `GeminiPlantService`, `GEMINI_MODEL`, картка ключа в `SettingsScreen`).
+  - Звірено чинну офіційну документацію Firebase AI Logic, App Check, Play Integrity, налаштування Android та Cloud Billing. Не підтверджено документацією: точні безкоштовні ліміти, Blaze для конкретного проєкту, Play Integrity для adb-встановлень.
+  - Створено `docs/tasks/TASK-019-firebase-ai-logic.md` (план, тести, відкат) та `docs/tasks/TASK-019-owner-firebase-guide.md` (інструкція Власника зі значеннями `com.flowers.app` і SHA debug-ключа).
+  - Додано ADR-009, оновлено TASK_BOARD і CURRENT_STATE.
+- **Підсумок:** план готовий; блокер для реалізації — дії Власника в консолі Firebase та `google-services.json`.

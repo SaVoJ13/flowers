@@ -7,13 +7,16 @@ class UserPreferences(context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
+    init {
+        // TASK-019: Видаляємо раніше збережений локальний API-ключ Gemini, щоб він не лишався на пристроях
+        if (prefs.contains(KEY_GEMINI_API_KEY)) {
+            prefs.edit().remove(KEY_GEMINI_API_KEY).apply()
+        }
+    }
+
     var isPremium: Boolean
         get() = prefs.getBoolean(KEY_IS_PREMIUM, true) // Enabled by default for Owner / test device
         set(value) = prefs.edit().putBoolean(KEY_IS_PREMIUM, value).apply()
-
-    var geminiApiKey: String
-        get() = prefs.getString(KEY_GEMINI_API_KEY, "") ?: ""
-        set(value) = prefs.edit().putString(KEY_GEMINI_API_KEY, value.trim()).apply()
 
     companion object {
         private const val PREFS_NAME = "flowers_user_preferences"

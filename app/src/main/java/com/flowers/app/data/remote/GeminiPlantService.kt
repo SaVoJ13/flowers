@@ -4,15 +4,16 @@ import com.flowers.app.data.local.dao.CarePodDao
 import com.flowers.app.data.local.dao.CatalogDao
 import com.flowers.app.data.local.entity.CarePodEntity
 import com.flowers.app.data.local.entity.CatalogPlantEntity
+import com.google.firebase.Firebase
+import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.generationConfig
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
-import java.net.HttpURLConnection
-import java.net.URL
+import java.io.IOException
+import java.net.UnknownHostException
 
 data class GeneratedPlantResponse(
     @SerializedName("name_uk")
@@ -54,20 +55,27 @@ class GeminiPlantService(
 ) {
     private val gson = Gson()
 
+    private val generativeModel by lazy {
+        Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+            modelName = GEMINI_MODEL,
+            generationConfig = generationConfig {
+                responseMimeType = "application/json"
+                temperature = 0.2f
+            }
+        )
+    }
+
     suspend fun generatePlantCareCard(
-        plantQuery: String,
-        apiKey: String
+        plantQuery: String
     ): GeneratePlantResult = withContext(Dispatchers.IO) {
-        val trimmedKey = apiKey.trim()
-        if (trimmedKey.isBlank()) {
-            return@withContext GeneratePlantResult.Error(
-                "API-ключ Google Gemini не вказано. Будь ласка, вкажіть його у вкладці «Налаштування»."
-            )
+        val trimmedQuery = plantQuery.trim()
+        if (trimmedQuery.isBlank()) {
+            return@withContext GeneratePlantResult.Error("Вкажіть назву рослини для пошуку.")
         }
 
         val prompt = """
             Ти досвідчений ботанік та експерт із догляду за кімнатними рослинами.
-            Склади точну, структуровану картку догляду для кімнатної рослини: «$plantQuery».
+            Склади точну, структуровану картку догляду для кімнатної рослини: «$trimmedQuery».
             Поверни виключно валідний JSON-об'єкт із такими полями (без жодного markdown-обрамлення):
             {
               "name_uk": "офіційна українська назва виду",
@@ -82,108 +90,103 @@ class GeminiPlantService(
             }
         """.trimIndent()
 
-        var lastErrorMessage = ""
+        try {
+            val response = generativeModel.generateContent(prompt)
+            val responseText = response.text ?: ""
+            val generated = parseGeminiResponse(responseText)
 
-        // Єдина модель з GeminiConfig; ключ передається в заголовку, а не в URL (щоб не потрапляв у логи).
-        run {
-            try {
-                val url = URL(geminiGenerateContentUrl())
-                val conn = url.openConnection() as HttpURLConnection
-                conn.requestMethod = "POST"
-                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
-                conn.setRequestProperty("x-goog-api-key", trimmedKey)
-                conn.connectTimeout = 15000
-                conn.readTimeout = 20000
-                conn.doOutput = true
+            if (generated != null) {
+                val plantId = "ai_" + System.currentTimeMillis() + "_" + generated.nameLatin.lowercase()
+                    .replace(" ", "_")
+                    .filter { it.isLetterOrDigit() || it == '_' }
 
-                val requestJson = """
-                    {
-                      "contents": [
-                        {
-                          "parts": [
-                            {
-                              "text": ${gson.toJson(prompt)}
-                            }
-                          ]
-                        }
-                      ],
-                      "generationConfig": {
-                        "responseMimeType": "application/json",
-                        "temperature": 0.2
-                      }
-                    }
-                """.trimIndent()
+                val catalogEntity = CatalogPlantEntity(
+                    id = plantId,
+                    nameUk = generated.nameUk,
+                    nameLatin = generated.nameLatin,
+                    popularName = generated.popularName,
+                    difficulty = generated.difficulty,
+                    light = generated.light,
+                    defaultCheckIntervalDays = generated.defaultCheckIntervalDays.coerceIn(3, 28),
+                    soilType = generated.soilType,
+                    toxicToPets = generated.toxicToPets
+                )
 
-                OutputStreamWriter(conn.outputStream, "UTF-8").use { it.write(requestJson) }
+                val podEntity = CarePodEntity(
+                    id = "pod_$plantId",
+                    plantSpeciesId = plantId,
+                    category = "general_rule",
+                    titleUk = "Порада догляду: ${generated.popularName}",
+                    contentUk = generated.careTip,
+                    icon = "psychology"
+                )
 
-                val responseCode = conn.responseCode
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    val responseText = BufferedReader(InputStreamReader(conn.inputStream, "UTF-8")).use { it.readText() }
-                    val generated = parseGeminiResponse(responseText)
+                catalogDao.insertAll(listOf(catalogEntity))
+                carePodDao.insertAll(listOf(podEntity))
 
-                    if (generated != null) {
-                        val plantId = "ai_" + System.currentTimeMillis() + "_" + generated.nameLatin.lowercase()
-                            .replace(" ", "_")
-                            .filter { it.isLetterOrDigit() || it == '_' }
-
-                        val catalogEntity = CatalogPlantEntity(
-                            id = plantId,
-                            nameUk = generated.nameUk,
-                            nameLatin = generated.nameLatin,
-                            popularName = generated.popularName,
-                            difficulty = generated.difficulty,
-                            light = generated.light,
-                            defaultCheckIntervalDays = generated.defaultCheckIntervalDays.coerceIn(3, 28),
-                            soilType = generated.soilType,
-                            toxicToPets = generated.toxicToPets
-                        )
-
-                        val podEntity = CarePodEntity(
-                            id = "pod_$plantId",
-                            plantSpeciesId = plantId,
-                            category = "general_rule",
-                            titleUk = "Порада догляду: ${generated.popularName}",
-                            contentUk = generated.careTip,
-                            icon = "psychology"
-                        )
-
-                        // Save to Room database so it is permanently cached and available offline
-                        catalogDao.insertAll(listOf(catalogEntity))
-                        carePodDao.insertAll(listOf(podEntity))
-
-                        return@withContext GeneratePlantResult.Success(catalogEntity, podEntity)
-                    }
-                } else {
-                    val errorStream = conn.errorStream
-                    val errorBody = errorStream?.let { BufferedReader(InputStreamReader(it, "UTF-8")).use { r -> r.readText() } } ?: ""
-                    lastErrorMessage = "Код помилки $responseCode: $errorBody"
-                }
-            } catch (e: Exception) {
-                lastErrorMessage = e.localizedMessage ?: e.javaClass.simpleName
+                return@withContext GeneratePlantResult.Success(catalogEntity, podEntity)
+            } else {
+                return@withContext GeneratePlantResult.Error("Не вдалося розпізнати відповідь ШІ для цієї рослини. Спробуйте уточнити назву.")
             }
+        } catch (e: Exception) {
+            val errorMsg = mapExceptionToHumanReadableMessage(e)
+            return@withContext GeneratePlantResult.Error(errorMsg)
         }
-
-        GeneratePlantResult.Error("Не вдалося згенерувати картку догляду: $lastErrorMessage")
     }
 
-    private fun parseGeminiResponse(rawJson: String): GeneratedPlantResponse? {
-        return try {
-            val root = gson.fromJson(rawJson, Map::class.java)
-            val candidates = root["candidates"] as? List<*> ?: return null
-            val firstCandidate = candidates.firstOrNull() as? Map<*, *> ?: return null
-            val content = firstCandidate["content"] as? Map<*, *> ?: return null
-            val parts = content["parts"] as? List<*> ?: return null
-            val firstPart = parts.firstOrNull() as? Map<*, *> ?: return null
-            val text = firstPart["text"] as? String ?: return null
+    private fun mapExceptionToHumanReadableMessage(e: Exception): String {
+        val message = e.message.orEmpty()
+        val className = e.javaClass.name
 
-            val cleanedText = text
+        return when {
+            e is UnknownHostException || (e is IOException && (message.contains("Unable to resolve host", ignoreCase = true) || message.contains("network", ignoreCase = true))) -> {
+                "Відсутнє підключення до інтернету. Перевірте зв'язок та спробуйте ще раз."
+            }
+            message.contains("AppCheck", ignoreCase = true) || message.contains("app-check", ignoreCase = true) || message.contains("403") || message.contains("PERMISSION_DENIED", ignoreCase = true) || className.contains("AppCheck", ignoreCase = true) -> {
+                "Помилка перевірки пристрою (App Check). Доступ тимчасово обмежено."
+            }
+            message.contains("429") || message.contains("RESOURCE_EXHAUSTED", ignoreCase = true) || message.contains("quota", ignoreCase = true) || message.contains("rate limit", ignoreCase = true) -> {
+                "Перевищено ліміт запитів до ШІ. Будь ласка, зачекайте кілька хвилин і спробуйте знову."
+            }
+            message.contains("500") || message.contains("503") || message.contains("UNAVAILABLE", ignoreCase = true) -> {
+                "Сервіс ШІ тимчасово недоступний. Будь ласка, спробуйте пізніше."
+            }
+            else -> {
+                "Не вдалося згенерувати картку догляду. Будь ласка, перевірте назву рослини та спробуйте ще раз."
+            }
+        }
+    }
+
+    fun parseGeminiResponse(rawText: String): GeneratedPlantResponse? {
+        return try {
+            val cleaned = rawText
                 .trim()
                 .removePrefix("```json")
                 .removePrefix("```")
                 .removeSuffix("```")
                 .trim()
 
-            gson.fromJson(cleanedText, GeneratedPlantResponse::class.java)
+            // If rawText is wrapped in candidates JSON (legacy/REST format or test mock)
+            if (cleaned.startsWith("{") && cleaned.contains("\"candidates\"")) {
+                val root = gson.fromJson(cleaned, Map::class.java)
+                val candidates = root["candidates"] as? List<*>
+                val firstCandidate = candidates?.firstOrNull() as? Map<*, *>
+                val content = firstCandidate?.get("content") as? Map<*, *>
+                val parts = content?.get("parts") as? List<*>
+                val firstPart = parts?.firstOrNull() as? Map<*, *>
+                val text = firstPart?.get("text") as? String
+                if (text != null) {
+                    val candidateCleaned = text
+                        .trim()
+                        .removePrefix("```json")
+                        .removePrefix("```")
+                        .removeSuffix("```")
+                        .trim()
+                    return gson.fromJson(candidateCleaned, GeneratedPlantResponse::class.java)
+                }
+            }
+
+            gson.fromJson(cleaned, GeneratedPlantResponse::class.java)
         } catch (e: Exception) {
             e.printStackTrace()
             null

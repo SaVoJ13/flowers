@@ -94,3 +94,12 @@
 - `2026-11-19`: Створено картку TASK-019. Власник вирівняв локальну `main` з `origin/main` (резервна гілка `backup/local-main-2026-11-19`). Вивчено поточну інтеграцію, звірено чинну офіційну документацію Firebase AI Logic, App Check, Play Integrity, білінгу. Написано план та інструкцію Власника. Код не змінювався.
 - Наступний крок: Власник виконує інструкцію (`docs/tasks/TASK-019-owner-firebase-guide.md`) і надсилає `google-services.json`.
 - `2026-11-19`: Блокер від Власника: `com.flowers.app` зайнятий у Google Play. Рішення Власника: новий applicationId `com.savoj.flowers` (ADR-010). Інструкцію Власника оновлено (крок 6.3 за security checklist), CI в репозиторії немає (§4.4). Реєстрацію в Firebase робити лише з новим ID.
+- `2026-11-19`: Реалізовано підзавдання TASK-019-B (Розробник, Antigravity):
+  1. Перевірено наявність `app/google-services.json` з `package_name = com.savoj.flowers`. Файл надійно додано до `.gitignore` першим комітом гілки `feat/task-019-firebase-ai-logic` (`125ab90`).
+  2. Створено тег `pre-task-019` на актуальному `main` для безпечного відкату.
+  3. Підключено плагін `google-services` 4.6.0, `Firebase BoM` 35.2.0, `firebase-ai` 18.2.0, `firebase-appcheck-playintegrity` та `firebase-appcheck-debug` (лише `debugImplementation`).
+  4. Створено мультисорсове розділення `AppCheckHelper`: у `src/debug` — `DebugAppCheckProviderFactory`, у `src/release` — `PlayIntegrityAppCheckProviderFactory`. У релізному бінарнику налагоджувальний провайдер відсутній (верифіковано).
+  5. Переведено `GeminiPlantService` на `Firebase.ai(backend = GenerativeBackend.googleAI())`. Збережено парсинг, валідацію та збереження в Room. Додано переклад помилок на зрозумілу українську мову.
+  6. Вилучено введення та збереження API-ключа в `SettingsScreen` та `UserPreferences` (додано очищення старого ключа з `SharedPreferences`).
+  7. Оновлено `GeminiConfigTest`, успішно пройдено юніт-тести (`./gradlew.bat test`), зібрано `assembleDebug` та `assembleRelease`.
+  8. Оновлено `docs/THIRD_PARTY.md` з новими залежностями Firebase.

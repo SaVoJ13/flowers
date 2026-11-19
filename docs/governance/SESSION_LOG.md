@@ -120,3 +120,28 @@
 - **Мета:** усунути блокер TASK-019: `com.flowers.app` зайнятий у Google Play.
 - **Результати:** `applicationId` → `com.savoj.flowers` (ADR-010); namespace і пакети без змін. Debug-збірка успішна, 19/19 тестів. На Samsung `RZCX326349A` видалено `com.flowers.app`, встановлено `com.savoj.flowers`, застосунок запущено (фокус вікна на `com.savoj.flowers/com.flowers.app.MainActivity`, збоїв у crash-буфері немає). Дані старої версії (рослини, налаштування, ключ) не перенесено. Оновлено інструкцію Власника (ID, крок 6.3), план TASK-019 (розділ CI: CI немає), store-документи.
 - **Підсумок:** можна реєструвати застосунок у Firebase з `com.savoj.flowers`.
+
+---
+
+## Сесія 011 — 2026-11-19 — Antigravity (Розробник)
+- **Мета:** реалізація підзавдання TASK-019-B за планом `docs/tasks/TASK-019-firebase-ai-logic.md` (Firebase AI Logic + Firebase App Check).
+- **Результати:**
+  - Перевірено наявність `app/google-services.json` з `package_name = com.savoj.flowers`.
+  - Створено гілку `feat/task-019-firebase-ai-logic` від актуального `origin/main`.
+  - Першим комітом (`125ab90`) додано `google-services.json` до `.gitignore`, перевірено через `git check-ignore`.
+  - Поставлено тег `pre-task-019` на `main` для можливості відкату.
+  - Оновлено `gradle/libs.versions.toml`: додано `firebaseBom = "35.2.0"`, `googleServices = "4.6.0"`, бібліотеки `firebase-bom`, `firebase-ai` (18.2.0), `firebase-appcheck-playintegrity`, `firebase-appcheck-debug`, плагін `google-services`.
+  - Оновлено `build.gradle.kts` та `app/build.gradle.kts`.
+  - Створено класи `AppCheckHelper` у `app/src/debug` (DebugAppCheckProviderFactory) та `app/src/release` (PlayIntegrityAppCheckProviderFactory). Перевірено, що релізний APK не містить debug-провайдера.
+  - Ініціалізовано Firebase та App Check у `FlowersApplication.kt`.
+  - `GeminiPlantService.kt` переведено на `Firebase.ai(backend = GenerativeBackend.googleAI())`. Збережено парсинг відповіді, валідацію `coerceIn(3, 28)` та Room-збереження. Додано обробку винятків з виведенням зрозумілих україномовних помилок.
+  - Оновлено `FlowersRepositoryImpl.kt` (прибрано передачу ключа).
+  - У `UserPreferences.kt` прибрано властивість `geminiApiKey`, додано автоматичне одноразове видалення старого ключа з `SharedPreferences`.
+  - У `SettingsScreen.kt` вилучено блок введення ключа та збереження, додано картку «ШІ-генератор догляду: Захищено Firebase App Check ✅».
+  - Оновлено `GeminiConfigTest.kt` (перевірка константи моделі `gemini-3.5-flash-lite`).
+  - Успішно пройдено юніт-тести (`./gradlew.bat test`), зібрано `assembleDebug` та `assembleRelease`.
+  - Оновлено `docs/THIRD_PARTY.md` з новими залежностями Firebase (Apache 2.0).
+  - Застосунок встановлено на телефон Samsung Galaxy S24 Ultra (`RZCX326349A`).
+  - Отримано App Check debug secret з Logcat для подальшої реєстрації Власником у консолі Firebase.
+  - Створено коміт та відкрито PR на GitHub (без злиття, очікує QA та підтвердження Власника).
+- **Підсумок:** підзавдання TASK-019-B виконано. PR відкрито для незалежної QA-перевірки.

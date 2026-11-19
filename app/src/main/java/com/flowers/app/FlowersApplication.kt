@@ -6,8 +6,11 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.flowers.app.data.local.FlowersDatabase
 import com.flowers.app.data.repository.FlowersRepositoryImpl
+import com.flowers.app.data.security.AppCheckHelper
 import com.flowers.app.data.worker.DailyReminderWorker
 import com.flowers.app.data.worker.NotificationHelper
+import com.google.firebase.Firebase
+import com.google.firebase.initialize
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -26,6 +29,8 @@ class FlowersApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        Firebase.initialize(this)
+        AppCheckHelper.initAppCheck()
         NotificationHelper.createNotificationChannel(this)
         scheduleDailyReminder()
     }

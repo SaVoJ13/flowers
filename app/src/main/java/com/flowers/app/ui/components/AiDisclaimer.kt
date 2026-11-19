@@ -43,7 +43,13 @@ fun AiSafetyNotice(modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         TextButton(
-            onClick = { uriHandler.openUri(AiTexts.ASPCA_URL) },
+            onClick = {
+                try {
+                    uriHandler.openUri(AiTexts.ASPCA_URL)
+                } catch (e: Exception) {
+                    // Немає браузера: тихо ігноруємо, текст порадити ветеринара лишається видимим.
+                }
+            },
             contentPadding = PaddingValues(0.dp)
         ) {
             Text(AiTexts.ASPCA_LABEL, style = MaterialTheme.typography.labelSmall)

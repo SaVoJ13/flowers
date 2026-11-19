@@ -12,8 +12,6 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.IOException
-import java.net.UnknownHostException
 
 data class GeneratedPlantResponse(
     @SerializedName("name_uk")
@@ -129,31 +127,8 @@ class GeminiPlantService(
                 return@withContext GeneratePlantResult.Error("Не вдалося розпізнати відповідь ШІ для цієї рослини. Спробуйте уточнити назву.")
             }
         } catch (e: Exception) {
-            val errorMsg = mapExceptionToHumanReadableMessage(e)
+            val errorMsg = AiErrorMapper.map(e)
             return@withContext GeneratePlantResult.Error(errorMsg)
-        }
-    }
-
-    private fun mapExceptionToHumanReadableMessage(e: Exception): String {
-        val message = e.message.orEmpty()
-        val className = e.javaClass.name
-
-        return when {
-            e is UnknownHostException || (e is IOException && (message.contains("Unable to resolve host", ignoreCase = true) || message.contains("network", ignoreCase = true))) -> {
-                "Відсутнє підключення до інтернету. Перевірте зв'язок та спробуйте ще раз."
-            }
-            message.contains("AppCheck", ignoreCase = true) || message.contains("app-check", ignoreCase = true) || message.contains("403") || message.contains("PERMISSION_DENIED", ignoreCase = true) || className.contains("AppCheck", ignoreCase = true) -> {
-                "Помилка перевірки пристрою (App Check). Доступ тимчасово обмежено."
-            }
-            message.contains("429") || message.contains("RESOURCE_EXHAUSTED", ignoreCase = true) || message.contains("quota", ignoreCase = true) || message.contains("rate limit", ignoreCase = true) -> {
-                "Перевищено ліміт запитів до ШІ. Будь ласка, зачекайте кілька хвилин і спробуйте знову."
-            }
-            message.contains("500") || message.contains("503") || message.contains("UNAVAILABLE", ignoreCase = true) -> {
-                "Сервіс ШІ тимчасово недоступний. Будь ласка, спробуйте пізніше."
-            }
-            else -> {
-                "Не вдалося згенерувати картку догляду. Будь ласка, перевірте назву рослини та спробуйте ще раз."
-            }
         }
     }
 

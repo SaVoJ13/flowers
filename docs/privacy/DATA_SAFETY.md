@@ -17,14 +17,14 @@
 |---|---|---|---|---|---|---|
 | App activity | **Other user-generated content** (назва рослини, надіслана для генерації) | Так | **Так** (Google, умови безкоштовного рівня: покращення продуктів, перегляд людьми; рішення O-Q4) | Ні (функція ШІ необов'язкова) | App functionality | Постачальник: Google Gemini через Firebase AI Logic |
 | App activity | **Other user-generated content** (текст картки, причина та коментар скарги) | Так | Ні (лише наша база Firestore, eur3) | Ні | App functionality (виправлення відповідей, безпека) | Зберігання 12 міс.; без ідентифікаторів користувача |
-| Device or other IDs | Ідентифікатор встановлення Firebase (FID), App ID, токен App Check (Play Integrity), user agent | **Так** (за посібником Firebase, див. `FIREBASE_DISCLOSURE_CHECK.md`) | **Ні** (Firebase як постачальник послуг) | Ні (збирається лише в необов'язкових функціях ШІ та скарги) | App functionality, Fraud prevention, security | Не пов'язується з особою; `Не підтверджено` |
+| Device or other IDs | Ідентифікатор встановлення Firebase (FID), App ID, токен App Check (Play Integrity), user agent | **Так** (за посібником Firebase, див. `FIREBASE_DISCLOSURE_CHECK.md`) | **Ні** (Firebase як постачальник послуг) | Ні (збирається лише в необов'язкових функціях ШІ та скарги) | App functionality, Fraud prevention, security | Не пов'язується з особою; (див. `FIREBASE_DISCLOSURE_CHECK.md`) |
 | App info and performance | Crash logs / diagnostics | Ні (власних SDK немає; Android vitals збирає Google Play) | — | — | — | Crashlytics не використовується (рішення Власника Q-1.1-4) |
 | Personal info / Location / Financial / Health / Messages / Photos & videos / Audio / Files / Calendar / Contacts / Web browsing | — | **Ні** | — | — | — | Камера й галерея не використовуються; геолокація не запитується |
 
 ## 3. Практики безпеки
 - Дані шифруються при передачі: **так**.
 - Запит на видалення: **так** (e-mail). Для скарг: видалення за точним текстом/часом (скарги не пов'язані з особою).
-- Локальні дані (рослини, журнал) не покидають пристрій, окрім можливого системного резервного копіювання Android Auto Backup (`allowBackup=true` у маніфесті) — це не збір розробником; рішення Власника (ADR-019): `allowBackup` лишається, копіюються лише база й налаштування (TASK-047).
+- Локальні дані (рослини, журнал) не покидають пристрій, окрім можливого системного резервного копіювання Android Auto Backup (`allowBackup=true` у маніфесті) — це не збір розробником; рішення Власника (ADR-019 п.3): `allowBackup` лишається; правила виключення з резервного копіювання (лише база й налаштування) підготовлено в TASK-047 (PR #21, чекає перевірки Власником); до його злиття Auto Backup копіює дані застосунку за замовчуванням.
 
 ## 4. Інше для Play Console
 - Цільова аудиторія: **18+** (умова Gemini API); вікова анкета IARC; реклама: **ні**; вхід в акаунт для доступу: **ні**.

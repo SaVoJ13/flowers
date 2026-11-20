@@ -1,0 +1,36 @@
+rules_version = '2';
+
+// TASK-027: скарги на відповіді ШІ. Клієнт може ЛИШЕ створити документ у `reports`.
+// Читання, оновлення, видалення заборонені всім клієнтам (скарги читає Власник у консолі Firebase).
+// Захист від зловживань додатково забезпечує App Check enforcement для Firestore (консоль, дія Власника);
+// правила App Check не перевіряють. Межі довжин дзеркалять `AiReport` у застосунку.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function validReport(d) {
+      return d.keys().hasOnly(['feature', 'plantQuery', 'responseText', 'reason', 'comment', 'appVersion', 'createdAt', 'expireAt'])
+        && d.keys().hasAll(['feature', 'plantQuery', 'responseText', 'reason', 'appVersion', 'createdAt', 'expireAt'])
+        && d.feature == 'plant_card'
+        && d.plantQuery is string && d.plantQuery.size() >= 1 && d.plantQuery.size() <= 100
+        && d.responseText is string && d.responseText.size() >= 1 && d.responseText.size() <= 4000
+        && d.reason in ['wrong', 'dangerous', 'offensive', 'other']
+        && (!('comment' in d) || (d.comment is string && d.comment.size() >= 1 && d.comment.size() <= 500))
+        && d.appVersion is string && d.appVersion.size() >= 1 && d.appVersion.size() <= 32
+        && d.createdAt == request.time
+        // Зберігання 12 місяців: клієнт ставить expireAt ≈ зараз + 365 днів, TTL-політика консолі видаляє після цієї дати.
+        && d.expireAt is timestamp
+        && d.expireAt > request.time + duration.value(360, 'd')
+        && d.expireAt < request.time + duration.value(370, 'd');
+    }
+
+    match /reports/{reportId} {
+      allow create: if validReport(request.resource.data);
+      allow read, update, delete: if false;
+    }
+
+    // Усе інше закрито.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -34,6 +34,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import com.flowers.app.ui.components.AiDisclaimerText
+import com.flowers.app.ui.components.AiReportButton
 import com.flowers.app.ui.components.AiTexts
 import com.flowers.app.ui.components.SafetyNotice
 import androidx.compose.runtime.collectAsState
@@ -355,6 +356,7 @@ fun CatalogPlantCard(plant: CatalogPlantEntity) {
             Spacer(modifier = Modifier.height(6.dp))
             if (plant.isAiGenerated) {
                 AiDisclaimerText()
+                AiReportButton(plant)
                 Spacer(modifier = Modifier.height(2.dp))
             }
             // ШІ-картки й каталог без джерел = UNKNOWN; прапорець «токсична» каталогу показується як TOXIC.

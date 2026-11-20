@@ -35,7 +35,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import com.flowers.app.ui.components.AiDisclaimerText
 import com.flowers.app.ui.components.AiTexts
-import com.flowers.app.ui.components.AiSafetyNotice
+import com.flowers.app.ui.components.SafetyNotice
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -352,19 +352,13 @@ fun CatalogPlantCard(plant: CatalogPlantEntity) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
+            Spacer(modifier = Modifier.height(6.dp))
             if (plant.isAiGenerated) {
-                Spacer(modifier = Modifier.height(6.dp))
                 AiDisclaimerText()
                 Spacer(modifier = Modifier.height(2.dp))
-                AiSafetyNotice()
-            } else if (plant.toxicToPets) {
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = "🐾 Увага: токсична для котів та собак при жуванні",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.error
-                )
             }
+            // ШІ-картки й каталог без джерел = UNKNOWN; прапорець «токсична» каталогу показується як TOXIC.
+            SafetyNotice(toxic = !plant.isAiGenerated && plant.toxicToPets)
         }
     }
 }

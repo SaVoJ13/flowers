@@ -18,7 +18,12 @@ object AiTexts {
             "(на безкоштовному рівні Google може використовувати запити для покращення своїх продуктів)."
     const val SAFETY_NOT_VERIFIED =
         "Безпека для тварин і дітей не перевірена. Уточніть у ветеринара або в довіднику ASPCA"
-    const val ASPCA_LABEL = "Відкрити довідник ASPCA"
+    const val TOXIC_WARNING = "Увага: токсична для котів та собак при жуванні"
+    const val SAFETY_ADVICE =
+        "Якщо тварина або дитина з'їла частину рослини, негайно зверніться до ветеринара або лікаря. " +
+            "Запишіть назву рослини або сфотографуйте її."
+    const val ASPCA_LABEL = "ASPCA (сайт англійською)"
+    const val ASPCA_HINT = "Браузер може перекласти сторінку"
     const val ASPCA_URL = "https://www.aspca.org/pet-care/animal-poison-control/toxic-and-non-toxic-plants"
 }
 
@@ -32,13 +37,30 @@ fun AiDisclaimerText(modifier: Modifier = Modifier) {
     )
 }
 
-/** Нейтральне повідомлення для ШІ-карток замість токсичності (TASK-025). */
+/**
+ * Безпека для тварин і дітей (TASK-025, TASK-046). Дві ситуації, обидві з практичною порадою й посиланням на ASPCA:
+ * [toxic] = перевірений прапорець каталогу «токсична»; інакше стан UNKNOWN (ШІ-картка або каталог без джерела).
+ * Аналогів ASPCA польською/українською немає, тому посилання підписане «сайт англійською».
+ */
 @Composable
-fun AiSafetyNotice(modifier: Modifier = Modifier) {
+fun SafetyNotice(toxic: Boolean, modifier: Modifier = Modifier) {
     val uriHandler = LocalUriHandler.current
     Column(modifier = modifier) {
+        if (toxic) {
+            Text(
+                text = "🐾 ${AiTexts.TOXIC_WARNING}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.error
+            )
+        } else {
+            Text(
+                text = "🐾 ${AiTexts.SAFETY_NOT_VERIFIED}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
         Text(
-            text = "🐾 ${AiTexts.SAFETY_NOT_VERIFIED}",
+            text = AiTexts.SAFETY_ADVICE,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -47,12 +69,17 @@ fun AiSafetyNotice(modifier: Modifier = Modifier) {
                 try {
                     uriHandler.openUri(AiTexts.ASPCA_URL)
                 } catch (e: Exception) {
-                    // Немає браузера: тихо ігноруємо, текст порадити ветеринара лишається видимим.
+                    // Немає браузера: тихо ігноруємо, текст поради лишається видимим.
                 }
             },
             contentPadding = PaddingValues(0.dp)
         ) {
             Text(AiTexts.ASPCA_LABEL, style = MaterialTheme.typography.labelSmall)
         }
+        Text(
+            text = AiTexts.ASPCA_HINT,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }

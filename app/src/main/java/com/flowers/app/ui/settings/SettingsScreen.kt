@@ -1,5 +1,6 @@
 package com.flowers.app.ui.settings
 
+import com.flowers.app.BuildConfig
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -65,57 +66,6 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // 1. Premium Status Card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Default.AutoAwesome,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Text(
-                                "👑 Flowers Premium",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        }
-                        Card(
-                            shape = RoundedCornerShape(8.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
-                        ) {
-                            Text(
-                                text = "АКТИВОВАНО",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Вам доступні всі преміум-функції: генерація персональних карток догляду для будь-яких рослин через Google Gemini та оновлення каталогу.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-            }
-
             // 2. AI Generator Info Card (Firebase App Check)
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -195,7 +145,7 @@ fun SettingsScreen(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "• Згенеровані рослини кешуються локально в Room\n• Особисті фотографії та журнал зберігаються лише на телефоні\n• Без реєстрації, без передачі особистих даних стороннім особам",
+                        text = "• Рослини, журнал і згенеровані картки зберігаються лише на телефоні\n• Для ШІ-картки назва рослини надсилається до Google (безкоштовний рівень); не вводьте особисті дані\n• Скарга на відповідь ШІ надсилається в базу розробника на 12 місяців\n• Без реєстрації й реклами",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -215,7 +165,7 @@ fun SettingsScreen(
                         Text("Про Flowers", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Версія: 1.1.0 (Freemium + Gemini AI)", style = MaterialTheme.typography.bodySmall)
+                    Text("Версія: ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodySmall)
                     Text("Ліцензія: Proprietary (All rights reserved)", style = MaterialTheme.typography.bodySmall)
                     Text("Розробник: Flowers Team", style = MaterialTheme.typography.bodySmall)
                 }

@@ -1,10 +1,16 @@
+---
+title: Privacy Policy — Flowers
+lang: en
+permalink: /privacy/en/
+---
+
 # PRIVACY POLICY — FLOWERS
-
-> **Status: DRAFT for release 1.0 (TASK-021-B), not published.** Published by the Owner. Before publishing the Owner: (1) sets the effective date; (2) hosts the text on a public page and enters the URL in Play Console; (3) confirms it matches the shipped build. Ukrainian version: `PRIVACY_POLICY.md` (content must stay in sync). Translated by the developer; not reviewed by a native English speaker.
-
 **App:** Flowers (Android, `com.savoj.flowers`) — houseplant care.
-**Last updated:** [publication date — set by the Owner]
+
+**Last updated:** November 20, 2026 (effective date)
+
 **Contact for privacy questions and deletion requests:** appvsdeveloper@gmail.com
+
 **Age limit:** the app is intended for users aged **18 and over**.
 
 ---
@@ -17,7 +23,9 @@
 ## 2. What is stored on your device
 Plants, watering dates and events, notes, settings, saved care cards (including AI-created ones). This data is not sent to us. You can delete it by removing a plant/entry in the app, clearing app data in Android settings, or uninstalling the app.
 **Android backup.** The app does not disable Android Auto Backup. If it is enabled on your phone, the system may store a copy of app data in your Google account under Google's rules; we have no access to it. You can turn it off in Android settings.
+
 **Photos and camera.** The app does not request access to the camera or gallery.
+
 **Notifications.** The app can show local reminders (`POST_NOTIFICATIONS` permission); they are created on the device, without a server.
 
 ## 3. Creating a care card with AI (Google Gemini)
@@ -33,8 +41,8 @@ When you search for a plant that is not in the catalog and start generation, the
 The report button ("Поскаржитися на відповідь ШІ") sends to our **Cloud Firestore (Google, region eur3 — Europe)** database:
 - the text of the card you report and the plant name;
 - the reason you chose and your **optional comment** (do not put personal data in it);
-- the app version, time of the report and the automatic deletion date.
-There are no accounts, and your device or account identifiers are **not attached** to the report. Only the developer can see reports, in the Firebase console. Purpose: fixing mistakes and improving the safety of answers. **Retention: 12 months**, after which the report is to be deleted.
+- the app version, time of the report and a technical end-of-retention date.
+There are no accounts, and your device or account identifiers are **not attached** to the report. Only the developer can see reports, in the Firebase console. Purpose: fixing mistakes and improving the safety of answers. **Retention: up to 12 months.** Automatic deletion is not available on the free plan, so at least once every 12 months the developer manually deletes **all** reports created before the cleanup date; no report is therefore kept longer than 12 months. After a move to a paid Firebase plan deletion will become automatic.
 Because a report is not linked to you, we can find and delete a specific one only if you give its exact text and approximate time.
 
 ## 5. What we do not do

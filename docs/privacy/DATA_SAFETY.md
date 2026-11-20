@@ -1,7 +1,7 @@
 # GOOGLE PLAY — DATA SAFETY: ПРОЄКТ ВІДПОВІДЕЙ (реліз 1.0, TASK-021-B)
 
 > **Статус: ПРОПОЗИЦІЯ для Власника.** Форму Play Console заповнює і відправляє Власник; відповідальність за точність відповідей на ньому (і за Google: розробник сам вирішує, як відповісти). Складено за фактичним кодом збірки (INTERNET, Firebase AI Logic, App Check Play Integrity, Cloud Firestore для скарг) і рішеннями Власника: O-Q4 (назви рослин у Google = «shared»), O-Q6 (скарги 12 місяців, e-mail appvsdeveloper@gmail.com).
-> **Не підтверджено:** точні вимоги Google до розкриття для Firebase **Installations** і **Firestore** (див. офіційний посібник: https://firebase.google.com/docs/android/play-data-disclosure; у цій сесії прочитано лише розділ App Check: SDK збирає токен Play Integrity і Firebase user agent). Перед відправкою форми звірити розділи Installations/Firestore/AI Logic цього посібника. Дата звірки: ____.
+> Звірено 2026-11-20 з посібником Firebase (`FIREBASE_DISCLOSURE_CHECK.md`); цитати перед відправкою форми перевіряє Власник.
 
 ## 1. Загальні питання
 | Питання | Відповідь | Обґрунтування |
@@ -17,16 +17,16 @@
 |---|---|---|---|---|---|---|
 | App activity | **Other user-generated content** (назва рослини, надіслана для генерації) | Так | **Так** (Google, умови безкоштовного рівня: покращення продуктів, перегляд людьми; рішення O-Q4) | Ні (функція ШІ необов'язкова) | App functionality | Постачальник: Google Gemini через Firebase AI Logic |
 | App activity | **Other user-generated content** (текст картки, причина та коментар скарги) | Так | Ні (лише наша база Firestore, eur3) | Ні | App functionality (виправлення відповідей, безпека) | Зберігання 12 міс.; без ідентифікаторів користувача |
-| Device or other IDs | Ідентифікатор встановлення Firebase / токен App Check (Play Integrity) | **Перевірити** (за посібником Firebase, ймовірно «Так») | **Перевірити** | Ні (створюється лише під час використання ШІ) | App functionality, Fraud prevention, security | Не пов'язується з особою; `Не підтверджено` |
+| Device or other IDs | Ідентифікатор встановлення Firebase (FID), App ID, токен App Check (Play Integrity), user agent | **Так** (за посібником Firebase, див. `FIREBASE_DISCLOSURE_CHECK.md`) | **Ні** (Firebase як постачальник послуг) | Ні (збирається лише в необов'язкових функціях ШІ та скарги) | App functionality, Fraud prevention, security | Не пов'язується з особою; (див. `FIREBASE_DISCLOSURE_CHECK.md`) |
 | App info and performance | Crash logs / diagnostics | Ні (власних SDK немає; Android vitals збирає Google Play) | — | — | — | Crashlytics не використовується (рішення Власника Q-1.1-4) |
 | Personal info / Location / Financial / Health / Messages / Photos & videos / Audio / Files / Calendar / Contacts / Web browsing | — | **Ні** | — | — | — | Камера й галерея не використовуються; геолокація не запитується |
 
 ## 3. Практики безпеки
 - Дані шифруються при передачі: **так**.
 - Запит на видалення: **так** (e-mail). Для скарг: видалення за точним текстом/часом (скарги не пов'язані з особою).
-- Локальні дані (рослини, журнал) не покидають пристрій, окрім можливого системного резервного копіювання Android Auto Backup (`allowBackup=true` у маніфесті) — це не збір розробником; за потреби розглянути вимкнення (питання Власнику в OWNER_INBOX).
+- Локальні дані (рослини, журнал) не покидають пристрій, окрім можливого системного резервного копіювання Android Auto Backup (`allowBackup=true` у маніфесті) — це не збір розробником; рішення Власника (ADR-019 п.3): `allowBackup` лишається; правила виключення з резервного копіювання (лише база й налаштування) підготовлено в TASK-047 (PR #21, чекає перевірки Власником); до його злиття Auto Backup копіює дані застосунку за замовчуванням.
 
 ## 4. Інше для Play Console
 - Цільова аудиторія: **18+** (умова Gemini API); вікова анкета IARC; реклама: **ні**; вхід в акаунт для доступу: **ні**.
 - Політика ШІ-контенту: у застосунку є кнопка скарги без виходу з нього (TASK-027), дисклеймер «Порада ШІ, не гарантія» (TASK-026).
-- Посилання на політику конфіденційності: URL, де Власник розмістить `PRIVACY_POLICY.md`/`.en.md`.
+- Посилання на політику конфіденційності: https://savoj13.github.io/flowers/privacy/uk/ і https://savoj13.github.io/flowers/privacy/en/ (після ввімкнення GitHub Pages).

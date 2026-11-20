@@ -51,6 +51,6 @@
 5. Тестова скарга з ШІ-картки і перевірка в Firestore → Data → reports (якщо ще не робили).
 
 ## Що варто знати про B0/B1
-- QA знайшла 5 хибних прапорців безпеки (джерела казали TOXIC, а стояло UNKNOWN або NON_TOXIC): виправлено. `NON_TOXIC` для котів і собак залишився лише для рослин, де його підтверджують теги NC State і немає суперечностей: ocimum_basilicum, salvia_rosmarinus, cissus_rhombifolia, phalaenopsis_hybrid, hoya_carnosa, nephrolepis_exaltata, beaucarnea_recurvata, aspidistra_elatior, chlorophytum, peperomia, calathea; pilea_peperomioides NON_TOXIC/NON_TOXIC за прозовим твердженням.
+- QA знайшла 5 хибних прапорців безпеки (у 4 випадках джерела казали TOXIC, а стояло UNKNOWN; для fatsia_japonica NON_TOXIC змінено на UNKNOWN, бо джерела суперечать одне одному): виправлено. `NON_TOXIC` для котів і собак залишився лише для рослин, де його підтверджують теги NC State і немає суперечностей: ocimum_basilicum, salvia_rosmarinus, cissus_rhombifolia, phalaenopsis_hybrid, hoya_carnosa, nephrolepis_exaltata, beaucarnea_recurvata, aspidistra_elatior, chlorophytum, peperomia, calathea; pilea_peperomioides NON_TOXIC/NON_TOXIC за прозовим твердженням.
 - Уривки джерел не гарантовано дослівні; QA додатково порівнювала тексти з повними сторінками (найдовший спільний ланцюжок 7 слів, поріг 8).
 - Каталог у репозиторії: 50 карток із 200 (B0, B1); B2–B7 не починались (потребують нового запуску конвеєра).

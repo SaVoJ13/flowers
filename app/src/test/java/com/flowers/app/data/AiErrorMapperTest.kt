@@ -12,8 +12,6 @@ import java.net.UnknownHostException
 
 class AiErrorMapperTest {
 
-    private class FakeAppCheckException(msg: String?) : Exception(msg)
-
     @Test
     fun `unknown host maps to no internet`() {
         assertEquals(AiErrorMapper.MSG_NO_INTERNET, AiErrorMapper.map(UnknownHostException("firebasevertexai.googleapis.com")))
@@ -35,52 +33,72 @@ class AiErrorMapperTest {
         assertEquals(AiErrorMapper.MSG_NO_INTERNET, AiErrorMapper.map(IOException("stream closed")))
     }
 
+    // ---- HTTP-коди: за ТИПАМИ SDK (ServerException/QuotaExceededException тощо), TASK-046 ----
+
+    private fun sdkServer(msg: String) = SdkExceptions.server(msg)
+
     @Test
-    fun `403 maps to app check`() {
-        assertEquals(AiErrorMapper.MSG_APP_CHECK, AiErrorMapper.map(Exception("Server returned HTTP 403")))
+    fun `server exception with 403 maps to app check`() {
+        assertEquals(AiErrorMapper.MSG_APP_CHECK, AiErrorMapper.map(sdkServer("Server returned HTTP 403")))
     }
 
     @Test
-    fun `permission denied maps to app check`() {
-        assertEquals(AiErrorMapper.MSG_APP_CHECK, AiErrorMapper.map(Exception("PERMISSION_DENIED: blocked")))
+    fun `server exception with permission denied or app check text maps to app check`() {
+        assertEquals(AiErrorMapper.MSG_APP_CHECK, AiErrorMapper.map(sdkServer("PERMISSION_DENIED: blocked")))
+        assertEquals(AiErrorMapper.MSG_APP_CHECK, AiErrorMapper.map(sdkServer("Firebase App Check token is invalid.")))
+        assertEquals(AiErrorMapper.MSG_APP_CHECK, AiErrorMapper.map(sdkServer("AppCheck failed")))
     }
 
     @Test
-    fun `app check message maps to app check`() {
-        assertEquals(AiErrorMapper.MSG_APP_CHECK, AiErrorMapper.map(Exception("Firebase App-Check token invalid")))
-        assertEquals(AiErrorMapper.MSG_APP_CHECK, AiErrorMapper.map(Exception("AppCheck failed")))
+    fun `access type exceptions map to app check without any message`() {
+        listOf("InvalidAPIKeyException", "ServiceDisabledException", "PermissionMissingException").forEach {
+            assertEquals(it, AiErrorMapper.MSG_APP_CHECK, AiErrorMapper.map(SdkExceptions.byName(it, "x")))
+        }
     }
 
     @Test
-    fun `app check exception class name maps to app check even without message`() {
-        assertEquals(AiErrorMapper.MSG_APP_CHECK, AiErrorMapper.map(FakeAppCheckException(null)))
+    fun `quota exceeded type maps to rate limit`() {
+        assertEquals(AiErrorMapper.MSG_RATE_LIMIT, AiErrorMapper.map(SdkExceptions.quota()))
     }
 
     @Test
-    fun `429 maps to rate limit`() {
-        assertEquals(AiErrorMapper.MSG_RATE_LIMIT, AiErrorMapper.map(Exception("HTTP 429 Too Many Requests")))
+    fun `server exception with 429 or resource exhausted maps to rate limit`() {
+        assertEquals(AiErrorMapper.MSG_RATE_LIMIT, AiErrorMapper.map(sdkServer("HTTP 429 Too Many Requests")))
+        assertEquals(AiErrorMapper.MSG_RATE_LIMIT, AiErrorMapper.map(sdkServer("RESOURCE_EXHAUSTED")))
     }
 
     @Test
     fun `rate limit text is the owner approved wording`() {
         assertEquals(
             "Безкоштовний ліміт ШІ-генерації зараз вичерпано. Спробуйте пізніше сьогодні або завтра. Решта функцій працює.",
-            AiErrorMapper.map(Exception("429"))
+            AiErrorMapper.map(SdkExceptions.quota())
         )
     }
 
     @Test
-    fun `resource exhausted quota and rate limit map to rate limit`() {
-        assertEquals(AiErrorMapper.MSG_RATE_LIMIT, AiErrorMapper.map(Exception("RESOURCE_EXHAUSTED")))
-        assertEquals(AiErrorMapper.MSG_RATE_LIMIT, AiErrorMapper.map(Exception("You exceeded your current quota")))
-        assertEquals(AiErrorMapper.MSG_RATE_LIMIT, AiErrorMapper.map(Exception("Rate limit reached")))
+    fun `any other server exception maps to server error`() {
+        assertEquals(AiErrorMapper.MSG_SERVER, AiErrorMapper.map(sdkServer("HTTP 500")))
+        assertEquals(AiErrorMapper.MSG_SERVER, AiErrorMapper.map(sdkServer("HTTP 503")))
+        assertEquals(AiErrorMapper.MSG_SERVER, AiErrorMapper.map(sdkServer("The service is currently unavailable.")))
+    }
+
+    // ---- Хибні спрацювання: цифри й слова в тексті НЕ-серверних винятків не мають значення ----
+
+    @Test
+    fun `status digits in non-sdk exception text are ignored`() {
+        listOf("read 1500 bytes", "HTTP 500", "HTTP 403", "HTTP 429", "App Check failed", "quota", "RESOURCE_EXHAUSTED", "UNAVAILABLE")
+            .forEach { assertEquals(it, AiErrorMapper.MSG_UNKNOWN, AiErrorMapper.map(Exception(it))) }
     }
 
     @Test
-    fun `500 503 and unavailable map to server error`() {
-        assertEquals(AiErrorMapper.MSG_SERVER, AiErrorMapper.map(Exception("HTTP 500")))
-        assertEquals(AiErrorMapper.MSG_SERVER, AiErrorMapper.map(Exception("HTTP 503")))
-        assertEquals(AiErrorMapper.MSG_SERVER, AiErrorMapper.map(Exception("UNAVAILABLE: overloaded")))
+    fun `read 1500 bytes does not produce server unavailable`() {
+        assertEquals(AiErrorMapper.MSG_UNKNOWN, AiErrorMapper.map(SdkExceptions.unknown(IllegalStateException("read 1500 bytes"))))
+        assertEquals(AiErrorMapper.MSG_UNKNOWN, AiErrorMapper.map(IllegalArgumentException("read 1500 bytes")))
+    }
+
+    @Test
+    fun `status number embedded in a longer number does not match`() {
+        assertEquals(AiErrorMapper.MSG_SERVER, AiErrorMapper.map(sdkServer("id 14039 and 4290 and v1.403.2")))
     }
 
     @Test
@@ -91,17 +109,17 @@ class AiErrorMapperTest {
 
     @Test
     fun `priority network beats app check and quota`() {
-        assertEquals(AiErrorMapper.MSG_NO_INTERNET, AiErrorMapper.map(UnknownHostException("403 quota")))
+        assertEquals(AiErrorMapper.MSG_NO_INTERNET, AiErrorMapper.map(SdkExceptions.unknown(UnknownHostException("403 quota"))))
     }
 
     @Test
     fun `priority 403 beats quota`() {
-        assertEquals(AiErrorMapper.MSG_APP_CHECK, AiErrorMapper.map(Exception("403 quota exceeded")))
+        assertEquals(AiErrorMapper.MSG_APP_CHECK, AiErrorMapper.map(sdkServer("403 quota exceeded")))
     }
 
     @Test
     fun `priority quota beats server error`() {
-        assertEquals(AiErrorMapper.MSG_RATE_LIMIT, AiErrorMapper.map(Exception("429 UNAVAILABLE")))
+        assertEquals(AiErrorMapper.MSG_RATE_LIMIT, AiErrorMapper.map(sdkServer("429 UNAVAILABLE")))
     }
 
     // ---- Дефект «ШІ без мережі»: SDK загортає мережеві винятки. Використовуємо РЕАЛЬНІ класи firebase-ai 18.2.0. ----
@@ -162,7 +180,7 @@ class AiErrorMapperTest {
 
     @Test
     fun `wrapped 429 in cause chain maps to rate limit`() {
-        assertEquals(AiErrorMapper.MSG_RATE_LIMIT, AiErrorMapper.map(SdkExceptions.unknown(RuntimeException("HTTP 429"))))
+        assertEquals(AiErrorMapper.MSG_RATE_LIMIT, AiErrorMapper.map(SdkExceptions.unknown(sdkServer("HTTP 429"))))
     }
 
     @Test

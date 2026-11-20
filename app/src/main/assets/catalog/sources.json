@@ -1,0 +1,266 @@
+{
+  "clemson_arrowhead_vine": {
+    "title": "Arrowhead Vine (Syngonium spp.) Indoor Care, Growing Tips and Plant Guide",
+    "publisher": "Clemson Cooperative Extension HGIC",
+    "url": "https://hgic.clemson.edu/factsheet/arrowhead-vine-syngonium-spp-indoor-care-growing-tips-plant-guide/",
+    "kind": "extension"
+  },
+  "clemson_chinese_evergreen": {
+    "title": "Chinese Evergreen (Aglaonema) factsheet",
+    "publisher": "Clemson Cooperative Extension HGIC",
+    "url": "https://hgic.clemson.edu/factsheet/chinese-evergreen/",
+    "kind": "extension"
+  },
+  "clemson_dracaena": {
+    "title": "Dracaena (HGIC factsheet, covers dragon tree)",
+    "publisher": "Clemson Cooperative Extension",
+    "url": "https://hgic.clemson.edu/factsheet/dracaena/",
+    "kind": "extension"
+  },
+  "clemson_peperomia": {
+    "title": "Peperomia (Peperomia spp.) Indoor Plant Care and Growing Guide",
+    "publisher": "Clemson Cooperative Extension HGIC",
+    "url": "https://hgic.clemson.edu/factsheet/peperomia-peperomia-spp-indoor-plant-care-and-growing-guide/",
+    "kind": "extension"
+  },
+  "clemson_pothos": {
+    "title": "How to Grow Pothos Indoors (Epipremnum spp.)",
+    "publisher": "Clemson HGIC",
+    "url": "https://hgic.clemson.edu/factsheet/how-to-grow-pothos-indoors-epipremnum-spp-care-cultivars-and-common-problems/",
+    "kind": "extension"
+  },
+  "clemson_rubber": {
+    "title": "Rubber Plant (HGIC factsheet)",
+    "publisher": "Clemson Cooperative Extension",
+    "url": "https://hgic.clemson.edu/factsheet/rubber-plant/",
+    "kind": "extension"
+  },
+  "clemson_spider": {
+    "title": "Spider Plant (HGIC factsheet)",
+    "publisher": "Clemson Cooperative Extension",
+    "url": "https://hgic.clemson.edu/factsheet/spider-plant/",
+    "kind": "extension"
+  },
+  "clemson_weeping": {
+    "title": "Weeping Ficus (HGIC factsheet)",
+    "publisher": "Clemson Cooperative Extension",
+    "url": "https://hgic.clemson.edu/factsheet/weeping-ficus/",
+    "kind": "extension"
+  },
+  "clemson_zz": {
+    "title": "ZZ Plant factsheet",
+    "publisher": "Clemson HGIC",
+    "url": "https://hgic.clemson.edu/factsheet/zz-plant/",
+    "kind": "extension"
+  },
+  "illinois_prayer_plant": {
+    "title": "Prayer plant (Houseplants)",
+    "publisher": "University of Illinois Extension",
+    "url": "https://extension.illinois.edu/houseplants/prayer-plant",
+    "kind": "extension"
+  },
+  "illinois_umbrella_tree": {
+    "title": "Australian umbrella tree (Houseplants)",
+    "publisher": "University of Illinois Extension",
+    "url": "https://extension.illinois.edu/houseplants/australian-umbrella-tree",
+    "kind": "extension"
+  },
+  "isu_philodendrons": {
+    "title": "Growing Philodendrons at Home",
+    "publisher": "Iowa State University Extension and Outreach",
+    "url": "https://yardandgarden.extension.iastate.edu/how-to/growing-philodendrons-home",
+    "kind": "extension"
+  },
+  "ncsu_aglaonema": {
+    "title": "Aglaonema - NC State Extension Gardener Plant Toolbox (genus page)",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/aglaonema/",
+    "kind": "extension"
+  },
+  "ncsu_aloe_vera": {
+    "title": "Aloe vera - NC State Extension Gardener Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/aloe-vera/",
+    "kind": "extension"
+  },
+  "ncsu_begonia_cane_types": {
+    "title": "Begonia (cane types) (NC State Extension Plant Toolbox)",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/begonia-cane-types/",
+    "kind": "extension"
+  },
+  "ncsu_dracaena_reflexa": {
+    "title": "Dracaena reflexa var. angustifolia (previously D. marginata), NC Extension Gardener Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/dracaena-marginata/",
+    "kind": "extension"
+  },
+  "ncsu_goeppertia_makoyana": {
+    "title": "Goeppertia makoyana (NC State Extension Plant Toolbox)",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/goeppertia-makoyana/",
+    "kind": "extension"
+  },
+  "ncsu_jade": {
+    "title": "Crassula ovata, NC Extension Gardener Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/crassula-ovata/",
+    "kind": "extension"
+  },
+  "ncsu_maranta_leuconeura": {
+    "title": "Maranta leuconeura (NC State Extension Plant Toolbox)",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/maranta-leuconeura/common-name/cathedral-windows/",
+    "kind": "extension"
+  },
+  "ncsu_monstera": {
+    "title": "Monstera deliciosa",
+    "publisher": "NC State Extension Plant Toolbox",
+    "url": "https://plants.ces.ncsu.edu/plants/monstera-deliciosa/",
+    "kind": "extension"
+  },
+  "ncsu_peperomia_obtusifolia": {
+    "title": "Peperomia obtusifolia - NC State Extension Gardener Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/peperomia-obtusifolia/",
+    "kind": "extension"
+  },
+  "ncsu_philodendron_hederaceum": {
+    "title": "Philodendron hederaceum - NC State Extension Gardener Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/philodendron-hederaceum/",
+    "kind": "extension"
+  },
+  "ncsu_pothos": {
+    "title": "Epipremnum aureum (pothos)",
+    "publisher": "NC State Extension Plant Toolbox",
+    "url": "https://plants.ces.ncsu.edu/plants/epipremnum-aureum/",
+    "kind": "extension"
+  },
+  "ncsu_rubber": {
+    "title": "Ficus elastica, NC Extension Gardener Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/ficus-elastica/",
+    "kind": "extension"
+  },
+  "ncsu_schefflera_arboricola": {
+    "title": "Schefflera arboricola (NC State Extension Plant Toolbox)",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/schefflera-arboricola/",
+    "kind": "extension"
+  },
+  "ncsu_snake": {
+    "title": "Dracaena trifasciata (snake plant)",
+    "publisher": "NC State Extension Plant Toolbox",
+    "url": "https://plants.ces.ncsu.edu/plants/dracaena-trifasciata/",
+    "kind": "extension"
+  },
+  "ncsu_spathiphyllum": {
+    "title": "Spathiphyllum (genus page incl. S. wallisii)",
+    "publisher": "NC State Extension Plant Toolbox",
+    "url": "https://plants.ces.ncsu.edu/plants/spathiphyllum",
+    "kind": "extension"
+  },
+  "ncsu_spider": {
+    "title": "Chlorophytum comosum, NC Extension Gardener Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/chlorophytum-comosum/",
+    "kind": "extension"
+  },
+  "ncsu_syngonium_podophyllum": {
+    "title": "Syngonium podophyllum - NC State Extension Gardener Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/syngonium-podophyllum/",
+    "kind": "extension"
+  },
+  "ncsu_tradescantia_zebrina": {
+    "title": "Tradescantia zebrina (NC State Extension Plant Toolbox)",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/tradescantia-zebrina/",
+    "kind": "extension"
+  },
+  "ncsu_weeping": {
+    "title": "Ficus benjamina, NC Extension Gardener Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/ficus-benjamina/",
+    "kind": "extension"
+  },
+  "ncsu_zz": {
+    "title": "Zamioculcas zamiifolia (ZZ plant)",
+    "publisher": "NC State Extension Plant Toolbox",
+    "url": "https://plants.ces.ncsu.edu/plants/zamioculcas-zamiifolia/",
+    "kind": "extension"
+  },
+  "psu_aloe": {
+    "title": "Aloe: A Hardy Houseplant",
+    "publisher": "Penn State Extension",
+    "url": "https://extension.psu.edu/aloe-a-hardy-houseplant",
+    "kind": "extension"
+  },
+  "psu_jade": {
+    "title": "Jade Plant: A No-Fuss Houseplant",
+    "publisher": "Penn State Extension",
+    "url": "https://extension.psu.edu/jade-plant-a-no-fuss-houseplant",
+    "kind": "extension"
+  },
+  "rhs_begonia_maculata": {
+    "title": "Begonia maculata (C)",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/112222/begonia-maculata-c/details",
+    "kind": "society"
+  },
+  "rhs_goeppertia_makoyana": {
+    "title": "Goeppertia makoyana",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/357223/goeppertia-makoyana/details",
+    "kind": "society"
+  },
+  "rhs_maranta_leuconeura": {
+    "title": "Maranta leuconeura",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/119598/maranta-leuconeura/details",
+    "kind": "society"
+  },
+  "rhs_monstera": {
+    "title": "Monstera deliciosa (F)",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/11192/monstera-deliciosa-(f)/details",
+    "kind": "society"
+  },
+  "rhs_sansevieria": {
+    "title": "Sansevieria trifasciata",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/16430/sansevieria-trifasciata/details",
+    "kind": "society"
+  },
+  "rhs_spathiphyllum": {
+    "title": "Spathiphyllum wallisii",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/17623/spathiphyllum-wallisii/details",
+    "kind": "society"
+  },
+  "rhs_tradescantia_zebrina": {
+    "title": "Tradescantia zebrina | silver inch plant",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/79575/wd/details",
+    "kind": "society"
+  },
+  "rhs_zz": {
+    "title": "Zamioculcas zamiifolia",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/19185/zamioculcas-zamiifolia/details",
+    "kind": "society"
+  },
+  "uwmadison_tradescantia_zebrina": {
+    "title": "Tradescantia zebrina (Horticulture)",
+    "publisher": "UW-Madison Extension",
+    "url": "https://hort.extension.wisc.edu/articles/tradescantia-zebrina/",
+    "kind": "extension"
+  },
+  "wisc_spider": {
+    "title": "Spider plant (Chlorophytum comosum)",
+    "publisher": "University of Wisconsin Extension Horticulture",
+    "url": "https://hort.extension.wisc.edu/articles/spider-plant-chlorophytum-comosum/",
+    "kind": "extension"
+  }
+}

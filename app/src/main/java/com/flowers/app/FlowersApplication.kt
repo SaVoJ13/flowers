@@ -5,6 +5,9 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.flowers.app.data.local.FlowersDatabase
+import com.flowers.app.data.remote.AndroidNetworkChecker
+import com.flowers.app.data.report.AiReportRepository
+import com.flowers.app.data.report.FirestoreReportSink
 import com.flowers.app.data.repository.FlowersRepositoryImpl
 import com.flowers.app.data.security.AppCheckHelper
 import com.flowers.app.data.worker.DailyReminderWorker
@@ -26,6 +29,9 @@ class FlowersApplication : Application() {
             context = this
         )
     }
+
+    /** Скарги на відповіді ШІ (TASK-027); Firestore ініціалізується ліниво, лише при надсиланні. */
+    val aiReportRepository by lazy { AiReportRepository(AndroidNetworkChecker(this), FirestoreReportSink()) }
 
     override fun onCreate() {
         super.onCreate()

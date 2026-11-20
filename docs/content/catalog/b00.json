@@ -1795,5 +1795,438 @@
       }
     },
     "notes": "Джерело безпеки (NC State) описує групу бегоній, де B. maculata згадана як сорт; перевірити QA."
+  },
+  {
+    "id": "pilea_peperomioides",
+    "latin": "Pilea peperomioides",
+    "family": "Urticaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "EASY",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 7,
+      "humidity": "MEDIUM",
+      "soil": "UNIVERSAL"
+    },
+    "safety": {
+      "pets": "NON_TOXIC",
+      "children": "NON_TOXIC",
+      "sourceIds": [
+        "ncsu_pilea"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Пілея пеперомієвидна",
+        "aliases": [
+          "Пілея",
+          "Китайське грошове дерево"
+        ],
+        "summary": "Компактна рослина з круглими листками-монетками, нескладна у догляді. Любить яскраве розсіяне світло і вологий, але повітропроникний ґрунт.",
+        "watering": "Перевіряйте ґрунт приблизно раз на тиждень: він має бути вологим, але не застоюватися. Надмірний полив шкодить більше за недостатній, бо спричиняє гниль коренів.",
+        "light": "Найкраще росте на яскравому розсіяному світлі. Прямого сонця уникайте, а за нестачі світла пагони витягуються.",
+        "soil": "Підійде вологоємний, але добре дренований ґрунт для кімнатних рослин. Вода не повинна застоюватися в горщику.",
+        "tip": "Не змочуйте листя під час поливу: на мокрому листі з'являються плями. Також оберігайте рослину від протягів і джерел тепла."
+      },
+      "en": {
+        "name": "Chinese money plant",
+        "aliases": [
+          "UFO plant",
+          "Pancake plant",
+          "Missionary plant"
+        ],
+        "summary": "A compact plant with round, coin-like leaves that is easy to keep. It does best in bright but filtered light and a damp, free-draining mix.",
+        "watering": "Feel the mix about once a week. Keep it lightly damp, never soggy; too much water rots the roots and does more harm than a little too little.",
+        "light": "Give it bright, indirect light and keep it out of direct sun. In dim spots the stems stretch and the plant turns leggy.",
+        "soil": "Use a light, well-draining houseplant mix that holds some moisture. Excess water must be able to escape from the pot.",
+        "tip": "Water the soil rather than the foliage, since wet leaves tend to spot. Keep the plant away from cold drafts and heat sources."
+      },
+      "ru": {
+        "name": "Пилея пеперомиевидная",
+        "aliases": [
+          "Пилея",
+          "Китайское денежное дерево"
+        ],
+        "summary": "Компактное растение с круглыми листьями-монетками, нетребовательное в уходе. Предпочитает яркий рассеянный свет и влажный, но воздухопроницаемый грунт.",
+        "watering": "Проверяйте грунт примерно раз в неделю: он должен быть влажным, но без застоя воды. Перелив опаснее недолива, потому что вызывает гниль корней.",
+        "light": "Лучше всего растёт на ярком рассеянном свету. Прямых лучей избегайте, а при нехватке света побеги вытягиваются.",
+        "soil": "Подойдёт влагоёмкий, но хорошо дренированный грунт для комнатных растений. Вода в горшке застаиваться не должна.",
+        "tip": "Старайтесь не мочить листья при поливе: на мокрой листве появляются пятна. Берегите растение от сквозняков и источников тепла."
+      },
+      "pl": {
+        "name": "Pilea peperomiowata",
+        "aliases": [
+          "Pilea"
+        ],
+        "summary": "Zwarta roślina o okrągłych liściach przypominających monety, łatwa w uprawie. Lubi jasne, rozproszone światło i wilgotne, przepuszczalne podłoże.",
+        "watering": "Sprawdzaj podłoże mniej więcej raz w tygodniu. Ma być lekko wilgotne, ale bez zastoju wody; przelanie szkodzi bardziej niż niedolanie, bo gnije system korzeniowy.",
+        "light": "Najlepiej rośnie w jasnym, rozproszonym świetle. Unikaj pełnego słońca, a przy braku światła pędy się wyciągają.",
+        "soil": "Sprawdzi się lekka, dobrze przepuszczalna ziemia do roślin doniczkowych, która zachowuje trochę wilgoci. Nadmiar wody musi mieć odpływ.",
+        "tip": "Podlewaj ziemię, a nie liście, bo na mokrych liściach pojawiają się plamy. Trzymaj roślinę z dala od przeciągów i źródeł ciepła."
+      }
+    },
+    "sourceIds": [
+      "ncsu_pilea",
+      "psu_pilea"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    }
+  },
+  {
+    "id": "phalaenopsis_hybrid",
+    "latin": "Phalaenopsis hybrid",
+    "family": "Orchidaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "MEDIUM",
+      "lightMin": "LOW",
+      "lightMax": "MEDIUM",
+      "checkIntervalDays": 7,
+      "humidity": "HIGH",
+      "soil": "ORCHID_BARK"
+    },
+    "safety": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN",
+      "sourceIds": [
+        "ncsu_phalaenopsis"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Фаленопсис (гібриди)",
+        "aliases": [
+          "Орхідея-метелик",
+          "Фаленопсис"
+        ],
+        "summary": "Популярні кімнатні орхідеї, які люблять тепло, високу вологість повітря та яскраве місце без прямого сонця. Ростуть у коровому субстраті, а не в звичайному ґрунті.",
+        "watering": "Поливайте дорослі рослини приблизно раз на тиждень, влітку частіше, коли субстрат трохи підсох. Повністю пересушувати не варто, але й застою води в горщику допускати не можна.",
+        "light": "Потрібне яскраве місце з невеликою кількістю прямого сонця або без нього, наприклад східне підвіконня. Помірного освітлення й тепла цим орхідеям зазвичай досить.",
+        "soil": "Використовуйте готову суміш для орхідей на основі кори, що швидко дренується. У звичайному ґрунті ці рослини часто гинуть.",
+        "tip": "Вдома повітря зазвичай надто сухе, тому вологість доводиться підвищувати. Уникайте води на листках і в пазухах, а також різких змін умов, від яких опадають бутони."
+      },
+      "en": {
+        "name": "Moth orchid",
+        "aliases": [
+          "Phalaenopsis"
+        ],
+        "summary": "Widely grown indoor orchids that enjoy warmth, humid air and a bright spot away from harsh sun. They grow in a bark-based medium rather than ordinary soil.",
+        "watering": "Water mature plants roughly weekly, more often in hot summers, once the medium has dried a little. Never let them dry out fully, and never leave the pot sitting in water.",
+        "light": "An east-facing windowsill is ideal, where the room is brightly lit but the sun never hits the leaves hard. Moderate light and steady warmth are enough.",
+        "soil": "Use a ready-made, fast-draining orchid mix built on bark. Planting them in regular soil often kills them.",
+        "tip": "Indoor air is usually too dry, so extra humidity is needed. Keep water out of the leaf axils, and avoid sudden changes in conditions, which make buds fall."
+      },
+      "ru": {
+        "name": "Фаленопсис (гибриды)",
+        "aliases": [
+          "Орхидея-бабочка",
+          "Фаленопсис"
+        ],
+        "summary": "Популярные комнатные орхидеи, которые любят тепло, влажный воздух и светлое место без прямого солнца. Растут в коровом субстрате, а не в обычном грунте.",
+        "watering": "Взрослые растения поливают примерно раз в неделю, летом чаще, когда субстрат слегка подсох. Полностью пересушивать нельзя, но и застоя воды в горшке быть не должно.",
+        "light": "Нужно светлое место с небольшим количеством прямого солнца или совсем без него, например восточное окно. Умеренного света и тепла этим орхидеям обычно хватает.",
+        "soil": "Берите готовую смесь для орхидей на основе коры, которая быстро дренируется. В обычном грунте эти растения часто погибают.",
+        "tip": "В квартире воздух обычно слишком сухой, поэтому влажность приходится повышать. Не допускайте воды в пазухах листьев и резких перемен условий, из-за которых опадают бутоны."
+      },
+      "pl": {
+        "name": "Falenopsis (hybrydy)",
+        "aliases": [
+          "Storczyk ćmowy",
+          "Falenopsis",
+          "Storczyk"
+        ],
+        "summary": "Popularne storczyki doniczkowe, które lubią ciepło, wilgotne powietrze i jasne miejsce bez ostrego słońca. Rosną w podłożu z kory, a nie w zwykłej ziemi.",
+        "watering": "Dorosłe rośliny podlewaj mniej więcej raz w tygodniu, latem częściej, gdy podłoże lekko przeschnie. Nie dopuszczaj do całkowitego przesuszenia ani do stania wody w doniczce.",
+        "light": "Wybierz jasne miejsce z niewielką ilością bezpośredniego słońca lub bez niego, na przykład okno wschodnie. Umiarkowane światło i ciepło zwykle im wystarczają.",
+        "soil": "Używaj gotowego podłoża do storczyków na bazie kory, które szybko przepuszcza wodę. W zwykłej ziemi te rośliny często giną.",
+        "tip": "W mieszkaniu powietrze jest zwykle zbyt suche, więc wilgotność trzeba podnosić. Unikaj wody w kątach liści oraz nagłych zmian warunków, przez które opadają pąki."
+      }
+    },
+    "sourceIds": [
+      "ncsu_phalaenopsis",
+      "clemson_orchids"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Картка на рівні роду/групи гібридів; безпека для котів і собак лише з тегів NC State."
+  },
+  {
+    "id": "ficus_lyrata",
+    "latin": "Ficus lyrata",
+    "family": "Moraceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "MEDIUM",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 7,
+      "humidity": "MEDIUM",
+      "soil": "UNIVERSAL"
+    },
+    "safety": {
+      "pets": "TOXIC",
+      "children": "TOXIC",
+      "sourceIds": [
+        "ncsu_ficus"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Фікус ліроподібний",
+        "aliases": [
+          "Фікус лірата"
+        ],
+        "summary": "Ефектна рослина з великими хвилястими листками. Потребує яскравого розсіяного світла або легкої напівтіні й чутлива до надмірного поливу.",
+        "watering": "Перевіряйте ґрунт приблизно раз на тиждень, занурюючи палець на пару сантиметрів. Не допускайте пересихання до відставання від стінок горщика, але й заливати не варто: листя опадає від надміру та нестачі води.",
+        "light": "Яскраве розсіяне світло або легка напівтінь. Пряме сонце випалює листки.",
+        "soil": "Вологий, але добре дренований ґрунт, найкраще якісна суміш для кімнатних рослин, яка швидко пропускає воду.",
+        "tip": "Коричневі плями на листі часто з'являються через перепади температури біля вентиляції. Раз на кілька місяців протирайте листя від пилу."
+      },
+      "en": {
+        "name": "Fiddle-leaf fig",
+        "aliases": [
+          "Fiddle leaf fig",
+          "Ficus lyrata"
+        ],
+        "summary": "A striking plant with large, violin-shaped leaves. It wants bright filtered light or light shade and reacts badly to overwatering.",
+        "watering": "Test the soil about once a week with a finger pushed a couple of inches down. Do not let it shrink away from the pot, yet do not drench it either; leaves drop with too much or too little water.",
+        "light": "Bright, indirect light or light shade suits it. Strong direct sun scorches the leaves.",
+        "soil": "A moist but well-draining soil, ideally a good houseplant mix that lets water through quickly.",
+        "tip": "Brown spots often follow temperature swings near a vent. Wipe the dust off the leaves every few months."
+      },
+      "ru": {
+        "name": "Фикус лировидный",
+        "aliases": [
+          "Фикус лирата"
+        ],
+        "summary": "Эффектное растение с крупными волнистыми листьями. Ему нужен яркий рассеянный свет или лёгкая полутень, а перелив для него вреден.",
+        "watering": "Проверяйте грунт примерно раз в неделю, погружая палец на пару сантиметров. Не давайте земле ссыхаться и отходить от стенок горшка, но и не заливайте: листья опадают и от избытка, и от нехватки воды.",
+        "light": "Яркий рассеянный свет или лёгкая полутень. Прямое солнце обжигает листья.",
+        "soil": "Влажный, но хорошо дренированный грунт, лучше всего качественная смесь для комнатных растений, быстро пропускающая воду.",
+        "tip": "Коричневые пятна на листьях нередко появляются из-за перепадов температуры у вентиляции. Раз в несколько месяцев протирайте листья от пыли."
+      },
+      "pl": {
+        "name": "Figowiec lirowaty",
+        "aliases": [
+          "Fikus lirowaty"
+        ],
+        "summary": "Efektowna roślina o dużych, falistych liściach. Potrzebuje jasnego, rozproszonego światła lub lekkiego półcienia i źle znosi przelanie.",
+        "watering": "Sprawdzaj ziemię mniej więcej raz w tygodniu, wsuwając palec na kilka centymetrów. Nie dopuszczaj, by odeszła od brzegów doniczki, ale też nie zalewaj: liście opadają zarówno od nadmiaru, jak i niedoboru wody.",
+        "light": "Jasne, rozproszone światło lub lekki półcień. Ostre słońce przypala liście.",
+        "soil": "Wilgotne, ale dobrze przepuszczalne podłoże, najlepiej dobrej jakości ziemia do roślin doniczkowych, która szybko odprowadza wodę.",
+        "tip": "Brązowe plamy na liściach często pojawiają się przez wahania temperatury przy nawiewie. Co kilka miesięcy przecieraj liście z kurzu."
+      }
+    },
+    "sourceIds": [
+      "ncsu_ficus",
+      "psu_ficus"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    }
+  },
+  {
+    "id": "hoya_carnosa",
+    "latin": "Hoya carnosa",
+    "family": "Apocynaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "EASY",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 14,
+      "humidity": "MEDIUM",
+      "soil": "AROID_MIX"
+    },
+    "safety": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN",
+      "sourceIds": [
+        "ncsu_hoya"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Хойя м'ясиста",
+        "aliases": [
+          "Восковий плющ"
+        ],
+        "summary": "Витка рослина з товстими восковими листками, нескладна у догляді. Любить яскраве розсіяне світло, а ґрунт між поливами має підсихати.",
+        "watering": "Перевіряйте ґрунт приблизно раз на два тижні. Поливайте водою кімнатної температури, коли субстрат майже повністю підсох; застій води в погано дренованому горщику швидко шкодить кореням.",
+        "light": "Найкраще яскраве розсіяне світло впродовж року. Надто сильне сонце може обпекти листя, а за нестачі світла пагони тонкі й цвіте мало.",
+        "soil": "Пухка суміш, що швидко дренується: ґрунт для кімнатних рослин із корою та перлітом або пемзою.",
+        "tip": "Не обрізайте квітконосні шпори, на яких з'являються нові суцвіття. Бруньки опадають від різких змін поливу, температури чи освітлення."
+      },
+      "en": {
+        "name": "Wax plant",
+        "aliases": [
+          "Porcelain flower",
+          "Wax vine",
+          "Hoya"
+        ],
+        "summary": "A trailing plant with thick, waxy leaves that is easy to grow. It likes bright filtered light and a mix that dries out between waterings.",
+        "watering": "Check the mix roughly every two weeks. Use room-temperature water and give a good soak only when the mix has dried almost completely; sitting in poorly draining soil quickly harms the roots.",
+        "light": "Bright, indirect light all year is ideal. Very strong sun can scorch the leaves, while dim light brings thin growth and few flowers.",
+        "soil": "A loose, fast-draining blend: potting soil mixed with orchid bark and perlite or pumice.",
+        "tip": "Leave the old flower spurs in place, since new blooms form on them. Buds fall when watering, temperature or light changes abruptly."
+      },
+      "ru": {
+        "name": "Хойя мясистая",
+        "aliases": [
+          "Восковой плющ"
+        ],
+        "summary": "Вьющееся растение с толстыми восковыми листьями, нетребовательное в уходе. Любит яркий рассеянный свет, а грунт между поливами должен просыхать.",
+        "watering": "Проверяйте грунт примерно раз в две недели. Поливайте водой комнатной температуры, когда субстрат почти полностью просох; застой воды в плохо дренированном горшке быстро вредит корням.",
+        "light": "Лучше всего яркий рассеянный свет круглый год. Слишком сильное солнце может обжечь листья, а при нехватке света побеги тонкие и цветёт мало.",
+        "soil": "Рыхлая, быстро дренирующаяся смесь: грунт для комнатных растений с корой и перлитом или пемзой.",
+        "tip": "Не обрезайте цветоносные шпорцы, на них появляются новые соцветия. Бутоны опадают при резких изменениях полива, температуры или освещения."
+      },
+      "pl": {
+        "name": "Hoja mięsista",
+        "aliases": [
+          "Woskownica",
+          "Hoja"
+        ],
+        "summary": "Pnąca roślina o grubych, woskowych liściach, łatwa w uprawie. Lubi jasne, rozproszone światło, a podłoże między podlewaniami powinno przeschnąć.",
+        "watering": "Sprawdzaj podłoże mniej więcej co dwa tygodnie. Podlewaj wodą o temperaturze pokojowej, gdy podłoże prawie całkiem przeschnie; stojąca woda w źle odprowadzającej doniczce szybko szkodzi korzeniom.",
+        "light": "Najlepsze jest jasne, rozproszone światło przez cały rok. Zbyt ostre słońce może przypalić liście, a przy braku światła pędy są cienkie i kwitnienie słabe.",
+        "soil": "Luźna, szybko przepuszczalna mieszanka: ziemia do roślin doniczkowych z korą oraz perlitem lub pumeksem.",
+        "tip": "Nie odcinaj kwiatostanowych ostróg, bo na nich wyrastają nowe kwiaty. Pąki opadają przy gwałtownej zmianie podlewania, temperatury lub światła."
+      }
+    },
+    "sourceIds": [
+      "ncsu_hoya",
+      "isu_hoya"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Безпека для котів і собак лише з тегів NC State (без речення в тексті)."
+  },
+  {
+    "id": "nephrolepis_exaltata",
+    "latin": "Nephrolepis exaltata",
+    "family": "Lomariopsidaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "MEDIUM",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 4,
+      "humidity": "HIGH",
+      "soil": "MOISTURE_RETAINING"
+    },
+    "safety": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN",
+      "sourceIds": [
+        "ncsu_nephrolepis"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Нефролепіс",
+        "aliases": [
+          "Бостонська папороть",
+          "Нефролепіс піднесений"
+        ],
+        "summary": "Пишна папороть з довгими перистими вайями. Любить помірно яскраве світло, рівномірно вологий ґрунт і підвищену вологість повітря.",
+        "watering": "Перевіряйте ґрунт часто, кожні кілька днів: він має бути рівномірно вологим, але не розмоклим і ніколи не пересихати. Надмір води призводить до гниття коренів, узимку полив зменшують.",
+        "light": "Помірно яскраве світло, наприклад біля східного вікна або за легкою завісою на південному чи західному. Підійде яскраве розсіяне світло й тепло.",
+        "soil": "Вологоутримний, але добре дренований субстрат, наприклад торф із вермікулітом.",
+        "tip": "Папороть потребує вологого повітря: у сухе зимове повітря кінчики листя буріють. Надлишок добрив теж підсушує кінчики вай."
+      },
+      "en": {
+        "name": "Boston fern",
+        "aliases": [
+          "Sword fern",
+          "Nephrolepis"
+        ],
+        "summary": "A lush fern with long, arching, feathery fronds. It wants moderately bright light, evenly moist soil and plenty of humidity in the air.",
+        "watering": "Check the soil often, every few days. Keep it evenly moist without letting it turn soggy, and never let it dry out; too much water rots the roots, so ease off in winter.",
+        "light": "Medium-bright light, for example near an east window or behind a sheer curtain in a south or west one. Bright indirect light and warmth also suit it.",
+        "soil": "A moisture-holding but well-draining medium, such as peat blended with vermiculite.",
+        "tip": "Ferns need humid air, and dry winter air browns the frond tips. Too much fertilizer can also scorch the tips."
+      },
+      "ru": {
+        "name": "Нефролепис",
+        "aliases": [
+          "Бостонский папоротник",
+          "Нефролепис возвышенный"
+        ],
+        "summary": "Пышный папоротник с длинными перистыми вайями. Любит умеренно яркий свет, равномерно влажный грунт и повышенную влажность воздуха.",
+        "watering": "Проверяйте грунт часто, каждые несколько дней: он должен быть равномерно влажным, но не раскисшим и никогда не пересыхать. Избыток воды ведёт к гниению корней, зимой полив сокращают.",
+        "light": "Умеренно яркий свет, например у восточного окна или за лёгкой шторой на южном или западном. Подойдёт и яркий рассеянный свет с теплом.",
+        "soil": "Влагоёмкий, но хорошо дренированный субстрат, например торф с вермикулитом.",
+        "tip": "Папоротнику нужен влажный воздух: в сухом зимнем воздухе кончики листьев буреют. Избыток удобрений тоже сушит кончики вай."
+      },
+      "pl": {
+        "name": "Nefrolepis",
+        "aliases": [
+          "Nefrolepis wzniosły"
+        ],
+        "summary": "Bujna paproć o długich, pierzastych liściach. Lubi umiarkowanie jasne światło, równomiernie wilgotne podłoże i wysoką wilgotność powietrza.",
+        "watering": "Sprawdzaj podłoże często, co kilka dni. Ma być równomiernie wilgotne, ale nie rozmokłe, i nigdy nie powinno całkiem przeschnąć; nadmiar wody powoduje gnicie korzeni, więc zimą podlewaj mniej.",
+        "light": "Umiarkowanie jasne światło, na przykład przy oknie wschodnim lub za firanką w oknie południowym albo zachodnim. Odpowiednie jest też jasne, rozproszone światło i ciepło.",
+        "soil": "Podłoże dobrze przepuszczalne, a zarazem zatrzymujące wilgoć, na przykład torf z wermikulitem.",
+        "tip": "Paprocie potrzebują wilgotnego powietrza, a suche powietrze zimą brązowi końcówki liści. Zbyt dużo nawozu również zasusza końce."
+      }
+    },
+    "sourceIds": [
+      "wisc_boston_fern",
+      "ncsu_nephrolepis"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Безпека для котів і собак лише з тегів NC State; джерела розходяться щодо родини (Lomariopsidaceae/Polypodiaceae)."
   }
 ]

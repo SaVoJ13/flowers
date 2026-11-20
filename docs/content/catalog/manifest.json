@@ -1,7 +1,8 @@
 {
-  "contentVersion": 1,
+  "contentVersion": 2,
   "schema": 1,
   "batches": [
-    "b00"
+    "b00",
+    "b01"
   ]
 }

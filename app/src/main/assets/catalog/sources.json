@@ -1,8 +1,20 @@
 {
+  "clemson_anth": {
+    "title": "Anthurium: Easy Houseplants That Offer Long-Lasting Color",
+    "publisher": "Clemson HGIC",
+    "url": "https://hgic.clemson.edu/anthurium-easy-houseplants-that-offer-long-lasting-color/",
+    "kind": "extension"
+  },
   "clemson_arrowhead_vine": {
     "title": "Arrowhead Vine (Syngonium spp.) Indoor Care, Growing Tips and Plant Guide",
     "publisher": "Clemson Cooperative Extension HGIC",
     "url": "https://hgic.clemson.edu/factsheet/arrowhead-vine-syngonium-spp-indoor-care-growing-tips-plant-guide/",
+    "kind": "extension"
+  },
+  "clemson_basil": {
+    "title": "Basil",
+    "publisher": "Clemson HGIC",
+    "url": "https://hgic.clemson.edu/factsheet/basil/",
     "kind": "extension"
   },
   "clemson_chinese_evergreen": {
@@ -11,16 +23,52 @@
     "url": "https://hgic.clemson.edu/factsheet/chinese-evergreen/",
     "kind": "extension"
   },
+  "clemson_dieff": {
+    "title": "Dieffenbachia (factsheet)",
+    "publisher": "Clemson HGIC",
+    "url": "https://hgic.clemson.edu/factsheet/dieffenbachia/",
+    "kind": "extension"
+  },
   "clemson_dracaena": {
-    "title": "Dracaena (HGIC factsheet, covers dragon tree)",
-    "publisher": "Clemson Cooperative Extension",
+    "title": "Dracaena",
+    "publisher": "Clemson HGIC",
     "url": "https://hgic.clemson.edu/factsheet/dracaena/",
+    "kind": "extension"
+  },
+  "clemson_fatsia": {
+    "title": "Fatsia",
+    "publisher": "Clemson HGIC",
+    "url": "https://hgic.clemson.edu/factsheet/fatsia/",
+    "kind": "extension"
+  },
+  "clemson_ivy": {
+    "title": "Growing English Ivy Indoors",
+    "publisher": "Clemson HGIC",
+    "url": "https://hgic.clemson.edu/factsheet/growing-english-ivy-indoors/",
+    "kind": "extension"
+  },
+  "clemson_lucky_bamboo": {
+    "title": "How To Grow and Care for Lucky Bamboo (Dracaena sanderiana)",
+    "publisher": "Clemson HGIC",
+    "url": "https://hgic.clemson.edu/how-to-grow-and-care-for-lucky-bamboo-dracaena-sanderiana/",
+    "kind": "extension"
+  },
+  "clemson_orchids": {
+    "title": "Orchids",
+    "publisher": "Clemson HGIC",
+    "url": "https://hgic.clemson.edu/factsheet/orchids/",
     "kind": "extension"
   },
   "clemson_peperomia": {
     "title": "Peperomia (Peperomia spp.) Indoor Plant Care and Growing Guide",
     "publisher": "Clemson Cooperative Extension HGIC",
     "url": "https://hgic.clemson.edu/factsheet/peperomia-peperomia-spp-indoor-plant-care-and-growing-guide/",
+    "kind": "extension"
+  },
+  "clemson_philodendron": {
+    "title": "Philodendron (factsheet)",
+    "publisher": "Clemson HGIC",
+    "url": "https://hgic.clemson.edu/factsheet/philodendron/",
     "kind": "extension"
   },
   "clemson_pothos": {
@@ -53,6 +101,24 @@
     "url": "https://hgic.clemson.edu/factsheet/zz-plant/",
     "kind": "extension"
   },
+  "iastate_philodendron": {
+    "title": "Growing Philodendrons at Home",
+    "publisher": "Iowa State University Extension",
+    "url": "https://yardandgarden.extension.iastate.edu/how-to/growing-philodendrons-home",
+    "kind": "extension"
+  },
+  "iastate_ponytail": {
+    "title": "How do I care for a ponytail palm?",
+    "publisher": "Iowa State University Extension",
+    "url": "https://yardandgarden.extension.iastate.edu/faq/how-do-i-care-ponytail-palm",
+    "kind": "extension"
+  },
+  "illinois_basil": {
+    "title": "Basil",
+    "publisher": "University of Illinois Extension",
+    "url": "https://extension.illinois.edu/herbs/basil",
+    "kind": "extension"
+  },
   "illinois_prayer_plant": {
     "title": "Prayer plant (Houseplants)",
     "publisher": "University of Illinois Extension",
@@ -65,10 +131,46 @@
     "url": "https://extension.illinois.edu/houseplants/australian-umbrella-tree",
     "kind": "extension"
   },
+  "isu_hoya": {
+    "title": "All About Hoyas",
+    "publisher": "Iowa State Extension Yard and Garden",
+    "url": "https://yardandgarden.extension.iastate.edu/how-to/all-about-hoyas",
+    "kind": "extension"
+  },
   "isu_philodendrons": {
     "title": "Growing Philodendrons at Home",
     "publisher": "Iowa State University Extension and Outreach",
     "url": "https://yardandgarden.extension.iastate.edu/how-to/growing-philodendrons-home",
+    "kind": "extension"
+  },
+  "ncstate_asp_setaceus": {
+    "title": "Asparagus setaceus - NC State Extension Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/asparagus-setaceus/",
+    "kind": "extension"
+  },
+  "ncstate_cissus_alata": {
+    "title": "Cissus alata (syn. Cissus rhombifolia) - NC State Extension Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/cissus-alata/",
+    "kind": "extension"
+  },
+  "ncstate_fatsia": {
+    "title": "Fatsia japonica - NC State Extension Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/fatsia-japonica/",
+    "kind": "extension"
+  },
+  "ncstate_hedera": {
+    "title": "Hedera helix - NC State Extension Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/hedera-helix/",
+    "kind": "extension"
+  },
+  "ncsu_adansonii": {
+    "title": "Monstera adansonii",
+    "publisher": "NC State Extension Plant Toolbox",
+    "url": "https://plants.ces.ncsu.edu/plants/monstera-adansonii/",
     "kind": "extension"
   },
   "ncsu_aglaonema": {
@@ -77,10 +179,40 @@
     "url": "https://plants.ces.ncsu.edu/plants/aglaonema/",
     "kind": "extension"
   },
+  "ncsu_alocasia": {
+    "title": "Alocasia x mortfontanensis",
+    "publisher": "NC State Extension Plant Toolbox",
+    "url": "https://plants.ces.ncsu.edu/plants/alocasia-x-mortfontanensis/",
+    "kind": "extension"
+  },
   "ncsu_aloe_vera": {
     "title": "Aloe vera - NC State Extension Gardener Plant Toolbox",
     "publisher": "NC State Extension",
     "url": "https://plants.ces.ncsu.edu/plants/aloe-vera/",
+    "kind": "extension"
+  },
+  "ncsu_anth": {
+    "title": "Anthurium andraeanum",
+    "publisher": "NC State Extension Plant Toolbox",
+    "url": "https://plants.ces.ncsu.edu/plants/anthurium-andraeanum/",
+    "kind": "extension"
+  },
+  "ncsu_aspidistra": {
+    "title": "Aspidistra elatior",
+    "publisher": "NC State Extension Plant Toolbox",
+    "url": "https://plants.ces.ncsu.edu/plants/aspidistra-elatior",
+    "kind": "extension"
+  },
+  "ncsu_basil": {
+    "title": "Ocimum basilicum (Plant Toolbox)",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/ocimum-basilicum/common-name/saint-josephs-wort/",
+    "kind": "extension"
+  },
+  "ncsu_beaucarnea": {
+    "title": "Beaucarnea recurvata",
+    "publisher": "NC State Extension Plant Toolbox",
+    "url": "https://plants.ces.ncsu.edu/plants/beaucarnea-recurvata/",
     "kind": "extension"
   },
   "ncsu_begonia_cane_types": {
@@ -89,16 +221,58 @@
     "url": "https://plants.ces.ncsu.edu/plants/begonia-cane-types/",
     "kind": "extension"
   },
-  "ncsu_dracaena_reflexa": {
-    "title": "Dracaena reflexa var. angustifolia (previously D. marginata), NC Extension Gardener Plant Toolbox",
+  "ncsu_citrus_meyer": {
+    "title": "Citrus x limon Meyer (Plant Toolbox)",
     "publisher": "NC State Extension",
-    "url": "https://plants.ces.ncsu.edu/plants/dracaena-marginata/",
+    "url": "https://plants.ces.ncsu.edu/plants/citrus-x-limon-meyer",
+    "kind": "extension"
+  },
+  "ncsu_cyperus_alternifolius": {
+    "title": "NC State Extension Plant Toolbox: Cyperus alternifolius (umbrella sedge)",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/cyperus-alternifolius/common-name/umbrella-sedge/",
+    "kind": "extension"
+  },
+  "ncsu_dracaena": {
+    "title": "Dracaena fragrans (Plant Toolbox)",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/all/dracaena-fragrans/",
+    "kind": "extension"
+  },
+  "ncsu_dracaena_braunii": {
+    "title": "NC State Extension Plant Toolbox: Dracaena sanderiana (page Dracaena braunii)",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/dracaena-braunii/",
+    "kind": "extension"
+  },
+  "ncsu_dracaena_reflexa": {
+    "title": "NC State Extension Plant Toolbox: Dracaena reflexa var. reflexa",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/dracaena-reflexa-var-reflexa",
+    "kind": "extension"
+  },
+  "ncsu_ds": {
+    "title": "Dieffenbachia seguine",
+    "publisher": "NC State Extension Plant Toolbox",
+    "url": "https://plants.ces.ncsu.edu/plants/dieffenbachia-seguine/",
+    "kind": "extension"
+  },
+  "ncsu_ficus": {
+    "title": "Ficus lyrata - Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/all/ficus-lyrata/",
     "kind": "extension"
   },
   "ncsu_goeppertia_makoyana": {
     "title": "Goeppertia makoyana (NC State Extension Plant Toolbox)",
     "publisher": "NC State Extension",
     "url": "https://plants.ces.ncsu.edu/plants/goeppertia-makoyana/",
+    "kind": "extension"
+  },
+  "ncsu_hoya": {
+    "title": "Hoya carnosa - Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/hoya-carnosa",
     "kind": "extension"
   },
   "ncsu_jade": {
@@ -119,10 +293,34 @@
     "url": "https://plants.ces.ncsu.edu/plants/monstera-deliciosa/",
     "kind": "extension"
   },
+  "ncsu_nephrolepis": {
+    "title": "Nephrolepis exaltata - Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/nephrolepis-exaltata/",
+    "kind": "extension"
+  },
+  "ncsu_pachira_aquatica": {
+    "title": "NC State Extension Plant Toolbox: Pachira aquatica",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/pachira-aquatica/",
+    "kind": "extension"
+  },
+  "ncsu_pb": {
+    "title": "Philodendron bipinnatifidum",
+    "publisher": "NC State Extension Plant Toolbox",
+    "url": "https://plants.ces.ncsu.edu/plants/philodendron-bipinnatifidum/",
+    "kind": "extension"
+  },
   "ncsu_peperomia_obtusifolia": {
     "title": "Peperomia obtusifolia - NC State Extension Gardener Plant Toolbox",
     "publisher": "NC State Extension",
     "url": "https://plants.ces.ncsu.edu/plants/peperomia-obtusifolia/",
+    "kind": "extension"
+  },
+  "ncsu_phalaenopsis": {
+    "title": "Phalaenopsis spp. - Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/phalaenopsis-spp/",
     "kind": "extension"
   },
   "ncsu_philodendron_hederaceum": {
@@ -131,10 +329,28 @@
     "url": "https://plants.ces.ncsu.edu/plants/philodendron-hederaceum/",
     "kind": "extension"
   },
+  "ncsu_pilea": {
+    "title": "Pilea peperomioides - Plant Toolbox",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/pilea-peperomioides",
+    "kind": "extension"
+  },
   "ncsu_pothos": {
     "title": "Epipremnum aureum (pothos)",
     "publisher": "NC State Extension Plant Toolbox",
     "url": "https://plants.ces.ncsu.edu/plants/epipremnum-aureum/",
+    "kind": "extension"
+  },
+  "ncsu_rhaphidophora": {
+    "title": "Rhaphidophora tetrasperma",
+    "publisher": "NC State Extension Plant Toolbox",
+    "url": "https://plants.ces.ncsu.edu/plants/rhaphidophora-tetrasperma/",
+    "kind": "extension"
+  },
+  "ncsu_rosemary": {
+    "title": "Salvia rosmarinus (Plant Toolbox)",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/salvia-rosmarinus/",
     "kind": "extension"
   },
   "ncsu_rubber": {
@@ -149,6 +365,12 @@
     "url": "https://plants.ces.ncsu.edu/plants/schefflera-arboricola/",
     "kind": "extension"
   },
+  "ncsu_scindapsus": {
+    "title": "Scindapsus pictus (Satin Pothos)",
+    "publisher": "NC State Extension Plant Toolbox",
+    "url": "https://plants.ces.ncsu.edu/plants/scindapsus-pictus/common-name/satin-pothos/",
+    "kind": "extension"
+  },
   "ncsu_snake": {
     "title": "Dracaena trifasciata (snake plant)",
     "publisher": "NC State Extension Plant Toolbox",
@@ -159,6 +381,12 @@
     "title": "Spathiphyllum (genus page incl. S. wallisii)",
     "publisher": "NC State Extension Plant Toolbox",
     "url": "https://plants.ces.ncsu.edu/plants/spathiphyllum",
+    "kind": "extension"
+  },
+  "ncsu_spearmint": {
+    "title": "Mentha spicata (Plant Toolbox)",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/mentha-spicata",
     "kind": "extension"
   },
   "ncsu_spider": {
@@ -185,16 +413,34 @@
     "url": "https://plants.ces.ncsu.edu/plants/ficus-benjamina/",
     "kind": "extension"
   },
+  "ncsu_yucca_gigantea": {
+    "title": "NC State Extension Plant Toolbox: Yucca gigantea",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/yucca-gigantea",
+    "kind": "extension"
+  },
   "ncsu_zz": {
     "title": "Zamioculcas zamiifolia (ZZ plant)",
     "publisher": "NC State Extension Plant Toolbox",
     "url": "https://plants.ces.ncsu.edu/plants/zamioculcas-zamiifolia/",
     "kind": "extension"
   },
+  "nybg_money_tree": {
+    "title": "NYBG: How do I care for my money tree houseplant?",
+    "publisher": "New York Botanical Garden",
+    "url": "https://libanswers.nybg.org/faq/222948",
+    "kind": "botanical"
+  },
   "psu_aloe": {
     "title": "Aloe: A Hardy Houseplant",
     "publisher": "Penn State Extension",
     "url": "https://extension.psu.edu/aloe-a-hardy-houseplant",
+    "kind": "extension"
+  },
+  "psu_ficus": {
+    "title": "Fiddle Leaf Fig (Ficus lyrata)",
+    "publisher": "Penn State Extension, Adams County Master Gardeners",
+    "url": "https://extension.psu.edu/programs/master-gardener/counties/adams/news/fiddle-leaf-fig-ficus-lyrata",
     "kind": "extension"
   },
   "psu_jade": {
@@ -203,10 +449,70 @@
     "url": "https://extension.psu.edu/jade-plant-a-no-fuss-houseplant",
     "kind": "extension"
   },
+  "psu_pilea": {
+    "title": "Pilea as a Houseplant",
+    "publisher": "Penn State Extension",
+    "url": "https://extension.psu.edu/pilea-as-a-houseplant",
+    "kind": "extension"
+  },
+  "psu_rosemary": {
+    "title": "Herb Garden Plants: Rosemary",
+    "publisher": "Penn State Extension",
+    "url": "https://extension.psu.edu/herb-garden-plants-rosemary",
+    "kind": "extension"
+  },
+  "rhs_alocasia": {
+    "title": "How to grow alocasias (RHS Growing Guide)",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/alocasia/growing-guide",
+    "kind": "society"
+  },
+  "rhs_asp_densiflorus": {
+    "title": "Asparagus densiflorus",
+    "publisher": "RHS",
+    "url": "https://www.rhs.org.uk/plants/1692/asparagus-densiflorus/details",
+    "kind": "society"
+  },
+  "rhs_asp_setaceus": {
+    "title": "Asparagus setaceus",
+    "publisher": "RHS",
+    "url": "https://www.rhs.org.uk/plants/27185/asparagus-setaceus/details",
+    "kind": "society"
+  },
+  "rhs_aspidistra": {
+    "title": "How to grow aspidistras",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/aspidistra/how-to-grow-aspidistras",
+    "kind": "society"
+  },
   "rhs_begonia_maculata": {
     "title": "Begonia maculata (C)",
     "publisher": "Royal Horticultural Society",
     "url": "https://www.rhs.org.uk/plants/112222/begonia-maculata-c/details",
+    "kind": "society"
+  },
+  "rhs_cissus_rhombifolia": {
+    "title": "Cissus rhombifolia",
+    "publisher": "RHS",
+    "url": "https://www.rhs.org.uk/plants/64602/i-cissus-rhombifolia-i/details",
+    "kind": "society"
+  },
+  "rhs_dracaena_reflexa": {
+    "title": "RHS: Dracaena reflexa (song of India)",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/65427/dracaena-reflexa/details",
+    "kind": "society"
+  },
+  "rhs_ds": {
+    "title": "Dieffenbachia seguine",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/31781/dieffenbachia-seguine/details",
+    "kind": "society"
+  },
+  "rhs_fatsia": {
+    "title": "Fatsia japonica",
+    "publisher": "RHS",
+    "url": "https://www.rhs.org.uk/plants/7147/fatsia-japonica/details",
     "kind": "society"
   },
   "rhs_goeppertia_makoyana": {
@@ -215,16 +521,46 @@
     "url": "https://www.rhs.org.uk/plants/357223/goeppertia-makoyana/details",
     "kind": "society"
   },
+  "rhs_ivy_houseplant": {
+    "title": "How to grow ivy indoors",
+    "publisher": "RHS",
+    "url": "https://www.rhs.org.uk/plants/ivy/ivy-as-a-houseplant",
+    "kind": "society"
+  },
   "rhs_maranta_leuconeura": {
     "title": "Maranta leuconeura",
     "publisher": "Royal Horticultural Society",
     "url": "https://www.rhs.org.uk/plants/119598/maranta-leuconeura/details",
     "kind": "society"
   },
+  "rhs_mint": {
+    "title": "How to grow mint",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/herbs/mint/grow-your-own",
+    "kind": "society"
+  },
   "rhs_monstera": {
     "title": "Monstera deliciosa (F)",
     "publisher": "Royal Horticultural Society",
     "url": "https://www.rhs.org.uk/plants/11192/monstera-deliciosa-(f)/details",
+    "kind": "society"
+  },
+  "rhs_pb": {
+    "title": "Philodendron bipinnatifidum",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/12672/philodendron-bipinnatifidum/details",
+    "kind": "society"
+  },
+  "rhs_pm": {
+    "title": "Philodendron melanochrysum",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/47836/philodendron-melanochrysum/details",
+    "kind": "society"
+  },
+  "rhs_rosemary": {
+    "title": "How to grow rosemary",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/herbs/rosemary/grow-your-own",
     "kind": "society"
   },
   "rhs_sansevieria": {
@@ -239,10 +575,22 @@
     "url": "https://www.rhs.org.uk/plants/17623/spathiphyllum-wallisii/details",
     "kind": "society"
   },
+  "rhs_swiss_cheese": {
+    "title": "How to grow Swiss cheese plants",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/swiss-cheese-plants/how-to-grow-swiss-cheese-plants",
+    "kind": "society"
+  },
   "rhs_tradescantia_zebrina": {
     "title": "Tradescantia zebrina | silver inch plant",
     "publisher": "Royal Horticultural Society",
     "url": "https://www.rhs.org.uk/plants/79575/wd/details",
+    "kind": "society"
+  },
+  "rhs_yucca_elephantipes": {
+    "title": "RHS: Yucca elephantipes",
+    "publisher": "Royal Horticultural Society",
+    "url": "https://www.rhs.org.uk/plants/68706/i-Yucca-elephantipes-i/Details",
     "kind": "society"
   },
   "rhs_zz": {
@@ -251,10 +599,46 @@
     "url": "https://www.rhs.org.uk/plants/19185/zamioculcas-zamiifolia/details",
     "kind": "society"
   },
+  "uaex_cyperus": {
+    "title": "Plant of the Week: Cyperus alternifolius, Umbrella Plant",
+    "publisher": "University of Arkansas Extension",
+    "url": "https://uaex.uada.edu/yard-garden/resource-library/plant-week/Cyperus-alternifolius-Umbrella-Plant-08-11-2017.aspx",
+    "kind": "extension"
+  },
+  "uconn_scindapsus": {
+    "title": "If Scindapsus is Wrong, I Don't Want to Be Right",
+    "publisher": "UConn Home & Garden Education Center",
+    "url": "https://homegarden.cahnr.uconn.edu/?p=19246",
+    "kind": "extension"
+  },
+  "unf_cyperus": {
+    "title": "UNF Botanical Garden: Cyperus involucratus (formerly C. alternifolius)",
+    "publisher": "University of North Florida Botanical Garden",
+    "url": "https://unf.edu/botanical-garden/plants/cyperus-involucratus.html",
+    "kind": "botanical"
+  },
   "uwmadison_tradescantia_zebrina": {
     "title": "Tradescantia zebrina (Horticulture)",
     "publisher": "UW-Madison Extension",
     "url": "https://hort.extension.wisc.edu/articles/tradescantia-zebrina/",
+    "kind": "extension"
+  },
+  "wisc_boston_fern": {
+    "title": "Boston fern (Nephrolepis exaltata 'Bostoniensis')",
+    "publisher": "UW-Madison Division of Extension Horticulture",
+    "url": "https://hort.extension.wisc.edu/articles/boston-fern-nephrolepis-exaltata-bostoniensis/",
+    "kind": "extension"
+  },
+  "wisc_citrus": {
+    "title": "Indoor citrus",
+    "publisher": "UW-Madison Extension Horticulture",
+    "url": "https://hort.extension.wisc.edu/articles/indoor-citrus/",
+    "kind": "extension"
+  },
+  "wisc_ponytail": {
+    "title": "Ponytail Palm (Beaucarnea recurvata)",
+    "publisher": "UW-Madison Division of Extension Horticulture",
+    "url": "https://hort.extension.wisc.edu/articles/ponytail-palm-beaucarnea-recurvata/",
     "kind": "extension"
   },
   "wisc_spider": {

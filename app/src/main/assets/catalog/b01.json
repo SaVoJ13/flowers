@@ -1,0 +1,2161 @@
+[
+  {
+    "id": "citrus_limon",
+    "latin": "Citrus limon",
+    "family": "Rutaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "DEMANDING",
+      "lightMin": "HIGH",
+      "lightMax": "DIRECT",
+      "checkIntervalDays": 5,
+      "humidity": "MEDIUM",
+      "soil": "LIGHT_AIRY"
+    },
+    "safety": {
+      "pets": "UNKNOWN",
+      "children": "UNKNOWN",
+      "sourceIds": [
+        "wisc_citrus",
+        "ncsu_citrus_meyer"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Лимон кімнатний",
+        "aliases": [
+          "Лимон",
+          "Лимонне дерево"
+        ],
+        "summary": "Вічнозелене цитрусове деревце для вазона. Не має періоду спокою, тому цілий рік потребує багато світла і певної вологості повітря.",
+        "watering": "Ґрунт має бути вологим, але не мокрим. Поливайте рясно й нечасто, коли верхній шар злегка підсох; узимку поливайте рідше.",
+        "light": "Потрібне максимально яскраве світло, найкраще південне або південно-західне вікно. Якщо прямого сонця менше за 6 годин, додайте досвічування.",
+        "soil": "Злегка кислий, добре дренований субстрат. Домішка перліту або пемзи (до третини) покращує відведення води.",
+        "tip": "Пожовклі або скручені листки часто означають надмірний полив. Стежте за щитівками, павутинними кліщами, білокрилкою й попелицями."
+      },
+      "en": {
+        "name": "Lemon tree",
+        "aliases": [
+          "Lemon"
+        ],
+        "summary": "An evergreen citrus that can be grown in a pot indoors. It never rests in winter, so it wants strong light and some humidity all year.",
+        "watering": "Keep the mix damp but never soggy. Soak the pot thoroughly, then wait until the surface has dried a little before the next round; ease off in winter.",
+        "light": "Give it the brightest spot you have, such as a south or southwest window. If it gets under six hours of direct sun, add a grow light.",
+        "soil": "Use a slightly acidic, free-draining mix. Mixing in perlite or pumice, up to a third by volume, helps excess water escape.",
+        "tip": "Yellowed or cupped leaves often point to too much water. Check regularly for scale, spider mites, whiteflies and aphids."
+      },
+      "ru": {
+        "name": "Лимон комнатный",
+        "aliases": [
+          "Лимон",
+          "Лимонное дерево"
+        ],
+        "summary": "Вечнозелёное цитрусовое деревце для выращивания в горшке. Зимой не впадает в покой, поэтому круглый год нуждается в ярком свете и влажном воздухе.",
+        "watering": "Грунт должен быть влажным, но не сырым. Поливайте обильно и нечасто, когда верхний слой слегка подсох; зимой поливайте реже.",
+        "light": "Нужно самое яркое место, лучше всего южное или юго-западное окно. Если прямого солнца меньше 6 часов, добавьте досветку.",
+        "soil": "Слегка кислый, хорошо дренированный субстрат. Добавка перлита или пемзы (до трети объёма) улучшает отвод воды.",
+        "tip": "Пожелтевшие или скрученные листья часто говорят о переливе. Следите за щитовками, паутинным клещом, белокрылкой и тлёй."
+      },
+      "pl": {
+        "name": "Cytryna",
+        "aliases": [
+          "Cytryna zwyczajna",
+          "Drzewko cytrynowe"
+        ],
+        "summary": "Wiecznie zielone drzewko cytrusowe do uprawy w doniczce. Zimą nie zapada w spoczynek, więc przez cały rok potrzebuje dużo światła i wilgotniejszego powietrza.",
+        "watering": "Podłoże ma być wilgotne, ale nigdy mokre. Podlewaj obficie i rzadko, gdy wierzch lekko przeschnie; zimą ogranicz podlewanie.",
+        "light": "Wybierz najjaśniejsze miejsce, najlepiej okno południowe lub południowo-zachodnie. Gdy bezpośredniego słońca jest mniej niż 6 godzin, dodaj doświetlanie.",
+        "soil": "Podłoże lekko kwaśne i przepuszczalne. Dodatek perlitu lub pumeksu, do jednej trzeciej objętości, poprawia odpływ wody.",
+        "tip": "Zażółcone lub zwinięte liście często oznaczają przelanie. Kontroluj roślinę pod kątem tarczników, przędziorków, mączlików i mszyc."
+      }
+    },
+    "sourceIds": [
+      "wisc_citrus",
+      "ncsu_citrus_meyer"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Сторінка NC State про сорт Meyer (Citrus x limon); безпеку не оцінено."
+  },
+  {
+    "id": "ocimum_basilicum",
+    "latin": "Ocimum basilicum",
+    "family": "Lamiaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "MEDIUM",
+      "lightMin": "HIGH",
+      "lightMax": "DIRECT",
+      "checkIntervalDays": 3,
+      "humidity": "MEDIUM",
+      "soil": "UNIVERSAL"
+    },
+    "safety": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN",
+      "sourceIds": [
+        "ncsu_basil"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Базилік",
+        "aliases": [
+          "Базилік справжній"
+        ],
+        "summary": "Однорічна пряна трава, яку легко вирощувати на підвіконні. Любить сонце, родючий ґрунт і постійну вологу.",
+        "watering": "Любить рівномірно вологий ґрунт, тож перевіряйте його часто. Поливайте під корінь, не мочіть листя, і не залишайте воду в піддонику.",
+        "light": "Найкраще росте на повному сонці. Задовольняється й частковим сонцем, приблизно шість годин світла на день.",
+        "soil": "Родючий, добре дренований ґрунт з органікою. У бідному субстраті ріст повільний, а смак листя слабкий.",
+        "tip": "Холодне повітря й холодний ґрунт гальмують ріст, а листя може почорніти. Рослину з ознаками в'янення швидко видаліть."
+      },
+      "en": {
+        "name": "Basil",
+        "aliases": [
+          "Sweet basil"
+        ],
+        "summary": "A tender culinary herb that does well on a sunny windowsill. It likes bright light, fertile soil and steady moisture.",
+        "watering": "It prefers to stay well watered, so check the pot often. Water at the base, keep the leaves dry and never leave the pot standing in a full saucer.",
+        "light": "Full sun suits it best, though a spot with about six hours of sun a day still gives decent growth.",
+        "soil": "Choose rich, free-draining soil with plenty of organic matter. In poor soil growth is slow and the flavour turns bland.",
+        "tip": "Chilly air and cold soil stunt growth and can leave leaves blackened. Pull out any plant showing wilt disease without delay."
+      },
+      "ru": {
+        "name": "Базилик",
+        "aliases": [
+          "Базилик душистый",
+          "Базилик обыкновенный"
+        ],
+        "summary": "Однолетняя пряная трава, которую просто растить на подоконнике. Любит солнце, плодородную почву и постоянную влагу.",
+        "watering": "Любит стабильно влажную землю, поэтому проверяйте её часто. Лейте под корень, листья не мочите, воду в поддоне не оставляйте.",
+        "light": "Лучше всего растёт на полном солнце. Мирится и с частичным солнцем, примерно шесть часов света в день.",
+        "soil": "Плодородная, хорошо дренированная земля с органикой. В бедном грунте рост медленный, а вкус листьев слабый.",
+        "tip": "Холодный воздух и холодная земля тормозят рост, листья могут почернеть. Растение с признаками увядания сразу уберите."
+      },
+      "pl": {
+        "name": "Bazylia",
+        "aliases": [
+          "Bazylia pospolita"
+        ],
+        "summary": "Jednoroczne ziele przyprawowe, które łatwo uprawiać na parapecie. Lubi słońce, żyzną ziemię i stałą wilgoć.",
+        "watering": "Lubi być stale dobrze nawodniona, więc często sprawdzaj ziemię. Podlewaj przy korzeniach, nie moczyć liści, nie zostawiaj wody w podstawce.",
+        "light": "Najlepiej rośnie w pełnym słońcu. Zadowoli się też stanowiskiem z około sześcioma godzinami słońca dziennie.",
+        "soil": "Wybierz żyzną, przepuszczalną ziemię z dodatkiem materii organicznej. W ubogim podłożu rośnie wolno, a liście mają mdły smak.",
+        "tip": "Zimne powietrze i chłodna ziemia hamują wzrost, a liście mogą poczernieć. Roślinę z objawami więdnięcia od razu usuń."
+      }
+    },
+    "sourceIds": [
+      "clemson_basil",
+      "illinois_basil",
+      "ncsu_basil"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Безпека для котів і собак лише з тегів NC State (без речення в тексті)."
+  },
+  {
+    "id": "salvia_rosmarinus",
+    "latin": "Salvia rosmarinus",
+    "family": "Lamiaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "DEMANDING",
+      "lightMin": "HIGH",
+      "lightMax": "DIRECT",
+      "checkIntervalDays": 10,
+      "humidity": "LOW",
+      "soil": "LIGHT_AIRY"
+    },
+    "safety": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN",
+      "sourceIds": [
+        "ncsu_rosemary"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Розмарин",
+        "aliases": [
+          "Розмарин лікарський"
+        ],
+        "summary": "Вічнозелений пряний чагарник, який любить сонце й сухуватий ґрунт. У приміщенні зимувати йому непросто через брак світла.",
+        "watering": "Найчастіша причина загибелі - надмірний полив. Не допускайте мокрого коріння, особливо взимку, і поливайте лише коли ґрунт підсохне.",
+        "light": "Потрібне повне сонце, не менше 6 годин прямого світла. У вазоні ставте на південне вікно, за потреби додайте досвічування й провітрюйте.",
+        "soil": "Легкий, злегка кислий, добре дренований ґрунт, не глинистий. Беріть горщик з дренажними отворами, завширшки й заглибшки щонайменше 30 см.",
+        "tip": "Не любить вологого повітря. Головний ризик взимку в домі: мало світла й неправильний полив, що призводить до гнилі коренів."
+      },
+      "en": {
+        "name": "Rosemary",
+        "aliases": [
+          "Common rosemary"
+        ],
+        "summary": "A woody evergreen herb that loves sun and a fairly dry root zone. Keeping it alive indoors over winter is the hard part.",
+        "watering": "Too much water is the usual cause of decline. Never let the roots sit wet, especially in winter; water only once the soil has dried out.",
+        "light": "It needs full sun, at least six hours of direct light. Indoors use a south-facing window, add a grow light if needed and keep air moving.",
+        "soil": "Use a light, slightly acidic, free-draining mix, never heavy clay. Pick a pot with drainage holes, at least 30 cm wide and deep.",
+        "tip": "It dislikes damp, humid air. The main indoor risks in winter are dim light and wrong watering, which lead to root rot."
+      },
+      "ru": {
+        "name": "Розмарин",
+        "aliases": [
+          "Розмарин лекарственный"
+        ],
+        "summary": "Вечнозелёный пряный кустарник, любящий солнце и суховатую землю. Зимовка в комнате даётся ему нелегко из-за нехватки света.",
+        "watering": "Чаще всего растение гибнет от перелива. Не допускайте мокрых корней, особенно зимой, и поливайте, лишь когда земля просохла.",
+        "light": "Нужно полное солнце, не меньше 6 часов прямого света. В комнате ставьте на южное окно, при необходимости досвечивайте и проветривайте.",
+        "soil": "Лёгкая, слегка кислая, хорошо дренированная почва, не глинистая. Берите горшок с дренажными отверстиями шириной и глубиной не менее 30 см.",
+        "tip": "Не любит влажный воздух. Главные зимние риски в доме: мало света и неверный полив, из-за которого начинается гниль корней."
+      },
+      "pl": {
+        "name": "Rozmaryn",
+        "aliases": [
+          "Rozmaryn lekarski"
+        ],
+        "summary": "Zimozielony krzew przyprawowy, który lubi słońce i raczej suche podłoże. Największym wyzwaniem jest przezimowanie go w domu.",
+        "watering": "Najczęstszą przyczyną ginięcia jest przelanie. Nie dopuszczaj do mokrych korzeni, zwłaszcza zimą, i podlewaj dopiero po przeschnięciu ziemi.",
+        "light": "Potrzebuje pełnego słońca, co najmniej 6 godzin bezpośredniego światła. W domu ustaw go w oknie południowym, w razie potrzeby doświetlaj i wietrz.",
+        "soil": "Podłoże lekkie, lekko kwaśne i przepuszczalne, nie gliniaste. Wybierz doniczkę z otworami odpływowymi, szeroką i głęboką na minimum 30 cm.",
+        "tip": "Nie lubi wilgotnego powietrza. Zimą w domu groźne są słabe światło i błędy w podlewaniu, które prowadzą do gnicia korzeni."
+      }
+    },
+    "sourceIds": [
+      "ncsu_rosemary",
+      "psu_rosemary",
+      "rhs_rosemary"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Безпека для котів і собак лише з тегів NC State (без речення в тексті)."
+  },
+  {
+    "id": "mentha",
+    "latin": "Mentha",
+    "family": "Lamiaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "EASY",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 4,
+      "humidity": "MEDIUM",
+      "soil": "MOISTURE_RETAINING"
+    },
+    "safety": {
+      "pets": "UNKNOWN",
+      "children": "UNKNOWN",
+      "sourceIds": [
+        "ncsu_spearmint",
+        "rhs_mint"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "М'ята",
+        "aliases": [
+          "Mentha"
+        ],
+        "summary": "Родина запашних трав, які швидко розростаються. Найкраще почуваються у вазоні, а восени їх можна внести на сонячне підвіконня.",
+        "watering": "Не терпить пересушеного ґрунту, потрібен вологий субстрат. У горщику земля висихає швидше, ніж у саду, тому перевіряйте її регулярно.",
+        "light": "Підходить повне сонце або півтінь, приблизно від 2 до 6 годин прямого світла.",
+        "soil": "Родючий, багатий на органіку, вологий і добре дренований ґрунт.",
+        "tip": "М'ята швидко поширюється, тож вирощуйте її в окремому горщику. Загалом вона невибаглива, але трапляються іржа та грибкові хвороби."
+      },
+      "en": {
+        "name": "Mint",
+        "aliases": [
+          "Mentha"
+        ],
+        "summary": "A group of scented, fast-spreading herbs. They are happiest in a pot, and in autumn can move to a sunny windowsill.",
+        "watering": "It dislikes dry soil and wants a damp, free-draining mix. Pots dry out faster than garden beds, so look at the soil regularly while it grows.",
+        "light": "Full sun or partial shade both work, roughly two to six hours of direct light.",
+        "soil": "Fertile, organically rich soil that stays moist but drains well.",
+        "tip": "Mint runs quickly, so give it a pot of its own. It is usually trouble free, though rust and fungal diseases do turn up."
+      },
+      "ru": {
+        "name": "Мята",
+        "aliases": [
+          "Mentha"
+        ],
+        "summary": "Род душистых трав, которые быстро разрастаются. Лучше всего чувствуют себя в горшке, а осенью их можно перенести на солнечный подоконник.",
+        "watering": "Не переносит пересушенную землю, нужен влажный субстрат. В горшке земля сохнет быстрее, чем на грядке, поэтому проверяйте её регулярно.",
+        "light": "Подойдёт полное солнце или полутень, примерно от 2 до 6 часов прямого света.",
+        "soil": "Плодородная, богатая органикой, влажная и хорошо дренированная земля.",
+        "tip": "Мята быстро расползается, поэтому растите её в отдельном горшке. Обычно она неприхотлива, но встречаются ржавчина и грибковые болезни."
+      },
+      "pl": {
+        "name": "Mięta",
+        "aliases": [
+          "Mentha"
+        ],
+        "summary": "Rodzaj aromatycznych ziół, które szybko się rozrastają. Najlepiej rosną w doniczce, a jesienią można je przenieść na słoneczny parapet.",
+        "watering": "Nie znosi przesuszonej ziemi, lubi podłoże wilgotne. W doniczce ziemia schnie szybciej niż w gruncie, dlatego sprawdzaj ją regularnie.",
+        "light": "Odpowiada jej pełne słońce lub półcień, mniej więcej od 2 do 6 godzin bezpośredniego światła.",
+        "soil": "Żyzna, bogata w materię organiczną ziemia, wilgotna, ale dobrze odprowadzająca wodę.",
+        "tip": "Mięta szybko się rozprzestrzenia, więc dla niej wydziel osobną doniczkę. Zwykle sprawia mało kłopotów, ale zdarza się rdza i choroby grzybowe."
+      }
+    },
+    "sourceIds": [
+      "ncsu_spearmint",
+      "rhs_mint"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Картка на рівні роду (еталон у джерелах M. spicata); безпеку не оцінено, джерела розходяться між видами."
+  },
+  {
+    "id": "dracaena_fragrans",
+    "latin": "Dracaena fragrans",
+    "family": "Asparagaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "VERY_EASY",
+      "lightMin": "LOW",
+      "lightMax": "MEDIUM",
+      "checkIntervalDays": 10,
+      "humidity": "MEDIUM",
+      "soil": "UNIVERSAL"
+    },
+    "safety": {
+      "pets": "TOXIC",
+      "children": "TOXIC",
+      "sourceIds": [
+        "ncsu_dracaena"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Драцена запашна",
+        "aliases": [
+          "Драцена пахуча"
+        ],
+        "summary": "Невибаглива кімнатна рослина, що мириться зі слабким освітленням. Найкраще почувається при яскравому розсіяному світлі.",
+        "watering": "Давайте ґрунту трохи підсохнути між поливами. У сезон росту тримайте його вологим, а взимку поливайте менше.",
+        "light": "Найкраще росте на яскравому розсіяному світлі, але терпить і притінок. Пряме сонце може обпекти листя.",
+        "soil": "Звичайний готовий субстрат для кімнатних рослин у горщику з дренажними отворами.",
+        "tip": "Сухі кінчики листя найчастіше з'являються через надто сухе повітря. Рослина чутлива до фтору та накопичених у ґрунті солей."
+      },
+      "en": {
+        "name": "Corn plant",
+        "aliases": [
+          "Fragrant dracaena",
+          "Cornstalk dracaena"
+        ],
+        "summary": "A forgiving houseplant that copes with dim rooms. It looks its best in bright, indirect light.",
+        "watering": "Let the soil dry out a little between drinks. Keep it evenly damp while it is growing and give less in winter.",
+        "light": "Bright, indirect light suits it best, yet it puts up with lower light. Direct sun can scorch the leaves.",
+        "soil": "An ordinary packaged houseplant mix will do, in a pot with drainage holes.",
+        "tip": "Brown, dry leaf tips usually mean the air is too dry. It is also sensitive to fluoride and salts building up in the soil."
+      },
+      "ru": {
+        "name": "Драцена душистая",
+        "aliases": [
+          "Драцена ароматная"
+        ],
+        "summary": "Неприхотливое комнатное растение, мирящееся со слабым освещением. Лучше всего чувствует себя на ярком рассеянном свете.",
+        "watering": "Давайте земле немного просохнуть между поливами. В период роста держите её влажной, а зимой поливайте меньше.",
+        "light": "Лучше всего растёт на ярком рассеянном свету, но переносит и полутень. Прямое солнце может обжечь листья.",
+        "soil": "Обычный готовый грунт для комнатных растений в горшке с дренажными отверстиями.",
+        "tip": "Сухие кончики листьев чаще всего появляются от слишком сухого воздуха. Растение чувствительно к фтору и накопившимся в земле солям."
+      },
+      "pl": {
+        "name": "Dracena wonna",
+        "aliases": [
+          "Dracena pachnąca"
+        ],
+        "summary": "Niewymagająca roślina doniczkowa, która radzi sobie nawet w słabo oświetlonym pomieszczeniu. Najładniej wygląda w jasnym, rozproszonym świetle.",
+        "watering": "Pozwól ziemi lekko przeschnąć między podlewaniami. W okresie wzrostu utrzymuj ją wilgotną, a zimą podlewaj mniej.",
+        "light": "Najlepiej rośnie w jasnym, rozproszonym świetle, ale toleruje też słabsze. Pełne słońce może poparzyć liście.",
+        "soil": "Zwykła gotowa ziemia do roślin doniczkowych, w doniczce z otworami odpływowymi.",
+        "tip": "Brązowe, suche końcówki liści zwykle wynikają ze zbyt suchego powietrza. Roślina źle znosi fluor i sole gromadzące się w podłożu."
+      }
+    },
+    "sourceIds": [
+      "clemson_dracaena",
+      "ncsu_dracaena"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    }
+  },
+  {
+    "id": "dracaena_reflexa",
+    "latin": "Dracaena reflexa",
+    "family": "Asparagaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "EASY",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 7,
+      "humidity": "MEDIUM",
+      "soil": "UNIVERSAL"
+    },
+    "safety": {
+      "pets": "TOXIC",
+      "children": "UNKNOWN",
+      "sourceIds": [
+        "ncsu_dracaena_reflexa"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Драцена загнута (пісня Індії)",
+        "aliases": [
+          "Драцена рефлекса",
+          "Пісня Індії"
+        ],
+        "summary": "Декоративна кімнатна драцена з вигнутим листям. Нескладна у догляді: любить яскраве розсіяне світло, помірно вологий ґрунт і вологе повітря.",
+        "watering": "Підтримуйте ґрунт рівномірно вологим, але не розмоклим: перед поливом перевіряйте верхній шар. Влітку поливайте помірно, взимку скупо. Краще брати відстояну, фільтровану або дощову воду.",
+        "light": "Найкраще росте на яскравому розсіяному світлі, у легкій півтіні теж почувається нормально. Гаряче пряме сонце може обпалити листя або вибілити його.",
+        "soil": "Підійде пухкий, добре дренований універсальний субстрат. Перліт або пісок поліпшать відведення води.",
+        "tip": "Головний ризик: надмірний полив, від якого гниє коріння. Жовтіння листя бувають і від пересихання, а плями з'являються, коли листя довго мокре."
+      },
+      "en": {
+        "name": "Song of India",
+        "aliases": [
+          "Pleomele",
+          "Dracaena reflexa"
+        ],
+        "summary": "A tidy, easygoing dracaena with arching leaves. It does best with bright filtered light, a mix that stays lightly damp, and fairly humid air.",
+        "watering": "Touch-test the surface before each watering and aim for soil that is evenly damp yet never soggy. Give moderate amounts in summer and just a little in winter. Filtered or rain water suits it better than tap.",
+        "light": "Happiest in bright, indirect light, though it copes with some shade. Hot midday sun can scorch the leaves or leave them pale.",
+        "soil": "Use a loose, free-draining potting mix. Mixing in perlite or coarse sand helps excess water escape.",
+        "tip": "Too much water is the usual culprit and leads to rotting roots. Yellowing can come from either extreme, and leaf spots show up if foliage stays wet."
+      },
+      "ru": {
+        "name": "Драцена отогнутая (песня Индии)",
+        "aliases": [
+          "Драцена рефлекса",
+          "Песня Индии"
+        ],
+        "summary": "Декоративная комнатная драцена с изогнутыми листьями. Неприхотлива: любит яркий рассеянный свет, умеренно влажный грунт и достаточно влажный воздух.",
+        "watering": "Грунт держите равномерно влажным, но не мокрым, перед поливом проверяйте верхний слой. Летом поливайте умеренно, зимой скупо. Лучше использовать отстоянную, фильтрованную или дождевую воду.",
+        "light": "Лучше всего растёт при ярком рассеянном свете, легкую полутень тоже переносит. Жаркое прямое солнце может обжечь листья или обесцветить их.",
+        "soil": "Подойдёт рыхлый, хорошо дренированный универсальный грунт. Перлит или песок улучшат отвод воды.",
+        "tip": "Главная опасность: переувлажнение, от него гниют корни. Листья желтеют и от пересыхания, а пятна появляются, если листва долго остаётся мокрой."
+      },
+      "pl": {
+        "name": "Dracena odgięta",
+        "aliases": [
+          "Dracena reflexa"
+        ],
+        "summary": "Ozdobna dracena pokojowa o łukowato wygiętych liściach. Nie sprawia kłopotów: lubi jasne rozproszone światło, umiarkowanie wilgotne podłoże i wilgotne powietrze.",
+        "watering": "Podłoże utrzymuj równomiernie wilgotne, ale nie rozmokłe, a przed podlaniem sprawdzaj wierzchnią warstwę. Latem podlewaj umiarkowanie, zimą oszczędnie. Najlepsza jest woda odstana, filtrowana lub deszczówka.",
+        "light": "Najlepiej rośnie w jasnym świetle rozproszonym, lekki półcień też znosi. Gorące, bezpośrednie słońce może poparzyć liście lub je wybielić.",
+        "soil": "Dobre będzie luźne, przepuszczalne podłoże uniwersalne. Perlit lub piasek poprawią odpływ wody.",
+        "tip": "Najczęstszy problem to przelanie, które prowadzi do gnicia korzeni. Żółknięcie liści zdarza się też przy przesuszeniu, a plamy pojawiają się, gdy liście długo są mokre."
+      }
+    },
+    "sourceIds": [
+      "ncsu_dracaena_reflexa",
+      "rhs_dracaena_reflexa"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    }
+  },
+  {
+    "id": "dracaena_sanderiana",
+    "latin": "Dracaena sanderiana",
+    "family": "Asparagaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "VERY_EASY",
+      "lightMin": "LOW",
+      "lightMax": "MEDIUM",
+      "checkIntervalDays": 7,
+      "humidity": "MEDIUM",
+      "soil": "UNIVERSAL"
+    },
+    "safety": {
+      "pets": "TOXIC",
+      "children": "TOXIC",
+      "sourceIds": [
+        "clemson_lucky_bamboo",
+        "ncsu_dracaena_braunii"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Драцена Сандера (щасливий бамбук)",
+        "aliases": [
+          "Щасливий бамбук",
+          "Драцена Брауна"
+        ],
+        "summary": "Дуже невибаглива рослина з гладкими зеленими стеблами. Її вирощують і в ґрунті, і просто у воді, а світло потрібне яскраве розсіяне.",
+        "watering": "У ґрунті поливайте, коли підсохне верхній шар, дайте воді стекти й не залишайте її в піддоні. У воді міняйте її раз на тиждень, краще без хлору.",
+        "light": "Любить яскраве розсіяне світло. Пряме сонце спричиняє побуріння листя.",
+        "soil": "У ґрунті береться добре дренований субстрат для кімнатних тропічних рослин. У посудині з водою камінці додають стійкості й місця для коренів.",
+        "tip": "Кінчики листя буріють від сухого повітря, а від надміру води листя жовтіє й гниють стебла. Підживлюйте слабким розчином."
+      },
+      "en": {
+        "name": "Lucky bamboo",
+        "aliases": [
+          "Dracaena braunii",
+          "Ribbon plant"
+        ],
+        "summary": "A very forgiving plant with smooth green canes that grows either in potting mix or simply in water. It wants bright light without harsh sun.",
+        "watering": "In soil, water once the top inch has dried out, let it drain and never leave water standing in the saucer. In a vase, replace the water weekly, ideally with chlorine-free water.",
+        "light": "Thrives in bright, indirect light. Direct sun turns the foliage brown.",
+        "soil": "In soil, a free-draining mix for tropical houseplants works well. In a water vase, pebbles anchor the canes and give roots room to spread.",
+        "tip": "Dry air browns the leaf tips, while too much water yellows the leaves and rots the canes. Feed only with a very weak solution."
+      },
+      "ru": {
+        "name": "Драцена Сандера (счастливый бамбук)",
+        "aliases": [
+          "Счастливый бамбук",
+          "Драцена Брауна"
+        ],
+        "summary": "Очень неприхотливое растение с гладкими зелёными стеблями. Его выращивают и в грунте, и просто в воде, свет нужен яркий рассеянный.",
+        "watering": "В грунте поливайте, когда подсохнет верхний слой, дайте воде стечь и не оставляйте её в поддоне. В воде меняйте её раз в неделю, лучше без хлора.",
+        "light": "Любит яркий рассеянный свет. От прямого солнца листья буреют.",
+        "soil": "Для посадки в грунт нужен хорошо дренированный субстрат для комнатных тропических растений. В сосуде с водой камешки добавляют устойчивости и место для корней.",
+        "tip": "Кончики листьев буреют от сухого воздуха, а от избытка воды листья желтеют и гниют стебли. Подкармливайте очень слабым раствором."
+      },
+      "pl": {
+        "name": "Dracena Sandera",
+        "aliases": [
+          "Szczęśliwy bambus",
+          "Bambus szczęścia"
+        ],
+        "summary": "Bardzo łatwa roślina o gładkich zielonych łodygach. Rośnie zarówno w podłożu, jak i po prostu w wodzie, potrzebuje jasnego, rozproszonego światła.",
+        "watering": "W podłożu podlewaj, gdy przeschnie wierzchnia warstwa, odczekaj aż woda spłynie i nie zostawiaj jej w podstawce. W wazonie wymieniaj wodę raz w tygodniu, najlepiej bez chloru.",
+        "light": "Lubi jasne światło rozproszone. Bezpośrednie słońce powoduje brązowienie liści.",
+        "soil": "W doniczce sprawdzi się przepuszczalne podłoże do roślin tropikalnych. W naczyniu z wodą kamyki stabilizują pędy i dają miejsce korzeniom.",
+        "tip": "Końcówki liści brązowieją od suchego powietrza, a nadmiar wody powoduje żółknięcie liści i gnicie łodyg. Nawoź bardzo słabym roztworem."
+      }
+    },
+    "sourceIds": [
+      "clemson_lucky_bamboo",
+      "ncsu_dracaena_braunii"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    }
+  },
+  {
+    "id": "cyperus_alternifolius",
+    "latin": "Cyperus alternifolius",
+    "family": "Cyperaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "EASY",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 3,
+      "humidity": "HIGH",
+      "soil": "MOISTURE_RETAINING"
+    },
+    "safety": {
+      "pets": "UNKNOWN",
+      "children": "UNKNOWN",
+      "sourceIds": []
+    },
+    "i18n": {
+      "uk": {
+        "name": "Циперус черговолистий (сить)",
+        "aliases": [
+          "Сить",
+          "Циперус зонтичний"
+        ],
+        "summary": "Вологолюбна рослина з пучками листків-парасольок на високих стеблах. Коріння має завжди бути у вологому середовищі, тож циперус охоче росте навіть у воді.",
+        "watering": "Ґрунт має бути постійно мокрим, горщик можна ставити в піддон з водою. Часто перевіряйте його, адже коріння не повинне пересихати. Буріння кінчиків листя зазвичай означає нестачу води.",
+        "light": "Росте від повного сонця до легкої півтіні. Від сильного сонця краще вкрити. Узимку шукайте для нього яскраве місце.",
+        "soil": "Любить родючий суглинок або піщаний ґрунт. Добре пристосовується, поки ґрунт вологий чи мокрий.",
+        "tip": "Тримайте подалі від опалення, що сушить повітря, і від морозу, який вбиває листя. Стебла можуть полягати, тож інколи потрібна опора."
+      },
+      "en": {
+        "name": "Umbrella sedge",
+        "aliases": [
+          "Umbrella plant",
+          "Umbrella papyrus"
+        ],
+        "summary": "A moisture-loving plant whose tall stems end in whorls of umbrella-like leaves. Its roots like to stay wet, so it will even grow standing in water.",
+        "watering": "Keep the soil wet all the time; the pot can sit in a saucer of water. Check often, since the roots should not dry out. Brown leaf tips typically signal too little water.",
+        "light": "Grows from full sun to part shade. Shield it from the strongest sun, and give it a bright spot in winter.",
+        "soil": "Prefers fertile loam or sandy ground. It adapts readily as long as the soil is moist to wet.",
+        "tip": "Keep it away from drying heaters and from frost, which kills the foliage. Stems may flop over, so some support can help."
+      },
+      "ru": {
+        "name": "Циперус очереднолистный (сыть)",
+        "aliases": [
+          "Сыть",
+          "Циперус зонтичный",
+          "Комнатный папирус"
+        ],
+        "summary": "Влаголюбивое растение с пучками листьев-зонтиков на высоких стеблях. Корни должны всегда оставаться во влажной среде, поэтому циперус растёт даже в воде.",
+        "watering": "Грунт должен быть постоянно мокрым, горшок можно ставить в поддон с водой. Проверяйте его часто, корни не должны пересыхать. Бурые кончики листьев обычно говорят о нехватке воды.",
+        "light": "Растёт от полного солнца до лёгкой полутени. От самого сильного солнца лучше прикрыть. Зимой подберите яркое место.",
+        "soil": "Любит плодородный суглинок или песчаную почву. Хорошо приспосабливается, пока грунт влажный или мокрый.",
+        "tip": "Держите подальше от батарей, сушащих воздух, и от мороза, который губит листья. Стебли могут полегать, поэтому иногда нужна опора."
+      },
+      "pl": {
+        "name": "Cyperus parasolowaty",
+        "aliases": [
+          "Cibora parasolowata"
+        ],
+        "summary": "Wilgociolubna roślina z wysokimi pędami zakończonymi parasolowatymi pękami liści. Korzenie powinny stale być w mokrym podłożu, więc cyperus rośnie nawet w wodzie.",
+        "watering": "Podłoże ma być stale mokre, doniczkę można stawiać w podstawce z wodą. Sprawdzaj je często, bo korzenie nie mogą przeschnąć. Brązowe końcówki liści zwykle oznaczają niedobór wody.",
+        "light": "Rośnie od pełnego słońca po lekki półcień. Przed najmocniejszym słońcem warto go osłonić. Zimą daj mu jasne miejsce.",
+        "soil": "Lubi żyzną glebę gliniastą lub piaszczystą. Dobrze się przystosowuje, o ile podłoże jest wilgotne lub mokre.",
+        "tip": "Trzymaj z dala od kaloryferów, które wysuszają powietrze, i od mrozu, który niszczy liście. Pędy mogą się kłaść, więc czasem przyda się podpora."
+      }
+    },
+    "sourceIds": [
+      "ncsu_cyperus_alternifolius",
+      "unf_cyperus",
+      "uaex_cyperus"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    }
+  },
+  {
+    "id": "yucca_gigantea",
+    "latin": "Yucca gigantea",
+    "family": "Asparagaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "VERY_EASY",
+      "lightMin": "HIGH",
+      "lightMax": "DIRECT",
+      "checkIntervalDays": 14,
+      "humidity": "LOW",
+      "soil": "CACTUS_MIX"
+    },
+    "safety": {
+      "pets": "TOXIC",
+      "children": "TOXIC",
+      "sourceIds": [
+        "ncsu_yucca_gigantea",
+        "rhs_yucca_elephantipes"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Юка гігантська",
+        "aliases": [
+          "Юка слонова"
+        ],
+        "summary": "Дуже невибаглива рослина з товстим стовбуром і жорстким листям. Витримує посуху й любить багато світла, тому добре росте біля яскравого вікна.",
+        "watering": "Перед поливом переконайтеся, що ґрунт підсох. Рослина стійка до посухи. У період росту поливайте щедро, взимку скупо.",
+        "light": "Віддає перевагу повному сонцю, але витримує й півтінь. Найкраще підійде південне або західне вікно.",
+        "soil": "Підійде легкий субстрат: одна частина садової землі й три частини перліту чи піску. Також годиться суглинистий субстрат з додатковим гравієм.",
+        "tip": "Надмірний полив призводить до гниття коріння, а холод пошкоджує рослину. Уникайте протягів і працюйте з нею в рукавичках."
+      },
+      "en": {
+        "name": "Giant yucca",
+        "aliases": [
+          "Spineless yucca",
+          "Yucca elephantipes"
+        ],
+        "summary": "A tough, easy plant with a thick trunk and stiff leaves. It shrugs off dry spells and loves strong light, so a bright window suits it well.",
+        "watering": "Make sure the mix has dried out before watering again, since the plant tolerates drought. Water generously while it is growing and sparingly in winter.",
+        "light": "Prefers full sun but copes with partial shade. A south or west window is ideal.",
+        "soil": "A gritty blend works: one part potting mix to three parts perlite or sand. A loam-based mix with extra grit is also fine.",
+        "tip": "Overwatering rots the roots and cold harms the plant, so avoid drafts. Wear gloves when handling it."
+      },
+      "ru": {
+        "name": "Юкка гигантская",
+        "aliases": [
+          "Юкка слоновая",
+          "Юкка слононогая"
+        ],
+        "summary": "Очень неприхотливое растение с толстым стволом и жёсткими листьями. Переносит засуху и любит много света, поэтому хорошо растёт у яркого окна.",
+        "watering": "Перед поливом убедитесь, что грунт просох, растение засухоустойчиво. В период роста поливайте обильно, зимой скупо.",
+        "light": "Предпочитает полное солнце, но мирится и с полутенью. Лучше всего подойдёт южное или западное окно.",
+        "soil": "Подойдёт лёгкая смесь: одна часть готового грунта и три части перлита или песка. Годится и суглинистый субстрат с добавлением крупного песка.",
+        "tip": "От переувлажнения гниют корни, а холод повреждает растение, избегайте сквозняков. Работать с ним лучше в перчатках."
+      },
+      "pl": {
+        "name": "Juka olbrzymia",
+        "aliases": [
+          "Yucca elephantipes"
+        ],
+        "summary": "Bardzo odporna roślina o grubym pniu i sztywnych liściach. Znosi suszę i lubi dużo światła, dlatego dobrze rośnie przy jasnym oknie.",
+        "watering": "Przed kolejnym podlaniem upewnij się, że podłoże przeschło, bo roślina jest odporna na suszę. W okresie wzrostu podlewaj obficie, zimą oszczędnie.",
+        "light": "Woli pełne słońce, ale toleruje też półcień. Najlepsze będzie okno od południa lub zachodu.",
+        "soil": "Sprawdzi się lekkie podłoże: jedna część ziemi do kwiatów i trzy części perlitu lub piasku. Dobra jest też ziemia gliniasta z dodatkiem żwirku.",
+        "tip": "Przelanie powoduje gnicie korzeni, a chłód szkodzi roślinie, więc unikaj przeciągów. Przy pracy z rośliną noś rękawice."
+      }
+    },
+    "sourceIds": [
+      "ncsu_yucca_gigantea",
+      "rhs_yucca_elephantipes"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    }
+  },
+  {
+    "id": "pachira_aquatica",
+    "latin": "Pachira aquatica",
+    "family": "Malvaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "EASY",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 7,
+      "humidity": "MEDIUM",
+      "soil": "UNIVERSAL"
+    },
+    "safety": {
+      "pets": "TOXIC",
+      "children": "UNKNOWN",
+      "sourceIds": [
+        "ncsu_pachira_aquatica"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Пахіра водна (грошове дерево)",
+        "aliases": [
+          "Грошове дерево",
+          "Пахіра"
+        ],
+        "summary": "Кімнатне деревце з товстим стовбуром і пальчастим листям. Любить яскраве розсіяне світло, вологе повітря та рівномірно вологий, але не мокрий ґрунт.",
+        "watering": "Поливайте рясно, а потім зачекайте, поки субстрат майже підсохне. Ґрунт має бути вологим, проте ніколи не залитим. Якщо він надто пересохне, листя може опасти.",
+        "light": "Віддає перевагу розсіяному сонцю або мішаному світлотіню. Біля вікна потрібне яскраве світло, але від прямого гарячого сонця листя обпікається.",
+        "soil": "Потрібен добре дренований субстрат, у якому вода не застоюється.",
+        "tip": "Не любить переставлянь, протягів і застою води в горщику: можливе опадання листя. Піддон з мокрим камінням підвищить вологість повітря."
+      },
+      "en": {
+        "name": "Money tree",
+        "aliases": [
+          "Guiana chestnut",
+          "Malabar chestnut"
+        ],
+        "summary": "A houseplant tree with a thick trunk and fan-like leaves. It enjoys bright filtered light, humid air and a mix that stays evenly damp without turning soggy.",
+        "watering": "Water thoroughly, then wait until the mix is nearly dry. Keep it moist but never waterlogged. If it gets too dry, leaves may drop.",
+        "light": "Likes indirect sun or a blend of sun and shade. Give it a bright window spot, but scorching direct summer sun burns the leaves.",
+        "soil": "Needs a well-drained mix that does not hold water around the roots.",
+        "tip": "Dislikes being moved, drafts and standing water, any of which can make it shed leaves. A tray of wet pebbles raises humidity."
+      },
+      "ru": {
+        "name": "Пахира водная (денежное дерево)",
+        "aliases": [
+          "Денежное дерево",
+          "Гвианский каштан"
+        ],
+        "summary": "Комнатное деревце с толстым стволом и пальчатыми листьями. Любит яркий рассеянный свет, влажный воздух и равномерно влажный, но не мокрый грунт.",
+        "watering": "Поливайте обильно, затем подождите, пока грунт почти просохнет. Он должен быть влажным, но никогда не залитым. Если сильно пересушить, листья могут опасть.",
+        "light": "Предпочитает рассеянное солнце или смесь света и тени. У окна нужен яркий свет, но от прямого жаркого солнца листья обгорают.",
+        "soil": "Нужен хорошо дренированный грунт, в котором не застаивается вода.",
+        "tip": "Не любит перестановок, сквозняков и застоя воды в горшке: возможен листопад. Поддон с влажной галькой повысит влажность воздуха."
+      },
+      "pl": {
+        "name": "Pachira wodna",
+        "aliases": [
+          "Pachira aquatica"
+        ],
+        "summary": "Pokojowe drzewko z grubym pniem i dłoniastymi liśćmi. Lubi jasne światło rozproszone, wilgotne powietrze oraz podłoże równomiernie wilgotne, ale nie rozmokłe.",
+        "watering": "Podlewaj obficie, a potem poczekaj, aż podłoże prawie przeschnie. Ma być wilgotne, ale nigdy zalane. Przy zbytnim przesuszeniu liście mogą opadać.",
+        "light": "Woli słońce rozproszone lub mieszankę słońca i cienia. Przy oknie potrzebuje jasnego miejsca, ale gorące, bezpośrednie słońce parzy liście.",
+        "soil": "Potrzebuje dobrze przepuszczalnego podłoża, w którym woda nie zalega przy korzeniach.",
+        "tip": "Nie lubi przestawiania, przeciągów ani stojącej wody, co może skończyć się zrzucaniem liści. Podstawka z mokrymi kamykami zwiększy wilgotność powietrza."
+      }
+    },
+    "sourceIds": [
+      "ncsu_pachira_aquatica",
+      "nybg_money_tree"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    }
+  },
+  {
+    "id": "beaucarnea_recurvata",
+    "latin": "Beaucarnea recurvata",
+    "family": "Asparagaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "EASY",
+      "lightMin": "HIGH",
+      "lightMax": "DIRECT",
+      "checkIntervalDays": 14,
+      "humidity": "LOW",
+      "soil": "CACTUS_MIX"
+    },
+    "safety": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN",
+      "sourceIds": [
+        "ncsu_beaucarnea"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Бокарнея відігнута (пляшкова пальма)",
+        "aliases": [
+          "Пляшкова пальма",
+          "Бокарнея"
+        ],
+        "summary": "Невибаглива кімнатна рослина, якій до душі сонячне місце, добре дренований ґрунт і сухе повітря опалених приміщень.",
+        "watering": "Поливайте рясно, але рідко: перед наступним поливом ґрунт має добре просохнути. Взимку воду значно скоротіть. Надлишок вологи найчастіше й губить цю рослину.",
+        "light": "Найкраще почувається на повному сонці, біля сонячного вікна; підійде й яскраве місце біля східного чи західного вікна. Влітку надворі привчайте до сонця поступово.",
+        "soil": "Потрібен добре дренований ґрунт, наприклад суміш для кактусів і сукулентів. До звичайного субстрату можна додати крупний пісок або дрібний гравій.",
+        "tip": "Головна небезпека це перезволоження, яке веде до гниття коренів. Коричневі кінчики листя часто з'являються через крайнощі в поливі, надлишок добрив чи солей."
+      },
+      "en": {
+        "name": "Ponytail palm",
+        "aliases": [
+          "Elephant's foot palm",
+          "Bottle palm"
+        ],
+        "summary": "A tough plant that likes a sunny spot, a fast-draining mix and the dry air of heated rooms. Easy to keep as long as it is not overwatered.",
+        "watering": "Give a thorough soak, then wait until the potting mix has dried before watering again. Water far less in winter. Too much water is the usual reason this plant fails.",
+        "light": "Happiest in full sun, such as a sunny windowsill; a bright east or west window also works. Introduce it to outdoor sun slowly to avoid burning.",
+        "soil": "Choose a free-draining mix like cactus and succulent compost. Mixing coarse sand or small gravel into ordinary potting mix helps water run through.",
+        "tip": "Soggy soil is the main threat and leads to rot. Brown leaf tips are common indoors and point to uneven watering, too much fertilizer or salt buildup."
+      },
+      "ru": {
+        "name": "Бокарнея изогнутая (бутылочная пальма)",
+        "aliases": [
+          "Бутылочная пальма",
+          "Слоновая нога"
+        ],
+        "summary": "Неприхотливая бокарнея любит солнечное место, хорошо дренированный грунт и сухой воздух отапливаемых комнат. Главное, не заливать её.",
+        "watering": "Поливайте обильно, но нечасто: перед следующим поливом грунт должен как следует просохнуть. Зимой воды нужно заметно меньше. Переувлажнение чаще всего и губит растение.",
+        "light": "Лучше всего растёт на полном солнце, у солнечного окна; подойдёт и яркое место у восточного или западного окна. На улицу летом приучайте постепенно.",
+        "soil": "Нужен хорошо дренированный грунт, например смесь для кактусов и суккулентов. В обычную землю для комнатных растений полезно добавить крупный песок или мелкий гравий.",
+        "tip": "Главная опасность это переувлажнение и гниль корней. Коричневые кончики листьев часто появляются из-за перепадов в поливе, избытка удобрений или накопления солей."
+      },
+      "pl": {
+        "name": "Beaucarnea odgięta (palma butelkowa)",
+        "aliases": [
+          "Palma butelkowa",
+          "Beaucarnea"
+        ],
+        "summary": "Wytrzymała beaucarnea lubi słoneczne miejsce, przepuszczalne podłoże i suche powietrze ogrzewanych pomieszczeń. Najważniejsze, by jej nie przelewać.",
+        "watering": "Podlewaj obficie, ale rzadko: przed kolejnym podlaniem podłoże powinno dobrze przeschnąć. Zimą wody trzeba wyraźnie mniej. Nadmiar wilgoci najczęściej szkodzi tej roślinie.",
+        "light": "Najlepiej rośnie w pełnym słońcu, przy słonecznym oknie; dobre będzie też jasne miejsce przy oknie wschodnim lub zachodnim. Latem na dwór przyzwyczajaj ją stopniowo.",
+        "soil": "Potrzebuje przepuszczalnego podłoża, np. mieszanki do kaktusów i sukulentów. Do zwykłej ziemi doniczkowej warto dodać gruby piasek lub drobny żwirek.",
+        "tip": "Największym zagrożeniem jest przelanie i gnicie korzeni. Brązowe końcówki liści pojawiają się często przez wahania w podlewaniu, za dużo nawozu lub nagromadzone sole."
+      }
+    },
+    "sourceIds": [
+      "ncsu_beaucarnea",
+      "wisc_ponytail",
+      "iastate_ponytail"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Безпека для котів і собак лише з тегів NC State."
+  },
+  {
+    "id": "aspidistra_elatior",
+    "latin": "Aspidistra elatior",
+    "family": "Asparagaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "VERY_EASY",
+      "lightMin": "LOW",
+      "lightMax": "MEDIUM",
+      "checkIntervalDays": 10,
+      "humidity": "LOW",
+      "soil": "UNIVERSAL"
+    },
+    "safety": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN",
+      "sourceIds": [
+        "ncsu_aspidistra"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Аспідистра висока",
+        "aliases": [
+          "Чавунна рослина"
+        ],
+        "summary": "Дуже невибаглива рослина для затінку й розсіяного світла, що мириться з сухим повітрям звичайних квартир. Витримує й нестачу води.",
+        "watering": "Від весни до осені поливайте регулярно, тримаючи ґрунт вологим, але не мокрим, і не пересушуйте повністю. Взимку поливайте скупо. Перед поливом перевіряйте верхній шар.",
+        "light": "Любить тінь і розсіяне чи приглушене світло, а пряме сонце переносить погано: листя може обпектися. Мириться навіть зі слабким освітленням.",
+        "soil": "Віддає перевагу поживному, добре дренованому ґрунту, хоч витримує й бідніший та сухий. Пересаджуйте навесні в горщик лише трохи більший, у суміш дернової й універсальної землі.",
+        "tip": "Додаткова вологість повітря не потрібна: звичайне повітря в оселі їй підходить. Небезпечний лише надмір води, від якого в мокрому ґрунті гниє коріння."
+      },
+      "en": {
+        "name": "Cast iron plant",
+        "aliases": [
+          "Aspidistra",
+          "Barroom plant"
+        ],
+        "summary": "A very forgiving shade plant that copes with poor light and the fairly dry air of ordinary homes. It also shrugs off the odd lapse in watering.",
+        "watering": "From spring to autumn water regularly, keeping the mix damp rather than wet, and never let it dry out fully. Ease off in winter. Feel the top layer before watering.",
+        "light": "Prefers shade or soft, filtered light and dislikes direct sun, which can scorch the foliage. It also puts up with weak lighting.",
+        "soil": "Does best in rich, free-draining soil, though it tolerates poorer, drier ground. Repot in spring into a pot only a little larger, using loam-based mix blended with multipurpose compost.",
+        "tip": "No need for extra humidity. The main risk is waterlogged soil, where roots can rot, so avoid leaving the pot soggy."
+      },
+      "ru": {
+        "name": "Аспидистра высокая",
+        "aliases": [
+          "Чугунное растение"
+        ],
+        "summary": "Очень выносливое растение для тени и рассеянного света, которое мирится с сухим воздухом обычных квартир. Прощает и недостаток воды.",
+        "watering": "С весны до осени поливайте регулярно, держа грунт влажным, но не мокрым, и не пересушивайте полностью. Зимой поливайте скупо. Перед поливом проверяйте верхний слой.",
+        "light": "Любит тень и рассеянный свет, прямое солнце переносит плохо: листья могут обгореть. Мирится даже с недостаточным освещением.",
+        "soil": "Предпочитает питательный, хорошо дренированный грунт, но переносит и бедный сухой. Пересаживайте весной в горшок лишь немного больше, в смесь дерновой и универсальной земли.",
+        "tip": "Дополнительная влажность воздуха не нужна: обычный воздух в доме ей подходит. Опасен только избыток воды, от которого в мокром грунте гниют корни."
+      },
+      "pl": {
+        "name": "Aspidistra wysoka",
+        "aliases": [
+          "Aspidistra"
+        ],
+        "summary": "Bardzo odporna roślina cienia, która znosi słabe światło i dość suche powietrze zwykłych mieszkań. Wybacza też chwilowe niedobory wody.",
+        "watering": "Od wiosny do jesieni podlewaj regularnie, utrzymując podłoże wilgotne, ale nie mokre, i nie dopuszczaj do całkowitego przesuszenia. Zimą podlewaj oszczędnie. Przed podlaniem sprawdź wierzchnią warstwę.",
+        "light": "Lubi cień oraz jasne, rozproszone światło, a słońce wprost jej szkodzi, bo liście mogą się poparzyć. Toleruje nawet słabe oświetlenie.",
+        "soil": "Woli żyzne, przepuszczalne podłoże, choć znosi też uboższe i suche. Przesadzaj wiosną do doniczki tylko trochę większej, w mieszankę ziemi gliniastej z uniwersalną.",
+        "tip": "Dodatkowa wilgotność powietrza nie jest potrzebna, zwykłe powietrze w domu jej wystarcza. Groźne jest tylko przelanie, od którego w mokrym podłożu gniją korzenie."
+      }
+    },
+    "sourceIds": [
+      "ncsu_aspidistra",
+      "rhs_aspidistra"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Безпека для котів і собак лише з тегів NC State."
+  },
+  {
+    "id": "monstera_adansonii",
+    "latin": "Monstera adansonii",
+    "family": "Araceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "MEDIUM",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 7,
+      "humidity": "HIGH",
+      "soil": "AROID_MIX"
+    },
+    "safety": {
+      "pets": "TOXIC",
+      "children": "TOXIC",
+      "sourceIds": [
+        "ncsu_adansonii",
+        "rhs_swiss_cheese"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Монстера Адансона",
+        "aliases": [
+          "Монстера адансоні"
+        ],
+        "summary": "Монстера з дірчастим листям любить яскраве розсіяне світло, підвищену вологість повітря та пухкий дренований субстрат.",
+        "watering": "Дайте субстрату майже просохнути, після чого полийте рясно; воду в піддоні не залишайте. Взимку поливайте рідше. Застій вологи призводить до гниття коренів.",
+        "light": "Потрібне яскраве, але розсіяне світло, наприклад біля східного чи західного вікна. Пряме сонце обпалює листя, а в сильній тіні дірок на листках менше.",
+        "soil": "Субстрат має бути вологим, пухким, добре дренованим і трохи кислим. Універсальну землю можна змішати із сумішшю для орхідей.",
+        "tip": "Любить підвищену вологість: у сухому повітрі краї листя буріють, допоможуть зволожувач чи піддон з камінцями. Із шкідників трапляються павутинні кліщі, червці, попелиці, білокрилки та щитівки."
+      },
+      "en": {
+        "name": "Swiss cheese vine",
+        "aliases": [
+          "Adanson's monstera",
+          "Five holes plant"
+        ],
+        "summary": "A monstera with perforated leaves that wants bright filtered light, humid air and an open, free-draining mix.",
+        "watering": "Let the compost almost dry, then water thoroughly and never leave the pot standing in water. Use less in winter. Soggy roots tend to rot.",
+        "light": "Bright but filtered light suits it, for instance by an east or west window. Direct sun can scorch the leaves, while very dim spots mean fewer holes.",
+        "soil": "Keep the mix moist yet open, free-draining and slightly acidic. Ordinary potting compost blended with some orchid mix works well.",
+        "tip": "Humidity matters: dry air browns the leaf edges, so use a humidifier or pebble tray. Watch for spider mites, mealybugs, aphids, whiteflies and scale."
+      },
+      "ru": {
+        "name": "Монстера Адансона",
+        "aliases": [
+          "Монстера адансони"
+        ],
+        "summary": "Монстера с дырчатыми листьями любит яркий рассеянный свет, повышенную влажность воздуха и рыхлый, хорошо дренированный грунт.",
+        "watering": "Дайте грунту почти просохнуть, затем поливайте обильно, не оставляя воду в поддоне. Зимой поливайте реже. Застой влаги приводит к гниению корней.",
+        "light": "Нужен яркий, но рассеянный свет, например у восточного или западного окна. Прямое солнце обжигает листья, а в сильной тени отверстий на листьях меньше.",
+        "soil": "Грунт должен быть влажным, рыхлым, хорошо дренированным и слегка кислым. Универсальную землю можно смешать с субстратом для орхидей.",
+        "tip": "Любит повышенную влажность: в сухом воздухе края листьев буреют, помогут увлажнитель или поддон с галькой. Из вредителей бывают паутинные клещи, червецы, тля, белокрылка и щитовка."
+      },
+      "pl": {
+        "name": "Monstera Adansona",
+        "aliases": [
+          "Monstera Adansonii"
+        ],
+        "summary": "Monstera o dziurkowanych liściach lubi jasne, rozproszone światło, podwyższoną wilgotność powietrza oraz luźne, przepuszczalne podłoże.",
+        "watering": "Pozwól podłożu prawie przeschnąć, po czym podlej obficie i nie zostawiaj wody w osłonce. Zimą podlewaj rzadziej. Zastoje wody prowadzą do gnicia korzeni.",
+        "light": "Potrzebuje jasnego, ale rozproszonego światła, np. przy oknie wschodnim lub zachodnim. Słońce wprost przypala liście, a w głębokim cieniu mają one mniej dziur.",
+        "soil": "Podłoże ma być wilgotne, luźne, dobrze przepuszczalne i lekko kwaśne. Ziemię uniwersalną można wymieszać z podłożem do storczyków.",
+        "tip": "Lubi wysoką wilgotność: w suchym powietrzu brzegi liści brązowieją, pomoże nawilżacz lub podstawka z kamykami. Mogą pojawić się przędziorki, wełnowce, mszyce, mączliki i tarczniki."
+      }
+    },
+    "sourceIds": [
+      "ncsu_adansonii",
+      "rhs_swiss_cheese"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Сторінка RHS загальна для роду Monstera."
+  },
+  {
+    "id": "scindapsus_pictus",
+    "latin": "Scindapsus pictus",
+    "family": "Araceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "EASY",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 8,
+      "humidity": "MEDIUM",
+      "soil": "AROID_MIX"
+    },
+    "safety": {
+      "pets": "TOXIC",
+      "children": "UNKNOWN",
+      "sourceIds": [
+        "ncsu_scindapsus"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Сциндапсус строкатий",
+        "aliases": [
+          "Сциндапсус"
+        ],
+        "summary": "Сциндапсус зі строкатим листям добре почувається в звичайних домашніх умовах, любить яскраве розсіяне світло й не терпить сильної сухості повітря.",
+        "watering": "Дайте верхнім кільком сантиметрам ґрунту підсохнути між поливами. Жовтіння листя може означати надлишок води, а скручування її нестачу.",
+        "light": "Віддає перевагу яскравому розсіяному світлу. Не переносить ані прямого сонця, ані прохолодного повітря.",
+        "soil": "Підійде суміш для ароїдних; готовий субстрат розпушіть перлітом чи корою для орхідей. У кімнаті любить вологий, добре дренований ґрунт.",
+        "tip": "Зовсім сухого повітря не любить, а у вологому листя крупніше. Стежте за щитівками, кліщами, червцями, трипсами та плямистостями; у мокрому ґрунті гниє коріння."
+      },
+      "en": {
+        "name": "Satin pothos",
+        "aliases": [
+          "Silver vine",
+          "Scindapsus pictus"
+        ],
+        "summary": "A patterned-leaf plant that adapts to ordinary home conditions, likes bright indirect light and dislikes very dry air.",
+        "watering": "Let the upper inch or two of soil dry before each watering. Yellowing leaves can hint at too much water, while curling ones suggest too little.",
+        "light": "Prefers bright indirect light. It does not tolerate direct sun or cool air.",
+        "soil": "Use a mix meant for aroids; a store-bought one can be lightened with perlite or orchid bark. Indoors it wants moist, free-draining potting soil.",
+        "tip": "It dislikes very dry air, and leaves grow larger where humidity is higher. Watch for scale, mites, mealybugs, thrips and leaf spots; wet soil invites root rot."
+      },
+      "ru": {
+        "name": "Сциндапсус раскрашенный",
+        "aliases": [
+          "Сциндапсус пиктус"
+        ],
+        "summary": "Растение с пятнистыми листьями приспосабливается к обычным домашним условиям, любит яркий рассеянный свет и не выносит сильной сухости воздуха.",
+        "watering": "Давайте верхним нескольким сантиметрам грунта просохнуть между поливами. Желтеющие листья могут говорить о переливе, а скручивающиеся о нехватке воды.",
+        "light": "Предпочитает яркий рассеянный свет. Прямое солнце и прохладный воздух плохо переносит.",
+        "soil": "Подойдёт грунт для ароидных; готовую смесь можно облегчить перлитом или корой для орхидей. В комнате любит влажный, хорошо дренированный грунт.",
+        "tip": "Очень сухой воздух не любит, во влажном листья крупнее. Следите за щитовкой, клещами, червецами, трипсами и пятнистостями; в сырой земле гниют корни."
+      },
+      "pl": {
+        "name": "Scindapsus pstry",
+        "aliases": [
+          "Scindapsus pictus"
+        ],
+        "summary": "Roślina o cętkowanych liściach dobrze znosi zwykłe warunki domowe, lubi jasne, rozproszone światło i nie przepada za bardzo suchym powietrzem.",
+        "watering": "Pozwól, by wierzchnie kilka centymetrów podłoża przeschło między podlewaniami. Żółknące liście mogą oznaczać przelanie, a zwijające się zbyt mało wody.",
+        "light": "Woli jasne, rozproszone światło. Nie toleruje słońca wprost ani chłodnego powietrza.",
+        "soil": "Sięgnij po podłoże dla aroidów; gotową mieszankę można rozluźnić perlitem lub korą dla storczyków. W domu lubi wilgotne, przepuszczalne podłoże.",
+        "tip": "Nie lubi bardzo suchego powietrza, a w wilgotnym ma większe liście. Obserwuj, czy nie pojawiają się tarczniki, przędziorki, wełnowce, wciornastki i plamistości; w mokrej ziemi gniją korzenie."
+      }
+    },
+    "sourceIds": [
+      "ncsu_scindapsus",
+      "uconn_scindapsus"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    }
+  },
+  {
+    "id": "rhaphidophora_tetrasperma",
+    "latin": "Rhaphidophora tetrasperma",
+    "family": "Araceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "MEDIUM",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 7,
+      "humidity": "HIGH",
+      "soil": "AROID_MIX"
+    },
+    "safety": {
+      "pets": "UNKNOWN",
+      "children": "UNKNOWN",
+      "sourceIds": [
+        "ncsu_rhaphidophora",
+        "iastate_philodendron"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Рафідофора чотиринасінна (міні-монстера)",
+        "aliases": [
+          "Міні-монстера",
+          "Рафідофора тетрасперма"
+        ],
+        "summary": "Міні-монстера любить яскраве розсіяне світло, вологе повітря та вологий дренований субстрат.",
+        "watering": "Поливайте, коли верхні 2-3 см субстрату підсохли, і тримайте його рівномірно вологим, але не мокрим.",
+        "light": "Любить яскраве розсіяне світло. Трохи прямого сонця може витримати, але надмір обпалює листя.",
+        "soil": "Потрібен вологий, добре дренований субстрат. Зазвичай вистачає й універсального ґрунту для кімнатних рослин.",
+        "tip": "Найкраще почувається у вологому повітрі, близько 60%. Жовте листя вказує на надлишок води чи брак світла, а коричневі краї на сухість. Можливі грибні комарики та павутинні кліщі."
+      },
+      "en": {
+        "name": "Mini monstera",
+        "aliases": [
+          "Rhaphidophora tetrasperma"
+        ],
+        "summary": "Often sold as mini monstera, it likes bright indirect light, humid air and a moist, free-draining potting mix.",
+        "watering": "Water once the upper inch of the mix has dried, aiming for evenly moist but never wet soil.",
+        "light": "Bright, indirect light is best. A little direct sun may be tolerated, but strong sun burns the leaves.",
+        "soil": "A moist, free-draining potting mix suits it. Plain all-purpose potting soil is usually enough for this kind of plant.",
+        "tip": "Thrives in humid air, around 60 percent. Yellow leaves point to overwatering or too little light, while brown margins mean dryness. Fungus gnats and spider mites can appear."
+      },
+      "ru": {
+        "name": "Рафидофора четырёхсеменная (мини-монстера)",
+        "aliases": [
+          "Мини-монстера",
+          "Рафидофора тетрасперма"
+        ],
+        "summary": "Мини-монстера любит яркий рассеянный свет, влажный воздух и влажный, хорошо дренированный грунт.",
+        "watering": "Поливайте, когда верхние 2-3 см грунта просохли, и держите его равномерно влажным, но не мокрым.",
+        "light": "Лучше всего яркий рассеянный свет. Немного прямого солнца она может вынести, но сильное солнце обжигает листья.",
+        "soil": "Нужен влажный, хорошо дренированный грунт. Обычной универсальной земли для комнатных растений, как правило, достаточно.",
+        "tip": "Лучше всего растёт во влажном воздухе, около 60%. Жёлтые листья говорят о переливе или нехватке света, коричневые края о сухости. Возможны грибные комарики и паутинные клещи."
+      },
+      "pl": {
+        "name": "Rafidofora tetrasperma",
+        "aliases": [
+          "Mini monstera",
+          "Monstera minima"
+        ],
+        "summary": "Mini monstera lubi jasne, rozproszone światło, wilgotne powietrze oraz wilgotne, przepuszczalne podłoże.",
+        "watering": "Podlewaj, gdy wierzchnie 2-3 cm podłoża przeschnie, i utrzymuj je równomiernie wilgotne, ale nie mokre.",
+        "light": "Najlepsze jest jasne, rozproszone światło. Odrobinę słońca wprost może znieść, ale mocne słońce przypala liście.",
+        "soil": "Odpowiada jej wilgotne, przepuszczalne podłoże. Zwykle wystarcza zwykła ziemia uniwersalna do roślin doniczkowych.",
+        "tip": "Najlepiej rośnie przy wysokiej wilgotności, około 60%. Żółte liście wskazują na przelanie lub za mało światła, a brązowe brzegi na suchość. Mogą pojawić się komarnice i przędziorki."
+      }
+    },
+    "sourceIds": [
+      "ncsu_rhaphidophora",
+      "iastate_philodendron"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Одне з джерел описує догляд за філодендроном, Rhaphidophora згадано як близьку рослину; безпеку не оцінено."
+  },
+  {
+    "id": "philodendron_bipinnatifidum",
+    "latin": "Philodendron bipinnatifidum",
+    "family": "Araceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "EASY",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 7,
+      "humidity": "MEDIUM",
+      "soil": "AROID_MIX"
+    },
+    "safety": {
+      "pets": "TOXIC",
+      "children": "TOXIC",
+      "sourceIds": [
+        "rhs_pb",
+        "ncsu_pb",
+        "clemson_philodendron"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Філодендрон перисторозсічений (ксанаду)",
+        "aliases": [
+          "Філодендрон ксанаду",
+          "Деревоподібний філодендрон"
+        ],
+        "summary": "Крупна рослина з глибоко розсіченим листям. Невибаглива, але з часом може стати завеликою для невеликої оселі, а вдома цвіте рідко.",
+        "watering": "Перевіряйте ґрунт і поливайте так, щоб він залишався рівномірно вологим, але не мокрим. Пересушування шкодить, а надлишок води веде до гнилі коренів. Не лишайте горщик у воді.",
+        "light": "Найкраще росте при яскравому розсіяному світлі біля східного, західного чи південного вікна. Прямий полуденний сонячний промінь може обпалити листя. У півтіні виживає, але листя дрібніше.",
+        "soil": "Потрібен вологий, добре дренований ґрунт, багатий на органіку. Підійде і звичайний універсальний субстрат, головне, щоб вода швидко відходила. Солі не люблять: ґрунт іноді промивайте.",
+        "tip": "Головний ризик - гниль коренів від надмірного поливу. Бурі підсохлі кінчики листя можуть вказувати на забагато добрив, а жовте нижнє листя на нестачу світла чи перелив."
+      },
+      "en": {
+        "name": "Tree philodendron",
+        "aliases": [
+          "Lacy tree philodendron",
+          "Xanadu"
+        ],
+        "summary": "A large, deeply lobed foliage plant that is easy to keep. Indoors it can outgrow a small home and rarely flowers.",
+        "watering": "Check the soil and water to keep it evenly damp, never soggy. It dislikes drying out completely, and too much water leads to root rot. Do not let the pot stand in a saucer of water.",
+        "light": "Place it by an east, west or south window so the light is strong but filtered. Midday sun can burn the foliage. In dimmer spots it survives, but new leaves grow smaller and less divided.",
+        "soil": "Use moist, fast-draining, humus-rich potting mix. Ordinary all-purpose compost works if water runs through quickly. It dislikes salt buildup, so flush the pot now and then.",
+        "tip": "Root rot from overwatering is the main danger. Brown, curled leaf tips may point to too much fertilizer, while yellowing lower leaves suggest poor light or soggy soil."
+      },
+      "ru": {
+        "name": "Филодендрон ксанаду (перисторассечённый)",
+        "aliases": [
+          "Филодендрон перисторассечённый",
+          "Древовидный филодендрон"
+        ],
+        "summary": "Крупное растение с глубоко рассечёнными листьями. Нетребовательное, но в тесном помещении быстро перерастает свое место, а дома цветёт редко.",
+        "watering": "Проверяйте почву и поливайте так, чтобы она оставалась равномерно влажной, но не сырой. Пересушка вредна, а избыток воды ведёт к гнили корней. Не оставляйте горшок стоять в воде.",
+        "light": "Лучше всего растёт при ярком рассеянном свете у восточного, западного или южного окна. Прямое жаркое солнце может обжечь листья. В тени выживает, но листья мельчают.",
+        "soil": "Нужна влажная, хорошо дренированная почва с большим содержанием органики. Подойдёт и обычный универсальный грунт, лишь бы вода быстро уходила. Соли растение не любит, поэтому грунт изредка промывают.",
+        "tip": "Главная угроза - гниль корней от переувлажнения. Бурые подсохшие кончики листьев могут говорить об избытке удобрений, а жёлтые нижние листья - о нехватке света или переливе."
+      },
+      "pl": {
+        "name": "Filodendron Xanadu",
+        "aliases": [
+          "Filodendron bipinnatifidum"
+        ],
+        "summary": "Duża roślina o głęboko wcinanych liściach, łatwa w uprawie. W mieszkaniu potrafi przerosnąć małe wnętrze i rzadko kwitnie.",
+        "watering": "Sprawdzaj ziemię i podlewaj tak, by była równomiernie wilgotna, ale nie mokra. Przesuszenie szkodzi, a nadmiar wody prowadzi do gnicia korzeni. Nie zostawiaj doniczki w wodzie.",
+        "light": "Najlepiej rośnie w jasnym, rozproszonym świetle przy oknie wschodnim, zachodnim lub południowym. Ostre słońce może poparzyć liście. W cieniu daje radę, lecz liście są mniejsze i mniej wcinane.",
+        "soil": "Potrzebuje wilgotnego, przepuszczalnego podłoża bogatego w próchnicę. Zwykła ziemia uniwersalna wystarczy, o ile woda szybko odpływa. Nie lubi nagromadzenia soli, więc od czasu do czasu przepłucz podłoże.",
+        "tip": "Najgroźniejsze jest gnicie korzeni po przelaniu. Brązowe, zwinięte końcówki liści mogą oznaczać zbyt dużo nawozu, a żółknące dolne liście brak światła lub zbyt mokre podłoże."
+      }
+    },
+    "sourceIds": [
+      "ncsu_pb",
+      "clemson_philodendron",
+      "rhs_pb"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    }
+  },
+  {
+    "id": "philodendron_melanochrysum",
+    "latin": "Philodendron melanochrysum",
+    "family": "Araceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "MEDIUM",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 7,
+      "humidity": "HIGH",
+      "soil": "AROID_MIX"
+    },
+    "safety": {
+      "pets": "TOXIC",
+      "children": "TOXIC",
+      "sourceIds": [
+        "rhs_pm",
+        "clemson_philodendron"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Філодендрон меланохрізум (чорне золото)",
+        "aliases": [
+          "Філодендрон чорне золото"
+        ],
+        "summary": "Ефектна ліана з оксамитовим серцеподібним листям, яке на вертикальній опорі за кілька років стає дуже великим. Любить яскраве розсіяне світло.",
+        "watering": "Перевіряйте ґрунт: він має бути вологим, але з хорошим дренажем. Поливайте помірно, у прохолодніші місяці ще менше. Не допускайте ні пересихання, ні надлишку води.",
+        "light": "Підходить яскраве, але розсіяне світло або легка півтінь, наприклад за тюлем. Низьке освітлення рослина терпить, проте найкраще почувається при добре освітленому місці.",
+        "soil": "Потрібен багатий на гумус, добре дренований субстрат. Придатна й універсальна земля для кімнатних рослин, якщо вона швидко пропускає воду.",
+        "tip": "Щоб листки виросли великими, рослину кілька років ведуть угору по опорі. Стежте за щитівками та павутинними кліщами, а також за надто вологим чи надто сухим ґрунтом."
+      },
+      "en": {
+        "name": "Black gold philodendron",
+        "aliases": [
+          "Philodendron melanochrysum"
+        ],
+        "summary": "A climbing aroid with velvety, heart-shaped leaves that grow very large once the vine is guided upward for a few years. Likes bright, softened light.",
+        "watering": "Check that the mix stays moist yet free-draining. Water in moderation and cut back when it is cooler. Avoid both bone-dry and waterlogged conditions.",
+        "light": "Give it bright light that is filtered, such as through a sheer curtain, or light partial shade. It will tolerate dimmer spots, but does best in a well-lit place.",
+        "soil": "Choose a humus-rich mix that drains well. A fast-draining houseplant compost is also suitable.",
+        "tip": "To get big leaves, train the vine upward on a support for several years. Watch for scale insects and spider mites, and keep watering steady."
+      },
+      "ru": {
+        "name": "Филодендрон меланохризум (чёрное золото)",
+        "aliases": [
+          "Филодендрон чёрное золото"
+        ],
+        "summary": "Эффектная лиана с бархатистыми сердцевидными листьями, которые при выращивании на вертикальной опоре через несколько лет становятся очень крупными. Любит яркий рассеянный свет.",
+        "watering": "Проверяйте почву: она должна быть влажной, но с хорошим дренажем. Поливайте умеренно, а в прохладное время ещё реже. Не допускайте ни пересыхания, ни застоя воды.",
+        "light": "Подходит яркий рассеянный свет или лёгкая полутень, например за тюлем. Слабое освещение терпит, но лучше всего чувствует себя на светлом месте.",
+        "soil": "Нужен рыхлый, богатый перегноем субстрат с хорошим дренажем. Подойдёт и универсальный грунт для комнатных растений, если он быстро пропускает воду.",
+        "tip": "Чтобы листья выросли крупными, лиану несколько лет ведут вверх по опоре. Следите за щитовками и паутинными клещами, а также за ровным режимом полива."
+      },
+      "pl": {
+        "name": "Filodendron melanochrysum",
+        "aliases": [
+          "Filodendron Black Gold"
+        ],
+        "summary": "Pnącze o aksamitnych, sercowatych liściach, które po kilku latach prowadzenia na pionowej podporze osiągają duże rozmiary. Lubi jasne, rozproszone światło.",
+        "watering": "Sprawdzaj podłoże: ma być wilgotne, ale dobrze przepuszczalne. Podlewaj umiarkowanie, a w chłodniejszej porze jeszcze oszczędniej. Unikaj zarówno przesuszenia, jak i stojącej wody.",
+        "light": "Odpowiada mu jasne światło rozproszone lub lekki półcień, na przykład za firanką. Słabsze oświetlenie znosi, ale najlepiej rośnie w jasnym miejscu.",
+        "soil": "Wybierz podłoże bogate w próchnicę i dobrze przepuszczalne. Sprawdzi się też ziemia do roślin doniczkowych, jeśli szybko odprowadza wodę.",
+        "tip": "Aby liście urosły duże, prowadź pęd w górę po podporze przez kilka lat. Zwracaj uwagę na tarczniki i przędziorki oraz dbaj o równomierne podlewanie."
+      }
+    },
+    "sourceIds": [
+      "rhs_pm",
+      "clemson_philodendron"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Друге джерело (Clemson) про рід Philodendron."
+  },
+  {
+    "id": "dieffenbachia_seguine",
+    "latin": "Dieffenbachia seguine",
+    "family": "Araceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "EASY",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 7,
+      "humidity": "HIGH",
+      "soil": "UNIVERSAL"
+    },
+    "safety": {
+      "pets": "TOXIC",
+      "children": "TOXIC",
+      "sourceIds": [
+        "ncsu_ds",
+        "clemson_dieff",
+        "rhs_ds"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Дифенбахія",
+        "aliases": [
+          "Діффенбахія"
+        ],
+        "summary": "Декоративно-листяна рослина, яка любить вологе повітря та розсіяне світло. Не терпить протягів і прямого сонця.",
+        "watering": "Поливайте рясно, а потім дочекайтеся, поки верхній шар ґрунту завглибшки приблизно 2,5 см повністю підсохне. Узимку поливайте менше, ніж у період росту.",
+        "light": "Найкраще підходить яскраве розсіяне світло або півтінь. Захищайте від протягів і прямого сонця. У тіні росте, але повільніше.",
+        "soil": "Потрібен пухкий, родючий ґрунт із великою часткою органіки та гарним дренажем. Підійде більшість дренованих сумішей для контейнерів, а важкий субстрат призводить до гнилі коренів.",
+        "tip": "Рослина віддає перевагу вологому повітрю, тож допоможе регулярне обприскування. Найчастіші проблеми - надто мокрий чи надто сухий ґрунт, павутинні кліщі та інші шкідники."
+      },
+      "en": {
+        "name": "Dumb cane",
+        "aliases": [
+          "Dieffenbachia",
+          "Leopard lily"
+        ],
+        "summary": "A leafy ornamental that enjoys humid air and filtered light. It dislikes cold drafts and strong direct sun.",
+        "watering": "Soak the pot well, then wait until the top inch or so of mix has dried out fully before watering again. Ease off in winter compared with the growing season.",
+        "light": "Suits bright filtered light or partial shade. Shield it from drafts and direct sun. It grows in dim rooms too, just more slowly.",
+        "soil": "Use a loose, fertile mix rich in organic matter that drains freely. Most well-draining container mixes work, while heavy ones invite root rot.",
+        "tip": "It likes humid air, so regular misting helps. The usual troubles are watering that is too heavy or too sparse, plus spider mites and other pests."
+      },
+      "ru": {
+        "name": "Диффенбахия",
+        "aliases": [
+          "Диффенбахия Сегуина"
+        ],
+        "summary": "Декоративно-лиственное растение, любящее влажный воздух и рассеянный свет. Не переносит сквозняков и прямого солнца.",
+        "watering": "Поливайте обильно, затем дождитесь, пока верхний слой почвы примерно на 2,5 см полностью просохнет. Зимой поливают реже, чем в период роста.",
+        "light": "Лучше всего подходит яркий рассеянный свет или полутень. Берегите от сквозняков и прямых лучей. В тени растёт, но медленнее.",
+        "soil": "Нужна рыхлая плодородная почва с высоким содержанием органики и хорошим дренажем. Подойдёт большинство дренированных грунтов для горшков, а плотный субстрат ведёт к гнили корней.",
+        "tip": "Растение любит влажный воздух, поэтому полезно регулярное опрыскивание. Частые проблемы - слишком обильный или скудный полив, паутинные клещи и другие вредители."
+      },
+      "pl": {
+        "name": "Difenbachia",
+        "aliases": [
+          "Dieffenbachia"
+        ],
+        "summary": "Ozdobna roślina liściasta, która lubi wilgotne powietrze i rozproszone światło. Nie znosi przeciągów ani ostrego słońca.",
+        "watering": "Podlewaj obficie, a potem poczekaj, aż wierzchnia warstwa ziemi, mniej więcej na 2,5 cm, całkiem przeschnie. Zimą podlewaj rzadziej niż w okresie wzrostu.",
+        "light": "Najlepiej czuje się w jasnym świetle rozproszonym lub półcieniu. Chroń ją przed przeciągami i bezpośrednim słońcem. W cieniu rośnie, ale wolniej.",
+        "soil": "Potrzebuje luźnego, żyznego podłoża z dużą ilością materii organicznej i dobrym drenażem. Wystarczy większość przepuszczalnych mieszanek, a ciężkie podłoże sprzyja gniciu korzeni.",
+        "tip": "Lubi wilgotne powietrze, więc pomaga regularne zraszanie. Najczęstsze kłopoty to zbyt obfite lub zbyt skąpe podlewanie oraz przędziorki i inne szkodniki."
+      }
+    },
+    "sourceIds": [
+      "ncsu_ds",
+      "clemson_dieff",
+      "rhs_ds"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    }
+  },
+  {
+    "id": "alocasia_amazonica",
+    "latin": "Alocasia × mortfontanensis 'Amazonica'",
+    "family": "Araceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "DEMANDING",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 5,
+      "humidity": "HIGH",
+      "soil": "AROID_MIX"
+    },
+    "safety": {
+      "pets": "TOXIC",
+      "children": "TOXIC",
+      "sourceIds": [
+        "ncsu_alocasia",
+        "rhs_alocasia"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Алоказія амазонська",
+        "aliases": [
+          "Алоказія Амазоніка"
+        ],
+        "summary": "Вибаглива декоративна рослина, якій потрібні тепло, вологе повітря та яскраве розсіяне світло. Погано реагує на холод і протяги.",
+        "watering": "Ґрунт має бути вологим; поливайте, коли верхній шар приблизно на 5 см підсох. Узимку в приміщенні полив скорочують, бо надлишок води у спокої призводить до гнилі коренів.",
+        "light": "Найкраще росте при яскравому розсіяному світлі. Пряме сонце може обпалити листки.",
+        "soil": "Потрібен вологий, дренований, родючий суглинистий субстрат. Для кращого дренажу до компосту додають крупний пісок або гриз.",
+        "tip": "Любить тепле й вологе повітря: допоможуть піддон із галькою, групування рослин або зволожувач. Сухе повітря підсушує краї листків, а холод пошкоджує рослину."
+      },
+      "en": {
+        "name": "Alocasia Amazonica",
+        "aliases": [
+          "African mask plant"
+        ],
+        "summary": "A fussy ornamental that wants warmth, humid air and bright filtered light. It reacts badly to cold and drafts.",
+        "watering": "Keep the mix moist, watering once the upper 5 cm or so has dried. Cut back in winter indoors, since soggy soil during dormancy invites root rot.",
+        "light": "Grows best in bright, softened light. Direct sun can scorch its leaves.",
+        "soil": "Needs a moist, free-draining, fertile loamy mix. Adding coarse grit to the compost improves drainage.",
+        "tip": "It loves warm, humid air, which a pebble tray, grouped plants or a humidifier can provide. Dry air browns the leaf edges, and chills harm the plant."
+      },
+      "ru": {
+        "name": "Алоказия амазонская",
+        "aliases": [
+          "Алоказия Амазоника"
+        ],
+        "summary": "Капризное декоративное растение, которому нужны тепло, влажный воздух и яркий рассеянный свет. Плохо переносит холод и сквозняки.",
+        "watering": "Почва должна быть влажной; поливайте, когда верхний слой примерно на 5 см подсох. Зимой в помещении полив сокращают, ведь избыток воды в период покоя вызывает гниль корней.",
+        "light": "Лучше всего растёт при ярком рассеянном свете. Прямое солнце может обжечь листья.",
+        "soil": "Нужен влажный, дренированный, плодородный суглинистый субстрат. Для лучшего дренажа в грунт добавляют крупный песок или гравий.",
+        "tip": "Любит тёплый влажный воздух: помогут поддон с галькой, группировка растений или увлажнитель. Сухой воздух сушит края листьев, а холод вредит растению."
+      },
+      "pl": {
+        "name": "Alokazja amazońska",
+        "aliases": [
+          "Alokazja Amazonica"
+        ],
+        "summary": "Wymagająca roślina ozdobna, która potrzebuje ciepła, wilgotnego powietrza i jasnego, rozproszonego światła. Źle znosi chłód i przeciągi.",
+        "watering": "Podłoże powinno być wilgotne; podlewaj, gdy wierzchnia warstwa, około 5 cm, przeschnie. Zimą w domu podlewaj oszczędniej, bo nadmiar wody w czasie spoczynku powoduje gnicie korzeni.",
+        "light": "Najlepiej rośnie w jasnym świetle rozproszonym. Bezpośrednie słońce może poparzyć liście.",
+        "soil": "Wymaga wilgotnego, przepuszczalnego, żyznego podłoża gliniasto-próchniczego. Dla lepszego drenażu dodaje się do ziemi gruboziarnisty żwirek.",
+        "tip": "Lubi ciepłe, wilgotne powietrze, w czym pomogą podstawka z kamykami, grupowanie roślin lub nawilżacz. Suche powietrze brązowi brzegi liści, a chłód szkodzi roślinie."
+      }
+    },
+    "sourceIds": [
+      "ncsu_alocasia",
+      "rhs_alocasia"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Назва в каталозі: Alocasia amazonica = A. x mortfontanensis; друге джерело (RHS) про рід."
+  },
+  {
+    "id": "anthurium_andraeanum",
+    "latin": "Anthurium andraeanum",
+    "family": "Araceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "MEDIUM",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 7,
+      "humidity": "HIGH",
+      "soil": "ORCHID_BARK"
+    },
+    "safety": {
+      "pets": "TOXIC",
+      "children": "TOXIC",
+      "sourceIds": [
+        "ncsu_anth",
+        "clemson_anth"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Антуріум Андре",
+        "aliases": [
+          "Антуріум",
+          "Квітка фламінго"
+        ],
+        "summary": "Квітуча рослина, що любить яскраве розсіяне світло та вологе повітря. За нестачі світла чи живлення цвіте гірше.",
+        "watering": "Поливайте, коли верхній шар ґрунту завглибшки близько 2,5 см став сухим на дотик. Поливайте ґрунтовно, але між поливами давайте субстрату трохи підсохнути.",
+        "light": "Потрібне яскраве розсіяне світло, воно сприяє рясному цвітінню. Пряме сонце може обпалити листки.",
+        "soil": "Це епіфіт, тож віддає перевагу грубому, добре дренованому субстрату, наприклад суміші орхідейного ґрунту з кактусовим.",
+        "tip": "Рослина любить вологе повітря та тепло без холодних протягів. Перелив спричиняє гниль коренів і пожовтіння, тому давайте ґрунту підсихати."
+      },
+      "en": {
+        "name": "Flamingo flower",
+        "aliases": [
+          "Anthurium",
+          "Flamingo lily"
+        ],
+        "summary": "A flowering houseplant that enjoys bright, filtered light and humid air. Flowering suffers when light or nutrients are short.",
+        "watering": "Water when the top inch or so of mix feels dry to the touch. Soak it well, but let the medium dry out slightly before the next round.",
+        "light": "Needs bright, indirect light, which also encourages plenty of blooms. Direct sun may scorch the leaves.",
+        "soil": "An epiphyte, so it prefers a coarse, fast-draining medium, for instance orchid mix blended with cactus mix.",
+        "tip": "It likes warm, humid air without cold drafts. Overwatering causes root rot and yellowing, so let the mix dry between drinks."
+      },
+      "ru": {
+        "name": "Антуриум Андре",
+        "aliases": [
+          "Антуриум",
+          "Цветок фламинго"
+        ],
+        "summary": "Цветущее комнатное растение, любящее яркий рассеянный свет и влажный воздух. При нехватке света или питания цветёт хуже.",
+        "watering": "Поливайте, когда верхний слой почвы примерно на 2,5 см стал сухим на ощупь. Лейте основательно, но давайте субстрату немного подсохнуть между поливами.",
+        "light": "Нужен яркий рассеянный свет, он способствует обильному цветению. Прямое солнце может обжечь листья.",
+        "soil": "Это эпифит, поэтому ему подходит грубый, хорошо дренированный субстрат, например смесь орхидейного и кактусового грунта.",
+        "tip": "Растение любит тепло и влажный воздух без холодных сквозняков. Перелив вызывает гниль корней и пожелтение, поэтому давайте грунту просыхать."
+      },
+      "pl": {
+        "name": "Anturium Andrego",
+        "aliases": [
+          "Anturium",
+          "Flamingowiec"
+        ],
+        "summary": "Kwitnąca roślina doniczkowa, która lubi jasne, rozproszone światło i wilgotne powietrze. Przy braku światła lub składników kwitnie słabiej.",
+        "watering": "Podlewaj, gdy wierzchnia warstwa podłoża, około 2,5 cm, jest sucha w dotyku. Wlewaj wodę obficie, ale pozwól podłożu lekko przeschnąć przed kolejnym podlaniem.",
+        "light": "Potrzebuje jasnego światła rozproszonego, które sprzyja obfitemu kwitnieniu. Ostre słońce może poparzyć liście.",
+        "soil": "To epifit, więc woli gruboziarniste, dobrze przepuszczalne podłoże, na przykład mieszankę ziemi do storczyków z podłożem do kaktusów.",
+        "tip": "Lubi ciepło i wilgotne powietrze bez zimnych przeciągów. Przelanie powoduje gnicie korzeni i żółknięcie, dlatego dawaj podłożu przeschnąć."
+      }
+    },
+    "sourceIds": [
+      "ncsu_anth",
+      "clemson_anth"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    }
+  },
+  {
+    "id": "hedera_helix",
+    "latin": "Hedera helix",
+    "family": "Araliaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "EASY",
+      "lightMin": "LOW",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 7,
+      "humidity": "MEDIUM",
+      "soil": "UNIVERSAL"
+    },
+    "safety": {
+      "pets": "UNKNOWN",
+      "children": "TOXIC",
+      "sourceIds": [
+        "ncstate_hedera"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Плющ звичайний",
+        "aliases": [
+          "Плющ",
+          "Англійський плющ"
+        ],
+        "summary": "Витка вічнозелена ліана, яка легко росте в кімнаті. Невибагливий, переносить сухе повітря квартир і найкраще почувається при яскравому розсіяному світлі.",
+        "watering": "Поливайте рясно, а потім дайте верхньому шару ґрунту підсохнути приблизно на півтора сантиметра. Повністю пересихати кому не варто. Воду з піддона зливайте.",
+        "light": "Найкраще росте при яскравому світлі без прямого сонця. У затінку ріст сповільнюється, а строкаті форми можуть втрачати візерунок. Підходять східні, західні й північні вікна.",
+        "soil": "Підійде родючий ґрунт для кімнатних рослин із хорошим дренажем: універсальний торф'яний субстрат або суміш на основі дернової землі.",
+        "tip": "Більшість проблем ідуть від надлишку чи нестачі води, а у спеку й сухому повітрі з'являються павутинні кліщі. Зелені пагони на строкатих формах краще прибирати."
+      },
+      "en": {
+        "name": "English ivy",
+        "aliases": [
+          "Common ivy"
+        ],
+        "summary": "A trailing evergreen climber that settles in easily indoors. It copes with dry household air and does best in bright, filtered light.",
+        "watering": "Soak the pot well, then wait until the top centimetre or so of compost has dried before watering again. Never let the root ball dry out completely, and empty the saucer.",
+        "light": "Bright light without direct sun suits it best. In dim spots growth slows and variegated forms may fade. East, west or north windows work; hot south sun can scorch leaves.",
+        "soil": "A good-quality, free-draining houseplant mix is enough, either multi-purpose compost or a loam-based one.",
+        "tip": "Most trouble starts with watering that is too heavy or too sparse; red spider mites and aphids join in when the air is warm and dry. Snip off shoots that revert to plain green."
+      },
+      "ru": {
+        "name": "Плющ обыкновенный",
+        "aliases": [
+          "Плющ",
+          "Хедера"
+        ],
+        "summary": "Вьющееся вечнозелёное растение, которое хорошо приживается в доме. Мирится с сухим комнатным воздухом и лучше всего растёт на ярком рассеянном свету.",
+        "watering": "Поливайте обильно, затем дайте верхнему слою земли подсохнуть примерно на полтора сантиметра. Полностью пересушивать ком не стоит. Лишнюю воду из поддона сливайте.",
+        "light": "Лучше всего растёт на ярком свету без прямых лучей. В тени рост замедляется, а пёстрые формы могут терять рисунок. Подходят восточные, западные и северные окна.",
+        "soil": "Подойдёт плодородный грунт для комнатных растений с хорошим дренажем: универсальный субстрат или смесь на основе дерновой земли.",
+        "tip": "Большинство бед связано с лишним или недостаточным поливом, а в тепле и сухом воздухе появляются паутинные клещи и тля. Зелёные побеги на пёстрых формах лучше обрезать."
+      },
+      "pl": {
+        "name": "Bluszcz pospolity",
+        "aliases": [
+          "Bluszcz",
+          "Hedera"
+        ],
+        "summary": "Pnący, zimozielony bluszcz, który łatwo przyzwyczaja się do wnętrz. Znosi suche powietrze mieszkań i najlepiej rośnie w jasnym, rozproszonym świetle.",
+        "watering": "Podlewaj obficie, a potem poczekaj, aż wierzchnia warstwa podłoża przeschnie na jakieś pół do półtora centymetra. Bryła korzeniowa nie powinna wyschnąć całkiem. Wodę z podstawka wylewaj.",
+        "light": "Najlepiej rośnie w jasnym miejscu bez bezpośredniego słońca. W półcieniu wzrost zwalnia, a formy pstre mogą tracić rysunek. Pasują okna wschodnie, zachodnie i północne.",
+        "soil": "Wystarczy żyzne, przepuszczalne podłoże do roślin doniczkowych: uniwersalne albo oparte na ziemi darniowej.",
+        "tip": "Większość kłopotów wynika ze zbyt obfitego lub zbyt skąpego podlewania, a w cieple i suchym powietrzu pojawiają się przędziorki i mszyce. Zielone pędy na formach pstrych warto wycinać."
+      }
+    },
+    "sourceIds": [
+      "ncstate_hedera",
+      "clemson_ivy",
+      "rhs_ivy_houseplant"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    }
+  },
+  {
+    "id": "cissus_rhombifolia",
+    "latin": "Cissus rhombifolia",
+    "family": "Vitaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "EASY",
+      "lightMin": "LOW",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 7,
+      "humidity": "LOW",
+      "soil": "UNIVERSAL"
+    },
+    "safety": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN",
+      "sourceIds": [
+        "ncstate_cissus_alata"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Цисус ромболистий",
+        "aliases": [
+          "Цисус",
+          "Кімнатний виноград"
+        ],
+        "summary": "Витка кімнатна рослина із зубчастими ромбоподібними листочками. Легка в догляді, добре переносить сухе повітря та різне освітлення.",
+        "watering": "Дайте ґрунту між поливами підсохнути. З весни до осені тримайте його помірно вологим, узимку поливайте скромніше. Ґрунт має добре дренуватися.",
+        "light": "Віддає перевагу яскравому розсіяному світлу без прямого сонця, але мириться з різним освітленням.",
+        "soil": "Добре дренований торфовий субстрат або суміш на основі дернової землі без торфу.",
+        "tip": "Листя обсипається і від надто сухого, і від надто мокрого ґрунту. Серед шкідників трапляються кліщі, червці та білокрилка. Обрізати можна будь-коли."
+      },
+      "en": {
+        "name": "Grape ivy",
+        "aliases": [
+          "Venezuela treebine"
+        ],
+        "summary": "A climbing houseplant with toothed, diamond-shaped leaflets. Easy to look after and tolerant of dry air and varied light levels.",
+        "watering": "Let the compost dry a little between waterings. Keep it evenly moist from spring to autumn and water lightly in winter. Good drainage matters.",
+        "light": "Bright, filtered light without harsh direct sun suits it, although it puts up with varied conditions.",
+        "soil": "A well-drained peaty potting mix, or a peat-free loam-based one.",
+        "tip": "Leaves drop if the soil stays too wet or gets too dry. Watch for spider mites, mealybugs and whitefly. You can prune it to shape whenever you like."
+      },
+      "ru": {
+        "name": "Цисус ромболистный",
+        "aliases": [
+          "Цисус",
+          "Комнатный виноград"
+        ],
+        "summary": "Вьющееся комнатное растение с зубчатыми ромбовидными листочками. Нетребовательно в уходе, хорошо переносит сухой воздух и разное освещение.",
+        "watering": "Давайте земле между поливами подсохнуть. С весны до осени держите её умеренно влажной, зимой поливайте скромнее. Грунт должен хорошо дренироваться.",
+        "light": "Предпочитает яркий рассеянный свет без прямого солнца, но мирится и с разным освещением.",
+        "soil": "Хорошо дренированный торфяной субстрат или смесь на основе дерновой земли без торфа.",
+        "tip": "Листья опадают и от слишком сухой, и от слишком влажной земли. Из вредителей встречаются клещи, червецы и белокрылка. Обрезать можно в любое время."
+      },
+      "pl": {
+        "name": "Cissus rombolistny",
+        "aliases": [
+          "Cissus"
+        ],
+        "summary": "Pnąca roślina doniczkowa o ząbkowanych, rombowatych listkach. Łatwa w uprawie, znosi suche powietrze i zmienne oświetlenie.",
+        "watering": "Pozwól podłożu między podlewaniami lekko przeschnąć. Od wiosny do jesieni utrzymuj je umiarkowanie wilgotne, zimą podlewaj oszczędniej. Podłoże musi dobrze odprowadzać wodę.",
+        "light": "Lubi jasne, rozproszone światło bez ostrego słońca, ale toleruje też zmienne warunki.",
+        "soil": "Przepuszczalna ziemia torfowa albo podłoże na bazie ziemi darniowej bez torfu.",
+        "tip": "Liście opadają zarówno przy zbyt suchym, jak i zbyt mokrym podłożu. Pojawiają się przędziorki, wełnowce i mączliki. Przycinać można o każdej porze roku."
+      }
+    },
+    "sourceIds": [
+      "ncstate_cissus_alata",
+      "rhs_cissus_rhombifolia"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Безпека для котів і собак лише з тегів NC State, сторінка про синонім Cissus alata."
+  },
+  {
+    "id": "asparagus_setaceus",
+    "latin": "Asparagus setaceus",
+    "family": "Asparagaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "MEDIUM",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 5,
+      "humidity": "HIGH",
+      "soil": "MOISTURE_RETAINING"
+    },
+    "safety": {
+      "pets": "TOXIC",
+      "children": "TOXIC",
+      "sourceIds": [
+        "ncstate_asp_setaceus",
+        "rhs_asp_setaceus"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Аспарагус перистий",
+        "aliases": [
+          "Аспарагус"
+        ],
+        "summary": "Кімнатна рослина з ажурними пір'їстими пагонами. Потребує яскравого розсіяного світла та вологого повітря, у сухому швидко буріє.",
+        "watering": "З весни до осені поливайте регулярно, не даючи ґрунту пересохнути, узимку скромніше. Нестача води жовтить і обсипає голочки, а надлишок загрожує гниттям коренів.",
+        "light": "Потрібне яскраве розсіяне світло, укрите від спекотного прямого сонця.",
+        "soil": "Трохи кислий, дренований, багатий на органіку субстрат. Для горщиків підійде вологоємний торфовий ґрунт.",
+        "tip": "Підтримуйте вологість повітря: допоможуть піддон із мокрим камінням чи зволожувач. У сухому повітрі кінчики буріють. Старі стебла зрізайте біля основи."
+      },
+      "en": {
+        "name": "Asparagus fern",
+        "aliases": [
+          "Lace fern",
+          "Plumosa fern"
+        ],
+        "summary": "A houseplant with feathery, airy foliage. It wants bright filtered light and humid air, and turns brown at the tips when the air is dry.",
+        "watering": "Water steadily from spring to autumn without letting the pot go dry, and ease off in winter. Too little water yellows and sheds the needles; too much invites root rot.",
+        "light": "Bright, indirect light suits it, kept away from hot direct sun.",
+        "soil": "A slightly acidic, free-draining mix rich in organic matter. In pots a moisture-holding peaty compost works well.",
+        "tip": "Keep the air humid with a pebble tray or humidifier, since dry air browns the tips. Cut old stems right down to the base instead of just shortening them."
+      },
+      "ru": {
+        "name": "Аспарагус перистый",
+        "aliases": [
+          "Аспарагус"
+        ],
+        "summary": "Комнатное растение с ажурными перистыми побегами. Нуждается в ярком рассеянном свете и влажном воздухе, в сухом быстро буреет.",
+        "watering": "С весны до осени поливайте регулярно, не давая земле пересохнуть, зимой скромнее. От нехватки воды хвоинки желтеют и осыпаются, а от излишка возможна гниль корней.",
+        "light": "Нужен яркий рассеянный свет, защищённый от жаркого прямого солнца.",
+        "soil": "Слегка кислый, дренированный субстрат, богатый органикой. Для горшков подойдёт влагоёмкий торфяной грунт.",
+        "tip": "Поддерживайте влажность воздуха: помогут поддон с мокрой галькой или увлажнитель. В сухом воздухе кончики буреют. Старые стебли срезайте у самого основания."
+      },
+      "pl": {
+        "name": "Szparag pierzasty",
+        "aliases": [
+          "Szparag"
+        ],
+        "summary": "Roślina doniczkowa o ażurowych, pierzastych pędach. Potrzebuje jasnego, rozproszonego światła i wilgotnego powietrza, w suchym brązowieje.",
+        "watering": "Od wiosny do jesieni podlewaj regularnie, nie dopuszczając do przesuszenia, zimą oszczędniej. Brak wody żółknie i sypie igiełkami, a nadmiar grozi gniciem korzeni.",
+        "light": "Lubi jasne, rozproszone światło, osłonięte przed gorącym, bezpośrednim słońcem.",
+        "soil": "Lekko kwaśne, przepuszczalne podłoże bogate w próchnicę. W doniczce sprawdzi się wilgotne podłoże torfowe.",
+        "tip": "Dbaj o wilgotne powietrze, na przykład podstawką z mokrymi kamykami albo nawilżaczem, bo w suchym końcówki brązowieją. Stare pędy tnij przy samej nasadzie."
+      }
+    },
+    "sourceIds": [
+      "ncstate_asp_setaceus",
+      "rhs_asp_setaceus"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    }
+  },
+  {
+    "id": "asparagus_densiflorus",
+    "latin": "Asparagus densiflorus",
+    "family": "Asparagaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "EASY",
+      "lightMin": "MEDIUM",
+      "lightMax": "HIGH",
+      "checkIntervalDays": 7,
+      "humidity": "MEDIUM",
+      "soil": "UNIVERSAL"
+    },
+    "safety": {
+      "pets": "UNKNOWN",
+      "children": "TOXIC",
+      "sourceIds": [
+        "rhs_asp_densiflorus"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Аспарагус Шпренгера",
+        "aliases": [
+          "Аспарагус густоквітковий",
+          "Аспарагус"
+        ],
+        "summary": "Декоративна кімнатна рослина з пухнастими довгими пагонами. Невибаглива, любить світле місце без прямого сонця та помірно вологий ґрунт.",
+        "watering": "Тримайте ґрунт вологим, але з хорошим відтоком води. З весни до осені поливайте регулярно, узимку помірніше. Перед поливом перевіряйте верхній шар.",
+        "light": "Росте при хорошому, але не прямому освітленні, витримує легку тінь.",
+        "soil": "Невибаглива до ґрунту, головне щоб він добре пропускав воду і не застоювався.",
+        "tip": "Щоб кущ був густішим, прищипуйте верхівки пагонів. Із шкідників можуть траплятися слимаки та равлики, а хвороб зазвичай мало."
+      },
+      "en": {
+        "name": "Sprenger's asparagus",
+        "aliases": [
+          "Emerald fern",
+          "Asparagus fern"
+        ],
+        "summary": "A decorative houseplant with long, fluffy arching stems. Undemanding; it likes a bright spot out of direct sun and compost that stays lightly moist.",
+        "watering": "Keep the compost moist but well drained. Water regularly from spring to autumn and a little less in winter, checking the top layer first.",
+        "light": "Does well in good light that is not direct, and copes with partial shade.",
+        "soil": "It is not fussy about soil as long as water drains freely and does not stand.",
+        "tip": "Pinch out the stem tips to keep the plant bushy. Slugs and snails may turn up, but otherwise it is generally trouble-free."
+      },
+      "ru": {
+        "name": "Аспарагус Шпренгера",
+        "aliases": [
+          "Аспарагус густоцветковый",
+          "Аспарагус"
+        ],
+        "summary": "Декоративное комнатное растение с длинными пушистыми побегами. Нетребовательное, любит светлое место без прямого солнца и умеренно влажную землю.",
+        "watering": "Держите землю влажной, но с хорошим оттоком воды. С весны до осени поливайте регулярно, зимой умереннее. Перед поливом проверяйте верхний слой.",
+        "light": "Растёт при хорошем, но не прямом освещении, переносит лёгкую тень.",
+        "soil": "Нетребователен к грунту, главное, чтобы он хорошо пропускал воду и не застаивался.",
+        "tip": "Чтобы куст был гуще, прищипывайте верхушки побегов. Из вредителей могут встретиться слизни и улитки, болезней обычно немного."
+      },
+      "pl": {
+        "name": "Szparag Sprengera",
+        "aliases": [
+          "Szparag gęstokwiatowy",
+          "Szparag"
+        ],
+        "summary": "Ozdobna roślina doniczkowa o długich, puszystych pędach. Mało wymagająca, lubi jasne miejsce bez ostrego słońca i umiarkowanie wilgotne podłoże.",
+        "watering": "Utrzymuj podłoże wilgotne, ale przepuszczalne. Od wiosny do jesieni podlewaj regularnie, zimą nieco rzadziej. Przed podlaniem sprawdź wierzchnią warstwę.",
+        "light": "Rośnie w dobrym, lecz nie bezpośrednim świetle i znosi lekki półcień.",
+        "soil": "Nie ma dużych wymagań co do ziemi, byleby woda swobodnie odpływała i nie zalegała.",
+        "tip": "Aby krzew był gęstszy, przycinaj końce pędów. Mogą pojawić się ślimaki, ale zwykle roślina rzadko choruje."
+      }
+    },
+    "sourceIds": [
+      "rhs_asp_densiflorus",
+      "ncstate_asp_setaceus"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Одне джерело саме про вид (RHS), друге (NC State) про A. setaceus того ж роду."
+  },
+  {
+    "id": "fatsia_japonica",
+    "latin": "Fatsia japonica",
+    "family": "Araliaceae",
+    "retired": false,
+    "replacedBy": null,
+    "care": {
+      "difficulty": "EASY",
+      "lightMin": "LOW",
+      "lightMax": "MEDIUM",
+      "checkIntervalDays": 7,
+      "humidity": "MEDIUM",
+      "soil": "MOISTURE_RETAINING"
+    },
+    "safety": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN",
+      "sourceIds": [
+        "ncstate_fatsia"
+      ]
+    },
+    "i18n": {
+      "uk": {
+        "name": "Фатсія японська",
+        "aliases": [
+          "Фатсія"
+        ],
+        "summary": "Рослина з великим глянцевим пальчастим листям. Любить півтінь і вологий, але дренований ґрунт, не терпить палючого сонця й сильного вітру.",
+        "watering": "Тримайте ґрунт вологим, але не мокрим. Надлишок води спричиняє гниття коренів, тому перед поливом перевіряйте верхній шар, а воду з піддона зливайте.",
+        "light": "Найкраще росте в півтіні чи розсіяному затіненні. На повному сонці й на протязі листя буріє.",
+        "soil": "Кислуватий, вологий, але дренований ґрунт, багатий на гумус і поживний.",
+        "tip": "У сухому або сонячному місці з'являються павутинні кліщі. Обрізати можна будь-коли, а підживлювати регулярно, крім зими."
+      },
+      "en": {
+        "name": "Japanese aralia",
+        "aliases": [
+          "Fatsia",
+          "Glossy-leaf paper plant"
+        ],
+        "summary": "A bold plant with large, glossy, hand-shaped leaves. It likes partial shade and soil that is moist yet well drained, and dislikes scorching sun and wind.",
+        "watering": "Keep the soil moist but never soggy. Too much water leads to root rot, so check the top layer first and tip out any water left in the saucer.",
+        "light": "Does best in partial or dappled shade. Full sun and drafty wind turn the leaves brown.",
+        "soil": "A slightly acidic, humus-rich, fertile soil that holds moisture yet drains freely.",
+        "tip": "Spider mites show up where it is too dry or sunny. You can prune it at any time and feed it regularly, except in winter."
+      },
+      "ru": {
+        "name": "Фатсия японская",
+        "aliases": [
+          "Фатсия",
+          "Японская аралия"
+        ],
+        "summary": "Растение с крупными глянцевыми пальчатыми листьями. Любит полутень и влажную, но дренированную землю, не выносит палящего солнца и сильного ветра.",
+        "watering": "Держите землю влажной, но не мокрой. Избыток воды вызывает гниль корней, поэтому перед поливом проверяйте верхний слой, а воду из поддона сливайте.",
+        "light": "Лучше всего растёт в полутени или рассеянном затенении. На полном солнце и на сквозняке листья буреют.",
+        "soil": "Слабокислый, влажный, но дренированный грунт, богатый гумусом и питательный.",
+        "tip": "В сухом или солнечном месте появляются паутинные клещи. Обрезать можно в любое время, а подкармливать регулярно, кроме зимы."
+      },
+      "pl": {
+        "name": "Fatsja japońska",
+        "aliases": [
+          "Fatsja"
+        ],
+        "summary": "Roślina o dużych, błyszczących, dłoniastych liściach. Lubi półcień i podłoże wilgotne, lecz przepuszczalne, nie znosi palącego słońca i wiatru.",
+        "watering": "Utrzymuj podłoże wilgotne, ale nie mokre. Nadmiar wody powoduje gnicie korzeni, więc przed podlaniem sprawdź wierzchnią warstwę, a wodę z podstawka wylewaj.",
+        "light": "Najlepiej rośnie w półcieniu lub świetle rozproszonym. W pełnym słońcu i na przeciągu liście brązowieją.",
+        "soil": "Lekko kwaśna, żyzna ziemia bogata w próchnicę, wilgotna, ale przepuszczalna.",
+        "tip": "W suchym lub nasłonecznionym miejscu pojawiają się przędziorki. Przycinać można o każdej porze roku, a nawozić regularnie, poza zimą."
+      }
+    },
+    "sourceIds": [
+      "ncstate_fatsia",
+      "clemson_fatsia",
+      "rhs_fatsia"
+    ],
+    "review": {
+      "authoredBy": "agent-sonnet",
+      "factChecked": "2026-11-20",
+      "ownerSampled": false,
+      "nativeReviewed": {
+        "uk": false,
+        "en": false,
+        "ru": false,
+        "pl": false
+      }
+    },
+    "notes": "Безпека для котів і собак лише з тегів NC State (без речення в тексті)."
+  }
+]

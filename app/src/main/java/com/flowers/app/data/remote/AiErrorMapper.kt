@@ -1,5 +1,12 @@
 package com.flowers.app.data.remote
 
+import com.google.firebase.ai.type.APINotConfiguredException
+import com.google.firebase.ai.type.InvalidAPIKeyException
+import com.google.firebase.ai.type.PermissionMissingException
+import com.google.firebase.ai.type.QuotaExceededException
+import com.google.firebase.ai.type.ServerException
+import com.google.firebase.ai.type.ServiceDisabledException
+import com.google.firebase.ai.type.UnsupportedUserLocationException
 import java.io.IOException
 import java.net.ConnectException
 import java.net.NoRouteToHostException
@@ -15,6 +22,8 @@ import java.util.IdentityHashMap
  * (зокрема UnknownHostException від Ktor) у `UnknownException("Something unexpected happened.", cause)`,
  * а таймаут Ktor у `RequestTimeoutException`. Тому розпізнавання йде по ВСЬОМУ ланцюжку cause і suppressed,
  * а не лише по верхньому винятку.
+ *
+ * HTTP-коди розпізнаються за ТИПАМИ винятків SDK, а не підрядком у тексті будь-якого винятку (TASK-046).
  *
  * Порядок гілок = пріоритет: таймаут → мережа → App Check/403 → 429/ліміт → 5xx → невідома помилка.
  */
@@ -79,23 +88,32 @@ object AiErrorMapper {
                     it.contains("Network is unreachable", ignoreCase = true)
             }
 
+    /** Типи SDK, що означають проблему доступу (ключ, API вимкнено, дозволи, регіон), а не мережу чи ліміт. */
+    private fun isAccessType(t: Throwable) =
+        t is InvalidAPIKeyException || t is ServiceDisabledException || t is APINotConfiguredException ||
+            t is PermissionMissingException || t is UnsupportedUserLocationException
+
+    // SDK 18.2.0 НЕ зберігає HTTP-код у виняткові: `validateResponse` будує виняток із тексту помилки сервера
+    // (повідомлення містить «quota» → QuotaExceededException, усе інше → ServerException з сирим текстом сервера).
+    // Тому код і ознаки App Check шукаємо ЛИШЕ в ServerException (його текст це відповідь сервера) і лише як ціле
+    // слово: «read 1500 bytes» у будь-якому іншому винятку не дає ні «500», ні «403».
     private fun hasAppCheckSignal(t: Throwable): Boolean {
+        if (isAccessType(t)) return true
+        if (t !is ServerException) return false
         val m = t.message.orEmpty()
-        return m.contains("AppCheck", ignoreCase = true) || m.contains("app-check", ignoreCase = true) ||
-            m.contains("403") || m.contains("PERMISSION_DENIED", ignoreCase = true) ||
-            name(t).contains("AppCheck", ignoreCase = true)
+        return STATUS_403.containsMatchIn(m) || m.contains("App Check", ignoreCase = true) ||
+            m.contains("AppCheck", ignoreCase = true) || m.contains("PERMISSION_DENIED", ignoreCase = true)
     }
 
     private fun hasQuotaSignal(t: Throwable): Boolean {
+        if (t is QuotaExceededException) return true
+        if (t !is ServerException) return false
         val m = t.message.orEmpty()
-        return m.contains("429") || m.contains("RESOURCE_EXHAUSTED", ignoreCase = true) ||
-            m.contains("quota", ignoreCase = true) || m.contains("rate limit", ignoreCase = true) ||
-            name(t).endsWith("QuotaExceededException")
+        return STATUS_429.containsMatchIn(m) || m.contains("RESOURCE_EXHAUSTED", ignoreCase = true)
     }
 
-    private fun hasServerSignal(t: Throwable): Boolean {
-        val m = t.message.orEmpty()
-        return m.contains("500") || m.contains("503") || m.contains("UNAVAILABLE", ignoreCase = true) ||
-            name(t).endsWith(".ServerException")
-    }
+    private fun hasServerSignal(t: Throwable) = t is ServerException
+
+    private val STATUS_403 = Regex("""(?<![\d.])403(?![\d.])""")
+    private val STATUS_429 = Regex("""(?<![\d.])429(?![\d.])""")
 }

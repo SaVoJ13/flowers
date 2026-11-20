@@ -42,8 +42,25 @@ object CatalogValidator {
     private val BATCH_RE = Regex("^b\\d{2}$")
     private val DATE_RE = Regex("^\\d{4}-\\d{2}-\\d{2}$")
     private val CYRILLIC = Regex("[\\u0400-\\u04FF]")
-    // Керівні, C1, роздільники рядків/абзаців, нульової ширини та двоспрямовані (bidi) символи.
-    private val CONTROL = Regex("[\\u0000-\\u001F\\u007F-\\u009F\\u200B-\\u200F\\u2028-\\u202E\\u2060-\\u2069\\uFEFF]")
+    private val NON_LATIN = Regex("[\\u0370-\\u03FF\\u0400-\\u052F]")
+    // Заборонені символи за категоріями Unicode: керівні (Cc), форматні/bidi/нульової ширини (Cf), приватні (Co),
+    // сурогати (Cs, зокрема неспарені), роздільники рядків/абзаців, U+FFFD. Охоплює U+061C, U+00AD, теги, U+202E тощо.
+    private object CONTROL {
+        fun containsMatchIn(s: CharSequence): Boolean {
+            var i = 0
+            while (i < s.length) {
+                val cp = Character.codePointAt(s, i)
+                val t = Character.getType(cp)
+                if (cp == 0xFFFD || t == Character.CONTROL.toInt() || t == Character.FORMAT.toInt() ||
+                    t == Character.PRIVATE_USE.toInt() || t == Character.SURROGATE.toInt() ||
+                    t == Character.LINE_SEPARATOR.toInt() || t == Character.PARAGRAPH_SEPARATOR.toInt() ||
+                    t == Character.UNASSIGNED.toInt()
+                ) return true
+                i += Character.charCount(cp)
+            }
+            return false
+        }
+    }
 
     private val CARD_KEYS = setOf("id", "latin", "family", "retired", "replacedBy", "care", "safety", "i18n", "sourceIds", "review", "notes")
     private val CARD_REQUIRED = CARD_KEYS - setOf("notes", "replacedBy")
@@ -234,6 +251,12 @@ object CatalogValidator {
                 val tw = "$w.i18n.$lang"
                 checkKeys(t, TEXT_KEYS, TEXT_KEYS, tw, errors)
                 LENGTHS.forEach { (k, range) -> t.str(k, "$tw.$k", errors, range) }
+                if (lang == "en" || lang == "pl") {
+                    // Гомогліфи (кирилична «о» у латинському тексті) обходять перевірку оригінальності.
+                    val parts = TEXT_KEYS.filter { it != "aliases" }.mapNotNull { k -> t.get(k)?.takeIf { it.isJsonPrimitive }?.asString } +
+                        ((t.get("aliases") as? JsonArray)?.mapNotNull { a -> a.takeIf { it.isJsonPrimitive }?.asString }.orEmpty())
+                    if (parts.any { NON_LATIN.containsMatchIn(it) }) errors += "$tw: кирилиця або грецькі літери в англійському/польському тексті"
+                }
                 val aliases = t.get("aliases")
                 if (aliases != null) {
                     if (aliases !is JsonArray) errors += "$tw.aliases має бути масивом" else {
@@ -263,7 +286,7 @@ object CatalogValidator {
             checkKeys(r, REVIEW_KEYS, REVIEW_KEYS, "$w.review", errors)
             r.str("authoredBy", "$w.review.authoredBy", errors, 2..60)
             r.str("factChecked", "$w.review.factChecked", errors, 10..10)?.let {
-                if (!DATE_RE.matches(it) || runCatching { LocalDate.parse(it) }.isFailure) errors += "$w.review.factChecked: формат YYYY-MM-DD і існуюча дата"
+                if (!DATE_RE.matches(it) || runCatching { LocalDate.parse(it) }.getOrNull()?.let { d -> d.year < 2025 || d.year > 2100 } != false) errors += "$w.review.factChecked: формат YYYY-MM-DD і існуюча дата"
             }
             val os = r.get("ownerSampled")
             if (os != null && !(os.isJsonPrimitive && os.asJsonPrimitive.isBoolean)) errors += "$w.review.ownerSampled має бути boolean"
@@ -387,6 +410,7 @@ object OverlapChecker {
 /** Строгий JSON: без одинарних лапок/ключів без лапок/коментарів і з відхиленням дублів ключів (імпортер має читати так само). */
 object StrictJson {
     fun parse(text: String): JsonElement {
+        if (text.startsWith("\uFEFF")) throw JsonParseException("BOM на початку файлу заборонений")
         val r = JsonReader(StringReader(text))
         r.strictness = Strictness.STRICT
         val v = read(r)

@@ -20,11 +20,22 @@ class CatalogValidatorTest {
         }
     """.trimIndent()
 
-    private fun text(name: String, lang: String) = JsonParser.parseString(
-        """{"name": "$name", "aliases": ["alias"], "summary": "Короткий опис рослини для тесту валідатора каталогу.",
-           "watering": "Поливайте, коли верхній шар ґрунту підсох.", "light": "Яскраве розсіяне світло без прямого сонця.",
-           "soil": "Легкий дренований ґрунт для кімнатних рослин.", "tip": "Повертайте горщик раз на тиждень до світла."}"""
-    ).asJsonObject.also { _ -> lang.length }
+    private fun text(name: String, lang: String): JsonObject {
+        val latin = lang == "en" || lang == "pl"
+        val body = if (latin) listOf(
+            "Short description of the plant for the validator test.", "Water when the top soil layer has dried.",
+            "Bright diffused light without direct sun.", "Light well drained soil for houseplants.", "Turn the pot weekly towards the light."
+        ) else listOf(
+            "Короткий опис рослини для тесту валідатора каталогу.", "Поливайте, коли верхній шар ґрунту підсох.",
+            "Яскраве розсіяне світло без прямого сонця.", "Легкий дренований ґрунт для кімнатних рослин.", "Повертайте горщик раз на тиждень до світла."
+        )
+        return JsonObject().also { o ->
+            o.addProperty("name", name)
+            o.add("aliases", JsonArray().also { it.add(if (latin) "alias" else "псевдонім") })
+            o.addProperty("summary", body[0]); o.addProperty("watering", body[1]); o.addProperty("light", body[2])
+            o.addProperty("soil", body[3]); o.addProperty("tip", body[4])
+        }
+    }
 
     private fun card(id: String = "test_plant"): JsonObject = JsonParser.parseString(
         """
@@ -305,6 +316,25 @@ class CatalogValidatorTest {
     @Test fun `bidi zero width and C1 characters are rejected`() {
         listOf("\u202E", "\u200B", "\u0085", "\u2028", "\uFEFF", "\u2066").forEach { ch ->
             assertHas(errorsFor { it.getAsJsonObject("i18n").getAsJsonObject("en").addProperty("tip", "Water when dry${ch}and keep bright light") }, "керівні символи")
+        }
+    }
+
+    @Test fun `more invisible characters are rejected by unicode category`() {
+        listOf("\u061C", "\u00AD", "\u180E", "\uFFF9", "\uE000", "\uFFFD", "\uD800", "\uDB40\uDC01").forEach { ch ->
+            assertHas(errorsFor { it.getAsJsonObject("i18n").getAsJsonObject("en").addProperty("tip", "Water when dry${ch}and keep bright light") }, "керівні символи")
+        }
+    }
+
+    @Test fun `homoglyphs in english and polish text are rejected`() {
+        assertHas(errorsFor { it.getAsJsonObject("i18n").getAsJsonObject("en").addProperty("tip", "Water thorоughly when dry") }, "кирилиця або грецькі")
+        assertHas(errorsFor { it.getAsJsonObject("i18n").getAsJsonObject("pl").addProperty("summary", "Roślina Μonstera do domu i ogrodu zimowego") }, "кирилиця або грецькі")
+        assertHas(errorsFor { it.getAsJsonObject("i18n").getAsJsonObject("en").add("aliases", JsonParser.parseString("[\"mоnstera\"]")) }, "кирилиця або грецькі")
+    }
+
+    @Test fun `bom is rejected and far dates are rejected`() {
+        assertHas(CatalogValidator.validate("\uFEFF" + manifest(), sourcesJson, emptyMap()), "не JSON")
+        listOf("9999-12-31", "0001-01-01", "2024-12-31").forEach { d ->
+            assertHas(errorsFor { it.getAsJsonObject("review").addProperty("factChecked", d) }, "існуюча дата")
         }
     }
 

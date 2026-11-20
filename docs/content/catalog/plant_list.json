@@ -252,12 +252,12 @@
   "legacy": false
  },
  {
-  "id": "dracaena_deremensis",
-  "latin": "Dracaena deremensis",
-  "uk": "Драцена деремська",
-  "group": "дерева",
+  "id": "cyperus_alternifolius",
+  "latin": "Cyperus alternifolius",
+  "uk": "Циперус (сит'є)",
+  "group": "листяні",
   "batch": 1,
-  "reason": "поширена, легка",
+  "reason": "поширений, любить вологу",
   "legacy": false
  },
  {
@@ -648,12 +648,12 @@
   "legacy": false
  },
  {
-  "id": "nolina_recurvata",
-  "latin": "Nolina recurvata",
-  "uk": "Нолина",
-  "group": "дерева",
+  "id": "chamaedorea_seifrizii",
+  "latin": "Chamaedorea seifrizii",
+  "uk": "Хамедорея Сейфріца (бамбукова пальма)",
+  "group": "пальми",
   "batch": 2,
-  "reason": "схожа на бокарнею",
+  "reason": "поширена",
   "legacy": false
  },
  {
@@ -1323,9 +1323,9 @@
   "legacy": false
  },
  {
-  "id": "pilea_involucrata",
-  "latin": "Pilea involucrata",
-  "uk": "Пілея закутана",
+  "id": "pilea_microphylla",
+  "latin": "Pilea microphylla",
+  "uk": "Пілея дрібнолиста",
   "group": "листяні",
   "batch": 5,
   "reason": "поширена",
@@ -1494,9 +1494,9 @@
   "legacy": false
  },
  {
-  "id": "cereus_peruvianus",
-  "latin": "Cereus peruvianus",
-  "uk": "Цереус перуанський",
+  "id": "cereus_repandus",
+  "latin": "Cereus repandus",
+  "uk": "Цереус перуанський (торгова назва C. peruvianus)",
   "group": "кактуси",
   "batch": 6,
   "reason": "поширений",
@@ -1602,8 +1602,8 @@
   "legacy": false
  },
  {
-  "id": "alocasia_macrorrhiza",
-  "latin": "Alocasia macrorrhiza",
+  "id": "alocasia_macrorrhizos",
+  "latin": "Alocasia macrorrhizos",
   "uk": "Алоказія великокоренева",
   "group": "листяні",
   "batch": 7,
@@ -1773,9 +1773,9 @@
   "legacy": false
  },
  {
-  "id": "senecio_articulatus",
-  "latin": "Senecio articulatus",
-  "uk": "Сенецiо членистий",
+  "id": "curio_articulatus",
+  "latin": "Curio articulatus",
+  "uk": "Кліня членистая (свічка)",
   "group": "сукуленти",
   "batch": 7,
   "reason": "поширений",

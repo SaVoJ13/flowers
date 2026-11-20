@@ -33,6 +33,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import com.flowers.app.ui.components.AiDisclaimerText
+import com.flowers.app.ui.components.AiTexts
+import com.flowers.app.ui.components.isAiGenerated
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -235,8 +238,14 @@ fun CatalogScreen(
             text = {
                 Column {
                     Text(
-                        text = "Введіть назву будь-якої кімнатної рослини (напр. «Філодендрон Біркін», «Стреліція», «Калатея Медальйон», «Бонсай»). Google Gemini сформує персональну картку з точним інтервалом перевірки ґрунту, світлом, поливом і токсичністю.",
+                        text = "Введіть назву будь-якої кімнатної рослини (напр. «Філодендрон Біркін», «Стреліція», «Калатея Медальйон», «Бонсай»). Google Gemini сформує картку з інтервалом перевірки ґрунту, світлом і порадою догляду.",
                         style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = AiTexts.PRIVACY_HINT,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     OutlinedTextField(
@@ -342,6 +351,11 @@ fun CatalogPlantCard(plant: CatalogPlantEntity) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
+            if (plant.isAiGenerated()) {
+                Spacer(modifier = Modifier.height(6.dp))
+                AiDisclaimerText()
+            }
 
             if (plant.toxicToPets) {
                 Spacer(modifier = Modifier.height(6.dp))

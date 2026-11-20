@@ -75,6 +75,7 @@ dependencies {
     // Firebase (TASK-019)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.ai)
+    implementation(libs.firebase.firestore) // TASK-027: скарги на відповіді ШІ (лише create)
     implementation(libs.firebase.appcheck.playintegrity)
     debugImplementation(libs.firebase.appcheck.debug)
 

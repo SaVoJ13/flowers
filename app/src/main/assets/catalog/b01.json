@@ -149,7 +149,7 @@
           "Bazylia pospolita"
         ],
         "summary": "Jednoroczne ziele przyprawowe, które łatwo uprawiać na parapecie. Lubi słońce, żyzną ziemię i stałą wilgoć.",
-        "watering": "Lubi być stale dobrze nawodniona, więc często sprawdzaj ziemię. Podlewaj przy korzeniach, nie moczyć liści, nie zostawiaj wody w podstawce.",
+        "watering": "Lubi być stale dobrze nawodniona, więc często sprawdzaj ziemię. Podlewaj przy korzeniach, nie mocz liści, nie zostawiaj wody w podstawce.",
         "light": "Najlepiej rośnie w pełnym słońcu. Zadowoli się też stanowiskiem z około sześcioma godzinami słońca dziennie.",
         "soil": "Wybierz żyzną, przepuszczalną ziemię z dodatkiem materii organicznej. W ubogim podłożu rośnie wolno, a liście mają mdły smak.",
         "tip": "Zimne powietrze i chłodna ziemia hamują wzrost, a liście mogą poczernieć. Roślinę z objawami więdnięcia od razu usuń."
@@ -273,11 +273,10 @@
       "soil": "MOISTURE_RETAINING"
     },
     "safety": {
-      "pets": "UNKNOWN",
+      "pets": "TOXIC",
       "children": "UNKNOWN",
       "sourceIds": [
-        "ncsu_spearmint",
-        "rhs_mint"
+        "ncsu_spearmint"
       ]
     },
     "i18n": {
@@ -286,9 +285,9 @@
         "aliases": [
           "Mentha"
         ],
-        "summary": "Родина запашних трав, які швидко розростаються. Найкраще почуваються у вазоні, а восени їх можна внести на сонячне підвіконня.",
+        "summary": "Рід запашних трав, які швидко розростаються. Найкраще почуваються у вазоні, а восени їх можна внести на сонячне підвіконня.",
         "watering": "Не терпить пересушеного ґрунту, потрібен вологий субстрат. У горщику земля висихає швидше, ніж у саду, тому перевіряйте її регулярно.",
-        "light": "Підходить повне сонце або півтінь, приблизно від 2 до 6 годин прямого світла.",
+        "light": "Підходить усе від півтіні до повного сонця.",
         "soil": "Родючий, багатий на органіку, вологий і добре дренований ґрунт.",
         "tip": "М'ята швидко поширюється, тож вирощуйте її в окремому горщику. Загалом вона невибаглива, але трапляються іржа та грибкові хвороби."
       },
@@ -299,7 +298,7 @@
         ],
         "summary": "A group of scented, fast-spreading herbs. They are happiest in a pot, and in autumn can move to a sunny windowsill.",
         "watering": "It dislikes dry soil and wants a damp, free-draining mix. Pots dry out faster than garden beds, so look at the soil regularly while it grows.",
-        "light": "Full sun or partial shade both work, roughly two to six hours of direct light.",
+        "light": "Anything from partial shade to full sun works.",
         "soil": "Fertile, organically rich soil that stays moist but drains well.",
         "tip": "Mint runs quickly, so give it a pot of its own. It is usually trouble free, though rust and fungal diseases do turn up."
       },
@@ -310,7 +309,7 @@
         ],
         "summary": "Род душистых трав, которые быстро разрастаются. Лучше всего чувствуют себя в горшке, а осенью их можно перенести на солнечный подоконник.",
         "watering": "Не переносит пересушенную землю, нужен влажный субстрат. В горшке земля сохнет быстрее, чем на грядке, поэтому проверяйте её регулярно.",
-        "light": "Подойдёт полное солнце или полутень, примерно от 2 до 6 часов прямого света.",
+        "light": "Подойдёт всё от полутени до полного солнца.",
         "soil": "Плодородная, богатая органикой, влажная и хорошо дренированная земля.",
         "tip": "Мята быстро расползается, поэтому растите её в отдельном горшке. Обычно она неприхотлива, но встречаются ржавчина и грибковые болезни."
       },
@@ -321,7 +320,7 @@
         ],
         "summary": "Rodzaj aromatycznych ziół, które szybko się rozrastają. Najlepiej rosną w doniczce, a jesienią można je przenieść na słoneczny parapet.",
         "watering": "Nie znosi przesuszonej ziemi, lubi podłoże wilgotne. W doniczce ziemia schnie szybciej niż w gruncie, dlatego sprawdzaj ją regularnie.",
-        "light": "Odpowiada jej pełne słońce lub półcień, mniej więcej od 2 do 6 godzin bezpośredniego światła.",
+        "light": "Odpowiada jej wszystko od półcienia po pełne słońce.",
         "soil": "Żyzna, bogata w materię organiczną ziemia, wilgotna, ale dobrze odprowadzająca wodę.",
         "tip": "Mięta szybko się rozprzestrzenia, więc dla niej wydziel osobną doniczkę. Zwykle sprawia mało kłopotów, ale zdarza się rdza i choroby grzybowe."
       }
@@ -341,7 +340,7 @@
         "pl": false
       }
     },
-    "notes": "Картка на рівні роду (еталон у джерелах M. spicata); безпеку не оцінено, джерела розходяться між видами."
+    "notes": "Картка на рівні роду (еталон у джерелах M. spicata); для котів і собак NC State позначає низьку тяжкість (ефірні олії), RHS окремо називає M. pulegium шкідливою; для людей і дітей явного твердження немає."
   },
   {
     "id": "dracaena_fragrans",
@@ -438,7 +437,7 @@
       "lightMin": "MEDIUM",
       "lightMax": "HIGH",
       "checkIntervalDays": 7,
-      "humidity": "MEDIUM",
+      "humidity": "HIGH",
       "soil": "UNIVERSAL"
     },
     "safety": {
@@ -625,10 +624,10 @@
         "name": "Циперус черговолистий (сить)",
         "aliases": [
           "Сить",
-          "Циперус зонтичний"
+          "Циперус парасольковий"
         ],
         "summary": "Вологолюбна рослина з пучками листків-парасольок на високих стеблах. Коріння має завжди бути у вологому середовищі, тож циперус охоче росте навіть у воді.",
-        "watering": "Ґрунт має бути постійно мокрим, горщик можна ставити в піддон з водою. Часто перевіряйте його, адже коріння не повинне пересихати. Буріння кінчиків листя зазвичай означає нестачу води.",
+        "watering": "Ґрунт має бути постійно мокрим, горщик можна ставити в піддон з водою. Часто перевіряйте його, адже коріння не повинне пересихати. Побуріння кінчиків листя зазвичай означає нестачу води.",
         "light": "Росте від повного сонця до легкої півтіні. Від сильного сонця краще вкрити. Узимку шукайте для нього яскраве місце.",
         "soil": "Любить родючий суглинок або піщаний ґрунт. Добре пристосовується, поки ґрунт вологий чи мокрий.",
         "tip": "Тримайте подалі від опалення, що сушить повітря, і від морозу, який вбиває листя. Стебла можуть полягати, тож інколи потрібна опора."
@@ -636,7 +635,6 @@
       "en": {
         "name": "Umbrella sedge",
         "aliases": [
-          "Umbrella plant",
           "Umbrella papyrus"
         ],
         "summary": "A moisture-loving plant whose tall stems end in whorls of umbrella-like leaves. Its roots like to stay wet, so it will even grow standing in water.",
@@ -1215,14 +1213,13 @@
       "lightMax": "HIGH",
       "checkIntervalDays": 7,
       "humidity": "HIGH",
-      "soil": "AROID_MIX"
+      "soil": "UNIVERSAL"
     },
     "safety": {
-      "pets": "UNKNOWN",
-      "children": "UNKNOWN",
+      "pets": "TOXIC",
+      "children": "TOXIC",
       "sourceIds": [
-        "ncsu_rhaphidophora",
-        "iastate_philodendron"
+        "ncsu_rhaphidophora"
       ]
     },
     "i18n": {
@@ -1289,7 +1286,7 @@
         "pl": false
       }
     },
-    "notes": "Одне з джерел описує догляд за філодендроном, Rhaphidophora згадано як близьку рослину; безпеку не оцінено."
+    "notes": "Одне з джерел описує догляд за філодендроном, Rhaphidophora згадано як близьку рослину; токсичність за NC State (сторінка виду)."
   },
   {
     "id": "philodendron_bipinnatifidum",
@@ -1583,7 +1580,7 @@
         "summary": "Вибаглива декоративна рослина, якій потрібні тепло, вологе повітря та яскраве розсіяне світло. Погано реагує на холод і протяги.",
         "watering": "Ґрунт має бути вологим; поливайте, коли верхній шар приблизно на 5 см підсох. Узимку в приміщенні полив скорочують, бо надлишок води у спокої призводить до гнилі коренів.",
         "light": "Найкраще росте при яскравому розсіяному світлі. Пряме сонце може обпалити листки.",
-        "soil": "Потрібен вологий, дренований, родючий суглинистий субстрат. Для кращого дренажу до компосту додають крупний пісок або гриз.",
+        "soil": "Потрібен вологий, дренований, родючий суглинистий субстрат. Для кращого дренажу до субстрату додають крупний пісок або дрібний гравій.",
         "tip": "Любить тепле й вологе повітря: допоможуть піддон із галькою, групування рослин або зволожувач. Сухе повітря підсушує краї листків, а холод пошкоджує рослину."
       },
       "en": {
@@ -1740,7 +1737,7 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "pets": "UNKNOWN",
+      "pets": "TOXIC",
       "children": "TOXIC",
       "sourceIds": [
         "ncstate_hedera"
@@ -1750,13 +1747,12 @@
       "uk": {
         "name": "Плющ звичайний",
         "aliases": [
-          "Плющ",
-          "Англійський плющ"
+          "Плющ"
         ],
         "summary": "Витка вічнозелена ліана, яка легко росте в кімнаті. Невибагливий, переносить сухе повітря квартир і найкраще почувається при яскравому розсіяному світлі.",
-        "watering": "Поливайте рясно, а потім дайте верхньому шару ґрунту підсохнути приблизно на півтора сантиметра. Повністю пересихати кому не варто. Воду з піддона зливайте.",
+        "watering": "Поливайте рясно, а потім дайте верхньому шару ґрунту підсохнути приблизно на півтора сантиметра. Не допускайте повного пересихання земляної грудки. Воду з піддона зливайте.",
         "light": "Найкраще росте при яскравому світлі без прямого сонця. У затінку ріст сповільнюється, а строкаті форми можуть втрачати візерунок. Підходять східні, західні й північні вікна.",
-        "soil": "Підійде родючий ґрунт для кімнатних рослин із хорошим дренажем: універсальний торф'яний субстрат або суміш на основі дернової землі.",
+        "soil": "Підійде родючий ґрунт для кімнатних рослин із хорошим дренажем: універсальний субстрат без торфу або суміш на основі дернової землі.",
         "tip": "Більшість проблем ідуть від надлишку чи нестачі води, а у спеку й сухому повітрі з'являються павутинні кліщі. Зелені пагони на строкатих формах краще прибирати."
       },
       "en": {
@@ -1849,7 +1845,8 @@
       "en": {
         "name": "Grape ivy",
         "aliases": [
-          "Venezuela treebine"
+          "Venezuela treebine",
+          "Cissus alata"
         ],
         "summary": "A climbing houseplant with toothed, diamond-shaped leaflets. Easy to look after and tolerant of dry air and varied light levels.",
         "watering": "Let the compost dry a little between waterings. Keep it evenly moist from spring to autumn and water lightly in winter. Good drainage matters.",
@@ -2008,50 +2005,46 @@
       "uk": {
         "name": "Аспарагус Шпренгера",
         "aliases": [
-          "Аспарагус густоквітковий",
-          "Аспарагус"
+          "Аспарагус густоквітковий"
         ],
         "summary": "Декоративна кімнатна рослина з пухнастими довгими пагонами. Невибаглива, любить світле місце без прямого сонця та помірно вологий ґрунт.",
         "watering": "Тримайте ґрунт вологим, але з хорошим відтоком води. З весни до осені поливайте регулярно, узимку помірніше. Перед поливом перевіряйте верхній шар.",
         "light": "Росте при хорошому, але не прямому освітленні, витримує легку тінь.",
         "soil": "Невибаглива до ґрунту, головне щоб він добре пропускав воду і не застоювався.",
-        "tip": "Щоб кущ був густішим, прищипуйте верхівки пагонів. Із шкідників можуть траплятися слимаки та равлики, а хвороб зазвичай мало."
+        "tip": "Підрізати рослину не потрібно. Із шкідників можуть траплятися слимаки та равлики, а хвороб зазвичай мало."
       },
       "en": {
         "name": "Sprenger's asparagus",
         "aliases": [
-          "Emerald fern",
-          "Asparagus fern"
+          "Emerald fern"
         ],
         "summary": "A decorative houseplant with long, fluffy arching stems. Undemanding; it likes a bright spot out of direct sun and compost that stays lightly moist.",
         "watering": "Keep the compost moist but well drained. Water regularly from spring to autumn and a little less in winter, checking the top layer first.",
         "light": "Does well in good light that is not direct, and copes with partial shade.",
         "soil": "It is not fussy about soil as long as water drains freely and does not stand.",
-        "tip": "Pinch out the stem tips to keep the plant bushy. Slugs and snails may turn up, but otherwise it is generally trouble-free."
+        "tip": "No pruning is needed. Slugs and snails may turn up, but otherwise it is generally trouble-free."
       },
       "ru": {
         "name": "Аспарагус Шпренгера",
         "aliases": [
-          "Аспарагус густоцветковый",
-          "Аспарагус"
+          "Аспарагус густоцветковый"
         ],
         "summary": "Декоративное комнатное растение с длинными пушистыми побегами. Нетребовательное, любит светлое место без прямого солнца и умеренно влажную землю.",
         "watering": "Держите землю влажной, но с хорошим оттоком воды. С весны до осени поливайте регулярно, зимой умереннее. Перед поливом проверяйте верхний слой.",
         "light": "Растёт при хорошем, но не прямом освещении, переносит лёгкую тень.",
         "soil": "Нетребователен к грунту, главное, чтобы он хорошо пропускал воду и не застаивался.",
-        "tip": "Чтобы куст был гуще, прищипывайте верхушки побегов. Из вредителей могут встретиться слизни и улитки, болезней обычно немного."
+        "tip": "Обрезка не требуется. Из вредителей могут встретиться слизни и улитки, болезней обычно немного."
       },
       "pl": {
         "name": "Szparag Sprengera",
         "aliases": [
-          "Szparag gęstokwiatowy",
-          "Szparag"
+          "Szparag gęstokwiatowy"
         ],
         "summary": "Ozdobna roślina doniczkowa o długich, puszystych pędach. Mało wymagająca, lubi jasne miejsce bez ostrego słońca i umiarkowanie wilgotne podłoże.",
         "watering": "Utrzymuj podłoże wilgotne, ale przepuszczalne. Od wiosny do jesieni podlewaj regularnie, zimą nieco rzadziej. Przed podlaniem sprawdź wierzchnią warstwę.",
         "light": "Rośnie w dobrym, lecz nie bezpośrednim świetle i znosi lekki półcień.",
         "soil": "Nie ma dużych wymagań co do ziemi, byleby woda swobodnie odpływała i nie zalegała.",
-        "tip": "Aby krzew był gęstszy, przycinaj końce pędów. Mogą pojawić się ślimaki, ale zwykle roślina rzadko choruje."
+        "tip": "Przycinanie nie jest potrzebne. Mogą pojawić się ślimaki, ale zwykle roślina rzadko choruje."
       }
     },
     "sourceIds": [
@@ -2086,11 +2079,9 @@
       "soil": "MOISTURE_RETAINING"
     },
     "safety": {
-      "pets": "NON_TOXIC",
+      "pets": "UNKNOWN",
       "children": "UNKNOWN",
-      "sourceIds": [
-        "ncstate_fatsia"
-      ]
+      "sourceIds": []
     },
     "i18n": {
       "uk": {
@@ -2102,7 +2093,7 @@
         "watering": "Тримайте ґрунт вологим, але не мокрим. Надлишок води спричиняє гниття коренів, тому перед поливом перевіряйте верхній шар, а воду з піддона зливайте.",
         "light": "Найкраще росте в півтіні чи розсіяному затіненні. На повному сонці й на протязі листя буріє.",
         "soil": "Кислуватий, вологий, але дренований ґрунт, багатий на гумус і поживний.",
-        "tip": "У сухому або сонячному місці з'являються павутинні кліщі. Обрізати можна будь-коли, а підживлювати регулярно, крім зими."
+        "tip": "У сухому або сонячному місці з'являються павутинні кліщі. Обрізати можна будь-коли, а підживлювати достатньо злегка навесні."
       },
       "en": {
         "name": "Japanese aralia",
@@ -2114,7 +2105,7 @@
         "watering": "Keep the soil moist but never soggy. Too much water leads to root rot, so check the top layer first and tip out any water left in the saucer.",
         "light": "Does best in partial or dappled shade. Full sun and drafty wind turn the leaves brown.",
         "soil": "A slightly acidic, humus-rich, fertile soil that holds moisture yet drains freely.",
-        "tip": "Spider mites show up where it is too dry or sunny. You can prune it at any time and feed it regularly, except in winter."
+        "tip": "Spider mites show up where it is too dry or sunny. You can prune it at any time and feed it lightly in spring."
       },
       "ru": {
         "name": "Фатсия японская",
@@ -2126,7 +2117,7 @@
         "watering": "Держите землю влажной, но не мокрой. Избыток воды вызывает гниль корней, поэтому перед поливом проверяйте верхний слой, а воду из поддона сливайте.",
         "light": "Лучше всего растёт в полутени или рассеянном затенении. На полном солнце и на сквозняке листья буреют.",
         "soil": "Слабокислый, влажный, но дренированный грунт, богатый гумусом и питательный.",
-        "tip": "В сухом или солнечном месте появляются паутинные клещи. Обрезать можно в любое время, а подкармливать регулярно, кроме зимы."
+        "tip": "В сухом или солнечном месте появляются паутинные клещи. Обрезать можно в любое время, а подкармливать достаточно слегка весной."
       },
       "pl": {
         "name": "Fatsja japońska",
@@ -2137,7 +2128,7 @@
         "watering": "Utrzymuj podłoże wilgotne, ale nie mokre. Nadmiar wody powoduje gnicie korzeni, więc przed podlaniem sprawdź wierzchnią warstwę, a wodę z podstawka wylewaj.",
         "light": "Najlepiej rośnie w półcieniu lub świetle rozproszonym. W pełnym słońcu i na przeciągu liście brązowieją.",
         "soil": "Lekko kwaśna, żyzna ziemia bogata w próchnicę, wilgotna, ale przepuszczalna.",
-        "tip": "W suchym lub nasłonecznionym miejscu pojawiają się przędziorki. Przycinać można o każdej porze roku, a nawozić regularnie, poza zimą."
+        "tip": "W suchym lub nasłonecznionym miejscu pojawiają się przędziorki. Przycinać można o każdej porze roku, a nawozić wystarczy lekko wiosną."
       }
     },
     "sourceIds": [
@@ -2156,6 +2147,6 @@
         "pl": false
       }
     },
-    "notes": "Безпека для котів і собак лише з тегів NC State (без речення в тексті)."
+    "notes": "Теги NC State «non-toxic for cats/dogs» суперечать RHS («Potentially harmful», плоди не їсти): безпеку не оцінено (UNKNOWN)."
   }
 ]

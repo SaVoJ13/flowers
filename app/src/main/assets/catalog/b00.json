@@ -1944,8 +1944,7 @@
         "name": "Falenopsis (hybrydy)",
         "aliases": [
           "Storczyk ćmowy",
-          "Falenopsis",
-          "Storczyk"
+          "Falenopsis"
         ],
         "summary": "Popularne storczyki doniczkowe, które lubią ciepło, wilgotne powietrze i jasne miejsce bez ostrego słońca. Rosną w podłożu z kory, a nie w zwykłej ziemi.",
         "watering": "Dorosłe rośliny podlewaj mniej więcej raz w tygodniu, latem częściej, gdy podłoże lekko przeschnie. Nie dopuszczaj do całkowitego przesuszenia ani do stania wody w doniczce.",
@@ -1978,7 +1977,7 @@
     "retired": false,
     "replacedBy": null,
     "care": {
-      "difficulty": "MEDIUM",
+      "difficulty": "EASY",
       "lightMin": "MEDIUM",
       "lightMax": "HIGH",
       "checkIntervalDays": 7,
@@ -1998,8 +1997,8 @@
         "aliases": [
           "Фікус лірата"
         ],
-        "summary": "Ефектна рослина з великими хвилястими листками. Потребує яскравого розсіяного світла або легкої напівтіні й чутлива до надмірного поливу.",
-        "watering": "Перевіряйте ґрунт приблизно раз на тиждень, занурюючи палець на пару сантиметрів. Не допускайте пересихання до відставання від стінок горщика, але й заливати не варто: листя опадає від надміру та нестачі води.",
+        "summary": "Ефектна рослина з великими ліроподібними листками. Потребує яскравого розсіяного світла або легкої напівтіні й чутлива до надмірного поливу.",
+        "watering": "Перевіряйте ґрунт приблизно раз на тиждень, занурюючи палець приблизно на 5 см. Не допускайте пересихання до відставання від стінок горщика, але й заливати не варто: листя опадає від надміру та нестачі води.",
         "light": "Яскраве розсіяне світло або легка напівтінь. Пряме сонце випалює листки.",
         "soil": "Вологий, але добре дренований ґрунт, найкраще якісна суміш для кімнатних рослин, яка швидко пропускає воду.",
         "tip": "Коричневі плями на листі часто з'являються через перепади температури біля вентиляції. Раз на кілька місяців протирайте листя від пилу."
@@ -2021,8 +2020,8 @@
         "aliases": [
           "Фикус лирата"
         ],
-        "summary": "Эффектное растение с крупными волнистыми листьями. Ему нужен яркий рассеянный свет или лёгкая полутень, а перелив для него вреден.",
-        "watering": "Проверяйте грунт примерно раз в неделю, погружая палец на пару сантиметров. Не давайте земле ссыхаться и отходить от стенок горшка, но и не заливайте: листья опадают и от избытка, и от нехватки воды.",
+        "summary": "Эффектное растение с крупными лировидными листьями. Ему нужен яркий рассеянный свет или лёгкая полутень, а перелив для него вреден.",
+        "watering": "Проверяйте грунт примерно раз в неделю, погружая палец примерно на 5 см. Не давайте земле ссыхаться и отходить от стенок горшка, но и не заливайте: листья опадают и от избытка, и от нехватки воды.",
         "light": "Яркий рассеянный свет или лёгкая полутень. Прямое солнце обжигает листья.",
         "soil": "Влажный, но хорошо дренированный грунт, лучше всего качественная смесь для комнатных растений, быстро пропускающая воду.",
         "tip": "Коричневые пятна на листьях нередко появляются из-за перепадов температуры у вентиляции. Раз в несколько месяцев протирайте листья от пыли."
@@ -2032,8 +2031,8 @@
         "aliases": [
           "Fikus lirowaty"
         ],
-        "summary": "Efektowna roślina o dużych, falistych liściach. Potrzebuje jasnego, rozproszonego światła lub lekkiego półcienia i źle znosi przelanie.",
-        "watering": "Sprawdzaj ziemię mniej więcej raz w tygodniu, wsuwając palec na kilka centymetrów. Nie dopuszczaj, by odeszła od brzegów doniczki, ale też nie zalewaj: liście opadają zarówno od nadmiaru, jak i niedoboru wody.",
+        "summary": "Efektowna roślina o dużych, lirowatych liściach. Potrzebuje jasnego, rozproszonego światła lub lekkiego półcienia i źle znosi przelanie.",
+        "watering": "Sprawdzaj ziemię mniej więcej raz w tygodniu, wsuwając palec na około 5 cm. Nie dopuszczaj, by odeszła od brzegów doniczki, ale też nie zalewaj: liście opadają zarówno od nadmiaru, jak i niedoboru wody.",
         "light": "Jasne, rozproszone światło lub lekki półcień. Ostre słońce przypala liście.",
         "soil": "Wilgotne, ale dobrze przepuszczalne podłoże, najlepiej dobrej jakości ziemia do roślin doniczkowych, która szybko odprowadza wodę.",
         "tip": "Brązowe plamy na liściach często pojawiają się przez wahania temperatury przy nawiewie. Co kilka miesięcy przecieraj liście z kurzu."

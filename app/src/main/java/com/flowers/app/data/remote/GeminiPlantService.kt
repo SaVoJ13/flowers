@@ -35,9 +35,6 @@ data class GeneratedPlantResponse(
     @SerializedName("soil_type")
     val soilType: String,
 
-    @SerializedName("toxic_to_pets")
-    val toxicToPets: Boolean,
-
     @SerializedName("care_tip")
     val careTip: String
 )
@@ -49,18 +46,23 @@ sealed class GeneratePlantResult {
 
 class GeminiPlantService(
     private val catalogDao: CatalogDao,
-    private val carePodDao: CarePodDao
+    private val carePodDao: CarePodDao,
+    private val networkChecker: NetworkChecker,
+    /** Виклик моделі; за замовчуванням Firebase AI Logic. Підміняється в тестах. */
+    private val generateText: suspend (String) -> String? = { prompt -> defaultModel.generateContent(prompt).text }
 ) {
     private val gson = Gson()
 
-    private val generativeModel by lazy {
-        Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-            modelName = GEMINI_MODEL,
-            generationConfig = generationConfig {
-                responseMimeType = "application/json"
-                temperature = 0.2f
-            }
-        )
+    private companion object {
+        val defaultModel by lazy {
+            Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+                modelName = GEMINI_MODEL,
+                generationConfig = generationConfig {
+                    responseMimeType = "application/json"
+                    temperature = 0.2f
+                }
+            )
+        }
     }
 
     suspend fun generatePlantCareCard(
@@ -71,26 +73,15 @@ class GeminiPlantService(
             return@withContext GeneratePlantResult.Error("Вкажіть назву рослини для пошуку.")
         }
 
-        val prompt = """
-            Ти досвідчений ботанік та експерт із догляду за кімнатними рослинами.
-            Склади точну, структуровану картку догляду для кімнатної рослини: «$trimmedQuery».
-            Поверни виключно валідний JSON-об'єкт із такими полями (без жодного markdown-обрамлення):
-            {
-              "name_uk": "офіційна українська назва виду",
-              "name_latin": "ботанічна латинська назва (напр. Monstera deliciosa)",
-              "popular_name": "народна/популярна українська назва",
-              "difficulty": "Дуже легко / Легко / Помірно / Складно",
-              "light": "рекомендації щодо світла українською мовою",
-              "default_check_interval_days": ціле число днів від 3 до 21 для перевірки вологості ґрунту (сукуленти 12-14, помірні 6-8, вологолюбні 4-5),
-              "soil_type": "склад субстрату та дренажу українською мовою",
-              "toxic_to_pets": true або false (чи токсична для котів/собак при жуванні),
-              "care_tip": "головна практична порада новачку для уникнення типових помилок (1-2 речення українською)"
-            }
-        """.trimIndent()
+        // Немає мережі: одразу повідомляємо, без запиту до ШІ.
+        if (!networkChecker.isOnline()) {
+            return@withContext GeneratePlantResult.Error(AiErrorMapper.MSG_NO_INTERNET)
+        }
+
+        val prompt = AiPrompt.plantCareCard(trimmedQuery)
 
         try {
-            val response = generativeModel.generateContent(prompt)
-            val responseText = response.text ?: ""
+            val responseText = generateText(prompt) ?: ""
             val generated = parseGeminiResponse(responseText)
 
             if (generated != null) {
@@ -107,7 +98,8 @@ class GeminiPlantService(
                     light = generated.light,
                     defaultCheckIntervalDays = generated.defaultCheckIntervalDays.coerceIn(3, 28),
                     soilType = generated.soilType,
-                    toxicToPets = generated.toxicToPets
+                    toxicToPets = false, // не використовується: для ШІ-карток токсичність невідома (TASK-025)
+                    isAiGenerated = true
                 )
 
                 val podEntity = CarePodEntity(

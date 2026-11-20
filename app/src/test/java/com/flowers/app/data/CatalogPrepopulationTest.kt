@@ -98,4 +98,19 @@ class CatalogPrepopulationTest {
         assertNotNull(fingerTestPod)
         assertEquals("Тест пальцем на 2 см", fingerTestPod!!.titleUk)
     }
+
+    @Test
+    fun `catalog keeps verified toxicity flags and none is marked ai generated`() {
+        val json = File("src/main/assets/content/PLANT_CATALOG.json").readText()
+        val type = object : TypeToken<List<CatalogPlantEntity>>() {}.type
+        val plants: List<CatalogPlantEntity> = gson.fromJson(json, type)
+        assertEquals(20, plants.size)
+        assertEquals(16, plants.count { it.toxicToPets })
+        assertEquals(4, plants.count { !it.toxicToPets })
+        assertEquals(
+            setOf("chlorophytum", "peperomia", "maranta", "calathea"),
+            plants.filter { !it.toxicToPets }.map { it.id }.toSet()
+        )
+        assertTrue(plants.none { it.isAiGenerated })
+    }
 }

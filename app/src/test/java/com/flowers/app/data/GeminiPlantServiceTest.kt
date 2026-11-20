@@ -52,7 +52,8 @@ class GeminiPlantServiceTest {
         assertEquals("Біркін", generated.popularName)
         assertEquals("Легко", generated.difficulty)
         assertEquals(7, generated.defaultCheckIntervalDays)
-        assertTrue(generated.toxicToPets)
+        // TASK-025: токсичність із відповіді ШІ ігнорується, у DTO такого поля немає.
+        assertTrue(GeneratedPlantResponse::class.java.declaredFields.none { it.name.contains("toxic", ignoreCase = true) })
         assertTrue(generated.careTip.contains("Поливати"))
     }
 }

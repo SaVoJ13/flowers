@@ -1,5 +1,8 @@
 # PRODUCT REQUIREMENTS DOCUMENT (PRD) — MVP FLOWERS
 
+> **Примітка 2026-11-20 (TASK-021-B):** розділи нижче описують початковий офлайн-MVP. Актуальний стан релізу 1.0: інтернет потрібен для ШІ-картки (безкоштовний Gemini через Firebase AI Logic) і скарг (Firestore), фото-функцій немає; див. `docs/release/RELEASE_1_0_PLAN.md`, `docs/governance/DECISIONS.md` (ADR-009/013/015). Повне оновлення PRD: окреме завдання (TASK-048, пропозиція).
+
+
 - **Проєкт:** Flowers (Android)
 - **Версія:** 1.0 (MVP)
 - **Дата:** 2026-11-18

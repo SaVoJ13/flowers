@@ -10,7 +10,7 @@
 `Flowers: Plant Care` (19)
 
 ### Short description (≤ 80 chars)
-`Gentle care reminders, plant tips and an AI care card for any houseplant.` (73)
+`Gentle care reminders, plant tips and an AI plant care card.` (58)
 
 ### Full description (≤ 4000 chars)
 ```
@@ -28,13 +28,13 @@ Short tips on each plant card: how to test soil moisture with a finger, where to
 A built-in catalog of 20 popular houseplants (ZZ plant, monstera, peace lily, snake plant, ficus and more) that works offline.
 
 4. AI CARE CARD
-Your plant isn't in the guide? Type its name and AI prepares a care card. Internet required. It is advice, not a guarantee: please verify it. For AI cards the app does not claim a plant is safe for pets or children. If an answer is wrong or unsafe, tap "Report this AI answer".
+Your plant isn't in the guide? Type its name and AI prepares a care card. Internet required. It is advice, not a guarantee: please verify it. For AI cards the app does not claim a plant is safe for pets or children. If an answer is wrong or unsafe, tap the report button ("Поскаржитися на відповідь ШІ" in the Ukrainian-only 1.0 interface).
 
 5. OFFLINE CONDITION CHECKLIST
 Yellow leaves or drooping stems? Go through a short check (leaves, stem, soil, pests): the app compares symptoms with your watering log and suggests what to check.
 
 6. CARE LOG
-Record waterings, feeding and other events for each plant.
+Record waterings and condition checks for each plant.
 
 🔒 PRIVACY
 • No sign-up, no accounts.

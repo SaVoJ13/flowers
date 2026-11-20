@@ -11,7 +11,7 @@
 
 ## 1. In short
 - Your plants, care journal and reminders are stored **only on your phone**. We have no accounts and do not collect your name, e-mail, phone number or location.
-- The app uses the internet in **two cases**: (a) when you ask it to create a care card with AI (the plant name is sent to Google); (b) when you tap "Report this AI answer" (the report is stored in our database).
+- The app uses the internet for **two user actions**: (a) when you ask it to create a care card with AI (the plant name is sent to Google); (b) when you tap the report button ("Поскаржитися на відповідь ШІ" in the Ukrainian-only 1.0 interface; the report is stored in our database). Firebase also performs technical app-integrity checks (section 3).
 - There are no ads, analytics or tracking.
 
 ## 2. What is stored on your device
@@ -30,7 +30,7 @@ When you search for a plant that is not in the catalog and start generation, the
 - Without internet, generation is unavailable; everything else works offline.
 
 ## 4. Reporting an AI answer
-The "Report this AI answer" button sends to our **Cloud Firestore (Google, region eur3 — Europe)** database:
+The report button ("Поскаржитися на відповідь ШІ") sends to our **Cloud Firestore (Google, region eur3 — Europe)** database:
 - the text of the card you report and the plant name;
 - the reason you chose and your **optional comment** (do not put personal data in it);
 - the app version, time of the report and the automatic deletion date.

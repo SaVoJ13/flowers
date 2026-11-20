@@ -17,7 +17,7 @@
 |---|---|---|---|---|---|---|
 | App activity | **Other user-generated content** (назва рослини, надіслана для генерації) | Так | **Так** (Google, умови безкоштовного рівня: покращення продуктів, перегляд людьми; рішення O-Q4) | Ні (функція ШІ необов'язкова) | App functionality | Постачальник: Google Gemini через Firebase AI Logic |
 | App activity | **Other user-generated content** (текст картки, причина та коментар скарги) | Так | Ні (лише наша база Firestore, eur3) | Ні | App functionality (виправлення відповідей, безпека) | Зберігання 12 міс.; без ідентифікаторів користувача |
-| Device or other IDs | Ідентифікатор встановлення Firebase / токен App Check (Play Integrity) | **Перевірити** (за посібником Firebase, ймовірно «Так») | **Перевірити** | Так (потрібен для ШІ) | App functionality, Fraud prevention, security | Не пов'язується з особою; `Не підтверджено` |
+| Device or other IDs | Ідентифікатор встановлення Firebase / токен App Check (Play Integrity) | **Перевірити** (за посібником Firebase, ймовірно «Так») | **Перевірити** | Ні (створюється лише під час використання ШІ) | App functionality, Fraud prevention, security | Не пов'язується з особою; `Не підтверджено` |
 | App info and performance | Crash logs / diagnostics | Ні (власних SDK немає; Android vitals збирає Google Play) | — | — | — | Crashlytics не використовується (рішення Власника Q-1.1-4) |
 | Personal info / Location / Financial / Health / Messages / Photos & videos / Audio / Files / Calendar / Contacts / Web browsing | — | **Ні** | — | — | — | Камера й галерея не використовуються; геолокація не запитується |
 

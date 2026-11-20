@@ -1,0 +1,20 @@
+title: Flowers
+description: Догляд за кімнатними рослинами / Houseplant care
+theme: jekyll-theme-minimal
+exclude:
+  - governance
+  - tasks
+  - release
+  - architecture
+  - content
+  - design
+  - research
+  - roadmap
+  - templates
+  - reports
+  - product
+  - monetization
+  - store
+  - THIRD_PARTY.md
+  - privacy/DATA_SAFETY.md
+  - privacy/FIREBASE_DISCLOSURE_CHECK.md

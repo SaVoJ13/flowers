@@ -16,10 +16,15 @@ fun interface NetworkChecker {
 class AndroidNetworkChecker(context: Context) : NetworkChecker {
     private val cm = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
 
-    override fun isOnline(): Boolean {
-        val manager = cm ?: return false
-        val caps = manager.getNetworkCapabilities(manager.activeNetwork ?: return false) ?: return false
-        return caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+    // Сама перевірка може впасти (SecurityException на частині Android 11 тощо): тоді пробуємо запит (рішення Власника).
+    override fun isOnline(): Boolean = checkOnlineSafely {
+        val manager = cm ?: throw IllegalStateException("ConnectivityManager недоступний")
+        val caps = manager.getNetworkCapabilities(manager.activeNetwork ?: return@checkOnlineSafely false)
+            ?: return@checkOnlineSafely false
+        caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
             caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
     }
 }
+
+/** Якщо перевірка мережі сама дала збій, повертає true: краще спробувати запит, ніж заблокувати його (TASK-046). */
+internal fun checkOnlineSafely(probe: () -> Boolean): Boolean = runCatching(probe).getOrDefault(true)

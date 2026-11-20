@@ -14,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Security
@@ -145,7 +144,7 @@ fun SettingsScreen(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "• Рослини, журнал і згенеровані картки зберігаються лише на телефоні\n• Для ШІ-картки назва рослини надсилається до Google (безкоштовний рівень); не вводьте особисті дані\n• Скарга на відповідь ШІ надсилається в базу розробника на 12 місяців\n• Без реєстрації й реклами",
+                        text = "• Рослини, журнал і згенеровані картки зберігаються лише на телефоні\n• Для ШІ-картки назва рослини надсилається до Google (безкоштовний рівень); не вводьте особисті дані\n• Скарга на відповідь ШІ надсилається в базу розробника (зберігається до 12 місяців)\n• Без реєстрації й реклами",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

@@ -147,8 +147,8 @@
   "id": "maranta",
   "latin": "Maranta leuconeura",
   "uk_old": "Маранта триколірна",
-  "uk_new": "Маранта біложилкова",
-  "changed": true,
+  "uk_new": "Маранта триколірна",
+  "changed": false,
   "confidence": "medium",
   "note": "M. leuconeura - біложилкова; «триколірна» лише сорт kerchoveana 'Tricolor'"
  },
@@ -190,7 +190,7 @@
  },
  {
   "id": "phalaenopsis_hybrid",
-  "latin": "Phalaenopsis hybrid",
+  "latin": "Phalaenopsis",
   "uk_old": "Фаленопсис (гібриди)",
   "uk_new": "Фаленопсис (гібриди)",
   "changed": false,
@@ -220,6 +220,42 @@
   "latin": "Nephrolepis exaltata",
   "uk_old": "Нефролепіс",
   "uk_new": "Нефролепіс",
+  "changed": false,
+  "confidence": "high",
+  "note": ""
+ },
+ {
+  "id": "citrus_limon",
+  "latin": "Citrus limon",
+  "uk_old": "Лимон кімнатний",
+  "uk_new": "Лимон кімнатний",
+  "changed": false,
+  "confidence": "high",
+  "note": ""
+ },
+ {
+  "id": "ocimum_basilicum",
+  "latin": "Ocimum basilicum",
+  "uk_old": "Базилік",
+  "uk_new": "Базилік",
+  "changed": false,
+  "confidence": "high",
+  "note": ""
+ },
+ {
+  "id": "salvia_rosmarinus",
+  "latin": "Salvia rosmarinus",
+  "uk_old": "Розмарин",
+  "uk_new": "Розмарин",
+  "changed": false,
+  "confidence": "high",
+  "note": ""
+ },
+ {
+  "id": "mentha",
+  "latin": "Mentha",
+  "uk_old": "М'ята",
+  "uk_new": "М'ята",
   "changed": false,
   "confidence": "high",
   "note": ""
@@ -282,10 +318,10 @@
   "id": "beaucarnea_recurvata",
   "latin": "Beaucarnea recurvata",
   "uk_old": "Бокарнея вигнута (пляшкова пальма)",
-  "uk_new": "Бокарнея вигнута (пляшкова пальма)",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Бокарнея відігнута (пляшкова пальма)",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Бокарнея вигнута (пляшкова пальма)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "aspidistra_elatior",
@@ -450,6 +486,33 @@
   "note": "«рослина-веснянка» - побутова, ок"
  },
  {
+  "id": "laurus_nobilis",
+  "latin": "Laurus nobilis",
+  "uk_old": "Лавр благородний",
+  "uk_new": "Лавр благородний",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Лавр шляхетний»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
+ },
+ {
+  "id": "olea_europaea",
+  "latin": "Olea europaea",
+  "uk_old": "Маслина європейська (олива)",
+  "uk_new": "Маслина європейська (олива)",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Олива європейська (оливкове дерево)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
+ },
+ {
+  "id": "persea_americana",
+  "latin": "Persea americana",
+  "uk_old": "Авокадо (з кісточки)",
+  "uk_new": "Авокадо (з кісточки)",
+  "changed": false,
+  "confidence": "high",
+  "note": ""
+ },
+ {
   "id": "howea_forsteriana",
   "latin": "Howea forsteriana",
   "uk_old": "Ховея Форстера (кентія)",
@@ -471,10 +534,10 @@
   "id": "dypsis_lutescens",
   "latin": "Dypsis lutescens",
   "uk_old": "Діпсис жовтуватий (арека)",
-  "uk_new": "Діпсис жовтуватий (арека)",
-  "changed": false,
+  "uk_new": "Дипсис жовтуватий (арека)",
+  "changed": true,
   "confidence": "medium",
-  "note": "lutescens - жовтіючий; «жовтуватий» вживається"
+  "note": "було «Діпсис жовтуватий (арека)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "rhapis_excelsa",
@@ -507,10 +570,10 @@
   "id": "cycas_revoluta",
   "latin": "Cycas revoluta",
   "uk_old": "Цикас повислий (саговник)",
-  "uk_new": "Цикас завитий (саговник)",
+  "uk_new": "Саговник відгорнений (цикас)",
   "changed": true,
   "confidence": "medium",
-  "note": "revoluta - завитий/відігнутий; «повислий» невиправдано"
+  "note": "було «Цикас завитий (саговник)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "strelitzia_reginae",
@@ -588,10 +651,10 @@
   "id": "polyscias_fruticosa",
   "latin": "Polyscias fruticosa",
   "uk_old": "Поліціас",
-  "uk_new": "Поліціас",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Полісціас",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Поліціас»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "radermachera_sinica",
@@ -678,10 +741,10 @@
   "id": "echeveria_elegans",
   "latin": "Echeveria elegans",
   "uk_old": "Ехеверія витончена",
-  "uk_new": "Ехеверія витончена",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Ечеверія",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Ехеверія витончена»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "haworthiopsis_attenuata",
@@ -723,19 +786,19 @@
   "id": "kalanchoe_blossfeldiana",
   "latin": "Kalanchoe blossfeldiana",
   "uk_old": "Каланхое Блосфельда",
-  "uk_new": "Каланхое Блосфельда",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Каланхое Блоссфельда",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Каланхое Блосфельда»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "kalanchoe_daigremontiana",
   "latin": "Kalanchoe daigremontiana",
   "uk_old": "Каланхое Дегремона",
-  "uk_new": "Каланхое Дегремона",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Каланхое Дайгремонта",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Каланхое Дегремона»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "kalanchoe_tomentosa",
@@ -876,10 +939,10 @@
   "id": "euphorbia_milii",
   "latin": "Euphorbia milii",
   "uk_old": "Молочай Мілля",
-  "uk_new": "Молочай Мілля",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Молочай Міля",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Молочай Мілля»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "euphorbia_pulcherrima",
@@ -903,10 +966,10 @@
   "id": "saintpaulia_ionantha",
   "latin": "Saintpaulia ionantha",
   "uk_old": "Сентполія (узамбарська фіалка)",
-  "uk_new": "Сентполія (узамбарська фіалка)",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Сенполія",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Сентполія (узамбарська фіалка)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "streptocarpus",
@@ -966,10 +1029,10 @@
   "id": "cyclamen_persicum",
   "latin": "Cyclamen persicum",
   "uk_old": "Цикламен персидський",
-  "uk_new": "Цикламен персидський",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Цикламен перський",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Цикламен персидський»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "clivia_miniata",
@@ -982,12 +1045,12 @@
  },
  {
   "id": "hippeastrum_hybrid",
-  "latin": "Hippeastrum hybrid",
+  "latin": "Hippeastrum",
   "uk_old": "Гіппеаструм (амариліс)",
-  "uk_new": "Гіппеаструм (амариліс)",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Гіпеаструм",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Гіппеаструм (амариліс)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "gardenia_jasminoides",
@@ -1020,23 +1083,23 @@
   "id": "impatiens_walleriana",
   "latin": "Impatiens walleriana",
   "uk_old": "Бальзамін Уоллера",
-  "uk_new": "Бальзамін Уоллера",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Бальзамін (розрив-трава) Воллера",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Бальзамін Уоллера»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "abutilon",
   "latin": "Abutilon",
   "uk_old": "Абутілон (кімнатний клен)",
-  "uk_new": "Абутілон (кімнатний клен)",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Абутилон",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Абутілон (кімнатний клен)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "fuchsia_hybrida",
-  "latin": "Fuchsia hybrida",
+  "latin": "Fuchsia",
   "uk_old": "Фуксія",
   "uk_new": "Фуксія",
   "changed": false,
@@ -1056,10 +1119,10 @@
   "id": "crossandra_infundibuliformis",
   "latin": "Crossandra infundibuliformis",
   "uk_old": "Кроссандра",
-  "uk_new": "Кроссандра",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Кросандра",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Кроссандра»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "justicia_brandegeeana",
@@ -1083,10 +1146,10 @@
   "id": "aphelandra_squarrosa",
   "latin": "Aphelandra squarrosa",
   "uk_old": "Афеландра",
-  "uk_new": "Афеландра",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Афеляндра",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Афеландра»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "episcia_cupreata",
@@ -1191,10 +1254,10 @@
   "id": "asplenium_nidus",
   "latin": "Asplenium nidus",
   "uk_old": "Асплений гніздоподібний",
-  "uk_new": "Асплений гніздоподібний",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Аспленій гніздовий",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Асплений гніздоподібний»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "adiantum_raddianum",
@@ -1254,10 +1317,10 @@
   "id": "selaginella_kraussiana",
   "latin": "Selaginella kraussiana",
   "uk_old": "Селагінелла",
-  "uk_new": "Селагінелла",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Селагінела (плаунок)",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Селагінелла»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "tradescantia_spathacea",
@@ -1371,28 +1434,28 @@
   "id": "vriesea_splendens",
   "latin": "Vriesea splendens",
   "uk_old": "Вріезія блискуча",
-  "uk_new": "Вріезія блискуча",
-  "changed": false,
+  "uk_new": "Фрізея (вріезія)",
+  "changed": true,
   "confidence": "medium",
-  "note": "також «Врізея/Вризея»"
+  "note": "було «Вріезія блискуча»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "tillandsia_ionantha",
   "latin": "Tillandsia ionantha",
   "uk_old": "Тілландсія іонанта",
-  "uk_new": "Тілландсія іонанта",
-  "changed": false,
+  "uk_new": "Тиландсія іонанта",
+  "changed": true,
   "confidence": "medium",
-  "note": "усталеної перекладної назви немає, використано транслітерацію"
+  "note": "було «Тілландсія іонанта»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "tillandsia_cyanea",
   "latin": "Tillandsia cyanea",
   "uk_old": "Тілландсія синя",
-  "uk_new": "Тілландсія синя",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Тиландсія синя",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Тілландсія синя»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "neoregelia_carolinae",
@@ -1405,7 +1468,7 @@
  },
  {
   "id": "cymbidium_hybrid",
-  "latin": "Cymbidium hybrid",
+  "latin": "Cymbidium",
   "uk_old": "Цимбідіум",
   "uk_new": "Цимбідіум",
   "changed": false,
@@ -1432,7 +1495,7 @@
  },
  {
   "id": "oncidium_hybrid",
-  "latin": "Oncidium hybrid",
+  "latin": "Oncidium",
   "uk_old": "Онцидіум",
   "uk_new": "Онцидіум",
   "changed": false,
@@ -1452,10 +1515,10 @@
   "id": "rhipsalis_baccifera",
   "latin": "Rhipsalis baccifera",
   "uk_old": "Ріпсаліс",
-  "uk_new": "Ріпсаліс",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Рипсаліс",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Ріпсаліс»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "opuntia_microdasys",
@@ -1551,10 +1614,10 @@
   "id": "mimosa_pudica",
   "latin": "Mimosa pudica",
   "uk_old": "Мімоза сором'язлива",
-  "uk_new": "Мімоза сором'язлива",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
+  "uk_new": "Мімоза соромлива",
+  "changed": true,
+  "confidence": "medium",
+  "note": "було «Мімоза сором'язлива»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "ardisia_crenata",
@@ -1579,15 +1642,6 @@
   "latin": "Anthurium scherzerianum",
   "uk_old": "Антуріум Шерцера",
   "uk_new": "Антуріум Шерцера",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
- },
- {
-  "id": "anthurium_crystallinum",
-  "latin": "Anthurium crystallinum",
-  "uk_old": "Антуріум кришталевий",
-  "uk_new": "Антуріум кришталевий",
   "changed": false,
   "confidence": "high",
   "note": ""
@@ -1624,15 +1678,6 @@
   "latin": "Colocasia esculenta",
   "uk_old": "Колоказія",
   "uk_new": "Колоказія",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
- },
- {
-  "id": "homalomena_rubescens",
-  "latin": "Homalomena rubescens",
-  "uk_old": "Гомаломена",
-  "uk_new": "Гомаломена",
   "changed": false,
   "confidence": "high",
   "note": ""
@@ -1683,37 +1728,10 @@
   "note": "crispum - кучерява/хвиляста; помірна усталеність"
  },
  {
-  "id": "monstera_obliqua",
-  "latin": "Monstera obliqua",
-  "uk_old": "Монстера косолиста",
-  "uk_new": "Монстера косолиста",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
- },
- {
   "id": "epipremnum_pinnatum",
   "latin": "Epipremnum pinnatum",
   "uk_old": "Епіпремнум перистий",
   "uk_new": "Епіпремнум перистий",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
- },
- {
-  "id": "dionaea_muscipula",
-  "latin": "Dionaea muscipula",
-  "uk_old": "Венерина мухоловка",
-  "uk_new": "Венерина мухоловка",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
- },
- {
-  "id": "nepenthes_hybrid",
-  "latin": "Nepenthes hybrid",
-  "uk_old": "Непентес",
-  "uk_new": "Непентес",
   "changed": false,
   "confidence": "high",
   "note": ""
@@ -1741,24 +1759,6 @@
   "latin": "Agave americana",
   "uk_old": "Агава американська",
   "uk_new": "Агава американська",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
- },
- {
-  "id": "pachypodium_lamerei",
-  "latin": "Pachypodium lamerei",
-  "uk_old": "Пахіподіум Ламера",
-  "uk_new": "Пахіподіум Ламера",
-  "changed": false,
-  "confidence": "high",
-  "note": ""
- },
- {
-  "id": "stapelia",
-  "latin": "Stapelia",
-  "uk_old": "Стапелія",
-  "uk_new": "Стапелія",
   "changed": false,
   "confidence": "high",
   "note": ""

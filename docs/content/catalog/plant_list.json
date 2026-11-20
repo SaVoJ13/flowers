@@ -233,14 +233,15 @@
  },
  {
   "id": "phalaenopsis_hybrid",
-  "latin": "Phalaenopsis hybrid",
+  "latin": "Phalaenopsis",
   "uk": "Фаленопсис (гібриди)",
   "group": "орхідеї",
   "batch": 0,
   "reason": "найпопулярніша кімнатна орхідея, часті запити про догляд",
   "legacy": false,
   "uk_conf": "high",
-  "uk_note": ""
+  "uk_note": "",
+  "rank_note": "рівень роду (ID збережено)"
  },
  {
   "id": "ficus_lyrata",
@@ -388,13 +389,13 @@
  {
   "id": "beaucarnea_recurvata",
   "latin": "Beaucarnea recurvata",
-  "uk": "Бокарнея вигнута (пляшкова пальма)",
+  "uk": "Бокарнея відігнута (пляшкова пальма)",
   "group": "дерева",
   "batch": 1,
   "reason": "популярна, толерантна до пересушування",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Бокарнея вигнута (пляшкова пальма)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "aspidistra_elatior",
@@ -597,24 +598,24 @@
  {
   "id": "laurus_nobilis",
   "latin": "Laurus nobilis",
-  "uk": "Лавр шляхетний",
+  "uk": "Лавр благородний",
   "group": "дерева",
   "batch": 2,
   "reason": "популярний у кімнатній культурі, кухонне листя",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Лавр шляхетний»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "olea_europaea",
   "latin": "Olea europaea",
-  "uk": "Олива європейська (оливкове дерево)",
+  "uk": "Маслина європейська (олива)",
   "group": "дерева",
   "batch": 2,
   "reason": "популярне дерево в Польщі й Україні",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Олива європейська (оливкове дерево)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "persea_americana",
@@ -652,13 +653,13 @@
  {
   "id": "dypsis_lutescens",
   "latin": "Dypsis lutescens",
-  "uk": "Діпсис жовтуватий (арека)",
+  "uk": "Дипсис жовтуватий (арека)",
   "group": "пальми",
   "batch": 2,
   "reason": "дуже поширена",
   "legacy": false,
   "uk_conf": "medium",
-  "uk_note": "lutescens - жовтіючий; «жовтуватий» вживається"
+  "uk_note": "було «Діпсис жовтуватий (арека)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "rhapis_excelsa",
@@ -696,13 +697,13 @@
  {
   "id": "cycas_revoluta",
   "latin": "Cycas revoluta",
-  "uk": "Цикас завитий (саговник)",
+  "uk": "Саговник відгорнений (цикас)",
   "group": "пальми",
   "batch": 2,
   "reason": "токсичний, потрібні застереження",
   "legacy": false,
   "uk_conf": "medium",
-  "uk_note": "revoluta - завитий/відігнутий; «повислий» невиправдано"
+  "uk_note": "було «Цикас завитий (саговник)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "strelitzia_reginae",
@@ -795,13 +796,13 @@
  {
   "id": "polyscias_fruticosa",
   "latin": "Polyscias fruticosa",
-  "uk": "Поліціас",
+  "uk": "Полісціас",
   "group": "дерева",
   "batch": 2,
   "reason": "декоративний",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Поліціас»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "radermachera_sinica",
@@ -905,13 +906,13 @@
  {
   "id": "echeveria_elegans",
   "latin": "Echeveria elegans",
-  "uk": "Ехеверія витончена",
+  "uk": "Ечеверія",
   "group": "сукуленти",
   "batch": 3,
   "reason": "дуже популярна",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Ехеверія витончена»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "haworthiopsis_attenuata",
@@ -960,24 +961,24 @@
  {
   "id": "kalanchoe_blossfeldiana",
   "latin": "Kalanchoe blossfeldiana",
-  "uk": "Каланхое Блосфельда",
+  "uk": "Каланхое Блоссфельда",
   "group": "сукуленти",
   "batch": 3,
   "reason": "поширена квітуча",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Каланхое Блосфельда»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "kalanchoe_daigremontiana",
   "latin": "Kalanchoe daigremontiana",
-  "uk": "Каланхое Дегремона",
+  "uk": "Каланхое Дайгремонта",
   "group": "сукуленти",
   "batch": 3,
   "reason": "поширена",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Каланхое Дегремона»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "kalanchoe_tomentosa",
@@ -1147,13 +1148,13 @@
  {
   "id": "euphorbia_milii",
   "latin": "Euphorbia milii",
-  "uk": "Молочай Мілля",
+  "uk": "Молочай Міля",
   "group": "сукуленти",
   "batch": 4,
   "reason": "поширений, токсичний сік",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Молочай Мілля»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "euphorbia_pulcherrima",
@@ -1180,13 +1181,13 @@
  {
   "id": "saintpaulia_ionantha",
   "latin": "Saintpaulia ionantha",
-  "uk": "Сентполія (узамбарська фіалка)",
+  "uk": "Сенполія",
   "group": "квітучі",
   "batch": 4,
   "reason": "одна з найпопулярніших",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Сентполія (узамбарська фіалка)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "streptocarpus",
@@ -1257,13 +1258,13 @@
  {
   "id": "cyclamen_persicum",
   "latin": "Cyclamen persicum",
-  "uk": "Цикламен персидський",
+  "uk": "Цикламен перський",
   "group": "квітучі",
   "batch": 4,
   "reason": "сезонний, токсичний",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Цикламен персидський»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "clivia_miniata",
@@ -1278,14 +1279,15 @@
  },
  {
   "id": "hippeastrum_hybrid",
-  "latin": "Hippeastrum hybrid",
-  "uk": "Гіппеаструм (амариліс)",
+  "latin": "Hippeastrum",
+  "uk": "Гіпеаструм",
   "group": "квітучі",
   "batch": 4,
   "reason": "сезонно популярний, токсичний",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Гіппеаструм (амариліс)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)",
+  "rank_note": "рівень роду (ID збережено)"
  },
  {
   "id": "gardenia_jasminoides",
@@ -1323,35 +1325,36 @@
  {
   "id": "impatiens_walleriana",
   "latin": "Impatiens walleriana",
-  "uk": "Бальзамін Уоллера",
+  "uk": "Бальзамін (розрив-трава) Воллера",
   "group": "квітучі",
   "batch": 4,
   "reason": "поширений",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Бальзамін Уоллера»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "abutilon",
   "latin": "Abutilon",
-  "uk": "Абутілон (кімнатний клен)",
+  "uk": "Абутилон",
   "group": "квітучі",
   "batch": 4,
   "reason": "поширений",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Абутілон (кімнатний клен)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "fuchsia_hybrida",
-  "latin": "Fuchsia hybrida",
+  "latin": "Fuchsia",
   "uk": "Фуксія",
   "group": "квітучі",
   "batch": 4,
   "reason": "поширена",
   "legacy": false,
   "uk_conf": "high",
-  "uk_note": ""
+  "uk_note": "",
+  "rank_note": "рівень роду (ID збережено)"
  },
  {
   "id": "bougainvillea_glabra",
@@ -1367,13 +1370,13 @@
  {
   "id": "crossandra_infundibuliformis",
   "latin": "Crossandra infundibuliformis",
-  "uk": "Кроссандра",
+  "uk": "Кросандра",
   "group": "квітучі",
   "batch": 4,
   "reason": "поширена",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Кроссандра»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "justicia_brandegeeana",
@@ -1400,13 +1403,13 @@
  {
   "id": "aphelandra_squarrosa",
   "latin": "Aphelandra squarrosa",
-  "uk": "Афеландра",
+  "uk": "Афеляндра",
   "group": "квітучі",
   "batch": 5,
   "reason": "поширена",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Афеландра»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "episcia_cupreata",
@@ -1532,13 +1535,13 @@
  {
   "id": "asplenium_nidus",
   "latin": "Asplenium nidus",
-  "uk": "Асплений гніздоподібний",
+  "uk": "Аспленій гніздовий",
   "group": "папороті",
   "batch": 5,
   "reason": "дуже популярна",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Асплений гніздоподібний»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "adiantum_raddianum",
@@ -1609,13 +1612,13 @@
  {
   "id": "selaginella_kraussiana",
   "latin": "Selaginella kraussiana",
-  "uk": "Селагінелла",
+  "uk": "Селагінела (плаунок)",
   "group": "папороті",
   "batch": 5,
   "reason": "поширена",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Селагінелла»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "tradescantia_spathacea",
@@ -1752,35 +1755,35 @@
  {
   "id": "vriesea_splendens",
   "latin": "Vriesea splendens",
-  "uk": "Вріезія блискуча",
+  "uk": "Фрізея (вріезія)",
   "group": "бромелієві",
   "batch": 6,
   "reason": "популярна",
   "legacy": false,
   "uk_conf": "medium",
-  "uk_note": "також «Врізея/Вризея»"
+  "uk_note": "було «Вріезія блискуча»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "tillandsia_ionantha",
   "latin": "Tillandsia ionantha",
-  "uk": "Тілландсія іонанта",
+  "uk": "Тиландсія іонанта",
   "group": "бромелієві",
   "batch": 6,
   "reason": "повітряна рослина, популярна",
   "legacy": false,
   "uk_conf": "medium",
-  "uk_note": "усталеної перекладної назви немає, використано транслітерацію"
+  "uk_note": "було «Тілландсія іонанта»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "tillandsia_cyanea",
   "latin": "Tillandsia cyanea",
-  "uk": "Тілландсія синя",
+  "uk": "Тиландсія синя",
   "group": "бромелієві",
   "batch": 6,
   "reason": "поширена",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Тілландсія синя»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "neoregelia_carolinae",
@@ -1795,14 +1798,15 @@
  },
  {
   "id": "cymbidium_hybrid",
-  "latin": "Cymbidium hybrid",
+  "latin": "Cymbidium",
   "uk": "Цимбідіум",
   "group": "орхідеї",
   "batch": 6,
   "reason": "популярний",
   "legacy": false,
   "uk_conf": "high",
-  "uk_note": ""
+  "uk_note": "",
+  "rank_note": "рівень роду (ID збережено)"
  },
  {
   "id": "dendrobium_nobile",
@@ -1828,14 +1832,15 @@
  },
  {
   "id": "oncidium_hybrid",
-  "latin": "Oncidium hybrid",
+  "latin": "Oncidium",
   "uk": "Онцидіум",
   "group": "орхідеї",
   "batch": 6,
   "reason": "поширений",
   "legacy": false,
   "uk_conf": "high",
-  "uk_note": ""
+  "uk_note": "",
+  "rank_note": "рівень роду (ID збережено)"
  },
  {
   "id": "epiphyllum_oxypetalum",
@@ -1851,13 +1856,13 @@
  {
   "id": "rhipsalis_baccifera",
   "latin": "Rhipsalis baccifera",
-  "uk": "Ріпсаліс",
+  "uk": "Рипсаліс",
   "group": "кактуси",
   "batch": 6,
   "reason": "популярний",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Ріпсаліс»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "opuntia_microdasys",
@@ -1972,13 +1977,13 @@
  {
   "id": "mimosa_pudica",
   "latin": "Mimosa pudica",
-  "uk": "Мімоза сором'язлива",
+  "uk": "Мімоза соромлива",
   "group": "листяні",
   "batch": 7,
   "reason": "цікава, популярна",
   "legacy": false,
-  "uk_conf": "high",
-  "uk_note": ""
+  "uk_conf": "medium",
+  "uk_note": "було «Мімоза сором'язлива»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
  {
   "id": "ardisia_crenata",

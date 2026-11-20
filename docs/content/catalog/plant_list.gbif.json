@@ -316,7 +316,7 @@
  },
  {
   "id": "phalaenopsis_hybrid",
-  "latin": "Phalaenopsis hybrid",
+  "latin": "Phalaenopsis",
   "query": "Phalaenopsis",
   "matchType": "EXACT",
   "status": "ACCEPTED",
@@ -1741,7 +1741,7 @@
  },
  {
   "id": "hippeastrum_hybrid",
-  "latin": "Hippeastrum hybrid",
+  "latin": "Hippeastrum",
   "query": "Hippeastrum",
   "matchType": "HIGHERRANK",
   "status": "ACCEPTED",
@@ -1831,9 +1831,9 @@
  },
  {
   "id": "fuchsia_hybrida",
-  "latin": "Fuchsia hybrida",
-  "query": "Fuchsiaa",
-  "matchType": "FUZZY",
+  "latin": "Fuchsia",
+  "query": "Fuchsia",
+  "matchType": "EXACT",
   "status": "ACCEPTED",
   "rank": "GENUS",
   "scientificName": "Fuchsia L.",
@@ -1841,7 +1841,7 @@
   "acceptedUsageKey": null,
   "synonym": null,
   "family": "Onagraceae",
-  "confidence": 80,
+  "confidence": 95,
   "error": null
  },
  {
@@ -2446,7 +2446,7 @@
  },
  {
   "id": "cymbidium_hybrid",
-  "latin": "Cymbidium hybrid",
+  "latin": "Cymbidium",
   "query": "Cymbidium",
   "matchType": "EXACT",
   "status": "ACCEPTED",
@@ -2491,7 +2491,7 @@
  },
  {
   "id": "oncidium_hybrid",
-  "latin": "Oncidium hybrid",
+  "latin": "Oncidium",
   "query": "Oncidium",
   "matchType": "EXACT",
   "status": "ACCEPTED",

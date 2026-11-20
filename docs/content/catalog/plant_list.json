@@ -906,7 +906,7 @@
  {
   "id": "echeveria_elegans",
   "latin": "Echeveria elegans",
-  "uk": "Ечеверія",
+  "uk": "Ечеверія витончена",
   "group": "сукуленти",
   "batch": 3,
   "reason": "дуже популярна",
@@ -1181,7 +1181,7 @@
  {
   "id": "saintpaulia_ionantha",
   "latin": "Saintpaulia ionantha",
-  "uk": "Сенполія",
+  "uk": "Сенполія (узамбарська фіалка)",
   "group": "квітучі",
   "batch": 4,
   "reason": "одна з найпопулярніших",
@@ -1280,7 +1280,7 @@
  {
   "id": "hippeastrum_hybrid",
   "latin": "Hippeastrum",
-  "uk": "Гіпеаструм",
+  "uk": "Гіпеаструм (амариліс)",
   "group": "квітучі",
   "batch": 4,
   "reason": "сезонно популярний, токсичний",
@@ -1336,7 +1336,7 @@
  {
   "id": "abutilon",
   "latin": "Abutilon",
-  "uk": "Абутилон",
+  "uk": "Абутилон (кімнатний клен)",
   "group": "квітучі",
   "batch": 4,
   "reason": "поширений",

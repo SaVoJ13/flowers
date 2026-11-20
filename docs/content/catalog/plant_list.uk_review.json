@@ -490,7 +490,7 @@
   "latin": "Laurus nobilis",
   "uk_old": "Лавр благородний",
   "uk_new": "Лавр благородний",
-  "changed": true,
+  "changed": false,
   "confidence": "medium",
   "note": "було «Лавр шляхетний»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
@@ -499,7 +499,7 @@
   "latin": "Olea europaea",
   "uk_old": "Маслина європейська (олива)",
   "uk_new": "Маслина європейська (олива)",
-  "changed": true,
+  "changed": false,
   "confidence": "medium",
   "note": "було «Олива європейська (оливкове дерево)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
  },
@@ -741,7 +741,7 @@
   "id": "echeveria_elegans",
   "latin": "Echeveria elegans",
   "uk_old": "Ехеверія витончена",
-  "uk_new": "Ечеверія",
+  "uk_new": "Ечеверія витончена",
   "changed": true,
   "confidence": "medium",
   "note": "було «Ехеверія витончена»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
@@ -966,7 +966,7 @@
   "id": "saintpaulia_ionantha",
   "latin": "Saintpaulia ionantha",
   "uk_old": "Сентполія (узамбарська фіалка)",
-  "uk_new": "Сенполія",
+  "uk_new": "Сенполія (узамбарська фіалка)",
   "changed": true,
   "confidence": "medium",
   "note": "було «Сентполія (узамбарська фіалка)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
@@ -1047,7 +1047,7 @@
   "id": "hippeastrum_hybrid",
   "latin": "Hippeastrum",
   "uk_old": "Гіппеаструм (амариліс)",
-  "uk_new": "Гіпеаструм",
+  "uk_new": "Гіпеаструм (амариліс)",
   "changed": true,
   "confidence": "medium",
   "note": "було «Гіппеаструм (амариліс)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"
@@ -1092,7 +1092,7 @@
   "id": "abutilon",
   "latin": "Abutilon",
   "uk_old": "Абутілон (кімнатний клен)",
-  "uk_new": "Абутилон",
+  "uk_new": "Абутилон (кімнатний клен)",
   "changed": true,
   "confidence": "medium",
   "note": "було «Абутілон (кімнатний клен)»; виправлено за uk.wikipedia/правописом 2019 (QA PR #15)"

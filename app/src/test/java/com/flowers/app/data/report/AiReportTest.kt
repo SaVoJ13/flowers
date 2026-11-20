@@ -56,10 +56,11 @@ class AiReportTest {
         val rules = java.io.File("../firestore.rules").readText()
         ReportReason.entries.forEach { assertTrue(it.code, rules.contains("'${it.code}'")) }
         assertTrue(rules.contains("'${AiReport.FEATURE_PLANT_CARD}'"))
-        assertTrue(rules.contains("<= ${AiReport.MAX_PLANT_QUERY}"))
-        assertTrue(rules.contains("<= ${AiReport.MAX_RESPONSE}"))
-        assertTrue(rules.contains("<= ${AiReport.MAX_COMMENT}"))
-        assertTrue(rules.contains("<= ${AiReport.MAX_APP_VERSION}"))
+        // Точні вирази (не підрядок: "<= 400" входить у "<= 4000").
+        assertTrue(rules.contains("d.plantQuery.size() <= ${AiReport.MAX_PLANT_QUERY} "))
+        assertTrue(rules.contains("d.responseText.size() <= ${AiReport.MAX_RESPONSE} "))
+        assertTrue(rules.contains("d.comment.size() <= ${AiReport.MAX_COMMENT})"))
+        assertTrue(rules.contains("d.appVersion.size() <= ${AiReport.MAX_APP_VERSION} "))
     }
 
     // ---- репозиторій ----

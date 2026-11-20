@@ -20,7 +20,7 @@
 ## Крок 3. Перевірити з телефону
 1. Встановіть збірку з PR TASK-027 (я покладу її на телефон через adb, коли він розблокований).
 2. Каталог → ШІ-пошук рослини (наприклад «tulip») → на картці **«Поскаржитися на відповідь ШІ»** → оберіть причину → **Надіслати**. Має з'явитися «Дякуємо! Скаргу надіслано.»
-3. У консолі: **Firestore Database → Data → reports** → має бути новий документ з полями: feature, plantQuery, responseText, reason, comment, appVersion, createdAt, expireAt. Скажіть мені «скарга є» (або що не з'явилась).
+3. У консолі: **Firestore Database → Data → reports** → має бути новий документ з полями: feature, plantQuery, responseText, reason, comment, appVersion, createdAt, expireAt. Поле `comment` є лише якщо ви його вписали. Скажіть мені «скарга є» (або що не з'явилась).
 
 ## Крок 4. Зберігання 12 місяців (автоматичне видалення)
 1. Firestore → вкладка **TTL** (Time-to-live) → **Create policy**.

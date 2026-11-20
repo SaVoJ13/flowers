@@ -1,0 +1,54 @@
+# Формат каталогу рослин, `schema: 1` (TASK-038)
+
+> Джерело істини: `app/src/main/assets/catalog/` (копія файлів у `docs/content/catalog/`, тест `docs copy of catalog equals assets` ловить розбіжність). Валідатор: `app/src/test/java/com/flowers/app/catalog/CatalogValidator.kt`, тести: `CatalogValidatorTest` (запускаються в `testDebugUnitTest`). Рішення Власника: ADR-015, ADR-018 (формат, Room v3 і правило «ID рослин не видаляються» затверджено 2026-11-20).
+
+## 1. Файли
+```
+catalog/
+  manifest.json        { "contentVersion": N, "schema": 1, "batches": ["b00", "b01", ...] }
+  sources.json         { "<sourceId>": { "title", "publisher", "url", "kind" } }
+  b00.json … b07.json  масив карток (≈25), одна партія = один файл
+```
+- `manifest.contentVersion`: ціле ≥ 0. `0` означає «партій ще немає». З першою злитою партією B0 стає ≥ 1. Кожна зміна карток чи нова партія збільшує число.
+- Файл партії `bNN.json` обов'язково перелічений у `manifest.batches` (і навпаки).
+- Імпорт (TASK-037) порівнює `contentVersion`, а не «порожність таблиці», і чіпає лише записи `origin=BUILTIN`.
+
+## 2. `sources.json`
+Кожен запис: `title`, `publisher`, `url` (лише `https://`), `kind` ∈ `extension | botanical | society | other`. `sourceId`: `[a-z0-9_]+`.
+**ASPCA не може бути джерелом** (дані не копіюються, ADR-014): `url` з `aspca.org` валідатор відхиляє. ASPCA лише як посилання `safety.aspcaUrl`.
+
+## 3. Картка
+| Поле | Тип | Правило |
+|---|---|---|
+| `id` | рядок | `[a-z0-9_]+`, 2–60, унікальний, **стабільний назавжди**. 20 наявних ID з Room v2 лишаються (список у валідаторі й `PLANT_CATALOG.json`); нові: латинський slug (`monstera_deliciosa`) |
+| `latin`, `family` | рядок | 3–80, 3–60 |
+| `retired`, `replacedBy` | bool, id/null | `retired=true` потребує `replacedBy`, що існує в каталозі; картка не видаляється ніколи |
+| `care.difficulty` | enum | `VERY_EASY, EASY, MEDIUM, DEMANDING` |
+| `care.lightMin/lightMax` | enum | `LOW, MEDIUM, HIGH, DIRECT`; `lightMin ≤ lightMax` (пороги lx: план 1.1 §6.2) |
+| `care.checkIntervalDays` | ціле | 3–28 |
+| `care.humidity` | enum | `LOW, MEDIUM, HIGH` |
+| `care.soil` | enum | `UNIVERSAL, AROID_MIX, CACTUS_MIX, ORCHID_BARK, MOISTURE_RETAINING, LIGHT_AIRY` |
+| `safety.pets`, `safety.children` | enum | `TOXIC, NON_TOXIC, UNKNOWN`. Усе, що не `UNKNOWN`, **потребує `safety.sourceIds`** (існуючі джерела). Немає надійного джерела = `UNKNOWN` |
+| `safety.aspcaUrl` | рядок, необов'язково | лише `https://www.aspca.org/...`; лише посилання |
+| `sourceIds` | масив | ≥ 2 **різних** існуючих джерела догляду |
+| `i18n.{uk,en,ru,pl}` | об'єкт | усі 4 мови, без зайвих |
+| `i18n.<lang>.name` | рядок 2–60 | uk/ru: кирилиця; en/pl: латиниця |
+| `i18n.<lang>.aliases` | масив | ≤ 8 елементів, кожен ≤ 40, непорожні |
+| `i18n.<lang>.summary` | 30–300 | |
+| `i18n.<lang>.watering/light/soil/tip` | 15–300 кожен | |
+| `review.authoredBy`, `factChecked` (`YYYY-MM-DD`), `ownerSampled`, `nativeReviewed.{uk,ru,pl,en}` | | усі обов'язкові; `nativeReviewed` = чи бачив текст носій мови |
+| `notes` | рядок ≤ 300, необов'язково | розбіжності між джерелами тощо (не усереднювати мовчки) |
+
+Зайві поля заборонені (захист від друкарських помилок). Керівні символи (`U+0000–001F`, `U+007F`, зокрема переведення рядка) у рядках заборонені.
+
+## 4. Правила партій
+1. Зібрати факти: на кожну рослину ≥ 2 джерела догляду + джерело безпеки; URL у `sources.json`; розбіжності в `notes`.
+2. Тексти кожною мовою пишуться **окремо за фактами**, не дослівним перекладом; власні формулювання.
+3. **Оригінальність:** найдовша послідовність слів, спільна з текстом джерела, має бути **< 8 слів** (`OverlapChecker`, `MAX_SHARED_WORDS = 8`). Перевіряється на чернетках фактів до злиття.
+4. Безпека для тварин/дітей лише з джерелом; сумнів = `UNKNOWN`. Помилка в бік «безпечно» гірша за `UNKNOWN`.
+5. Валідатор зелений. Незалежна QA іншою моделлю: вибірка ≥ 30 % (мінімум 8) карток звіряється з джерелами за URL, **100 % прапорців безпеки**, перевірка оригінальності, звіт із числами. Модель, що збирала/писала партію, не є QA тієї партії (ADR-017).
+6. Вибірка Власника: 3–5 карток партії. Для pl/en без носія `nativeReviewed=false` (рішення Q-1.1-5: російську перевіряє Власник; польську перевіряє носій, якого знайде Власник, на вибірці з 5 карток і тексті магазину; англійська публікується з позначкою «без перегляду носієм»).
+7. Після злиття партії `contentVersion++`, ID не змінюються.
+
+## 5. Що перевіряє валідатор (зведення)
+Наявність і тип усіх полів; унікальність `id`; enum-и; межі довжин; наявність усіх 4 мов; кирилиця/латиниця в назвах; існування кожного `sourceId`; `safety` ≠ `UNKNOWN` ⇒ є джерело; ≥ 2 джерела догляду; ASPCA не джерело, `aspcaUrl` лише з aspca.org; керівні символи; `retired/replacedBy`; файли партій ↔ manifest; **при `contentVersion ≥ 1` усі 20 наявних ID присутні**.

@@ -16,6 +16,8 @@ object SdkExceptions {
     fun server(message: String = "Server error", cause: Throwable? = null) = make("ServerException", message, cause)
     fun quota(message: String = "Too many requests", cause: Throwable? = null) = make("QuotaExceededException", message, cause)
 
+    fun byName(simpleName: String, message: String = "x", cause: Throwable? = null) = make(simpleName, message, cause)
+
     fun requestTimeout(cause: Throwable? = null): Throwable {
         val c = Class.forName(PKG + "RequestTimeoutException")
             .getConstructor(String::class.java, Throwable::class.java, List::class.java)

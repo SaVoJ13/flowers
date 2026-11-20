@@ -6,7 +6,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "sansevieria",
@@ -15,7 +17,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "medium",
+  "uk_note": "Dracaena trifasciata; назва «Сансевієрія» - побутова, усталена"
  },
  {
   "id": "epipremnum",
@@ -24,7 +28,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "monstera",
@@ -33,7 +39,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "medium",
+  "uk_note": "M. deliciosa: також «Монстера чарівна»; «делікатесна» поширена"
  },
  {
   "id": "spathiphyllum",
@@ -42,7 +50,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "chlorophytum",
@@ -51,7 +61,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "crassula",
@@ -60,7 +72,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "ficus_elastica",
@@ -69,7 +83,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "ficus_benjamina",
@@ -78,7 +94,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "dracaena_marginata",
@@ -87,7 +105,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "peperomia",
@@ -96,7 +116,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "aglaonema",
@@ -105,7 +127,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "philodendron",
@@ -114,7 +138,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "syngonium",
@@ -123,7 +149,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "aloe_vera",
@@ -132,7 +160,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "tradescantia",
@@ -141,7 +171,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "maranta",
@@ -150,7 +182,10 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "medium",
+  "uk_note": "M. leuconeura - біложилкова; «триколірна» лише сорт kerchoveana 'Tricolor'",
+  "uk_suggest": "Маранта біложилкова"
  },
  {
   "id": "schefflera",
@@ -159,7 +194,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "calathea",
@@ -168,7 +205,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "begonia",
@@ -177,7 +216,9 @@
   "group": "наявні",
   "batch": 0,
   "reason": "наявна в застосунку (ID зберігається)",
-  "legacy": true
+  "legacy": true,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "pilea_peperomioides",
@@ -186,7 +227,9 @@
   "group": "листяні",
   "batch": 0,
   "reason": "дуже популярна в соцмережах, проста, компактна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "phalaenopsis_hybrid",
@@ -195,7 +238,9 @@
   "group": "орхідеї",
   "batch": 0,
   "reason": "найпопулярніша кімнатна орхідея, часті запити про догляд",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "ficus_lyrata",
@@ -204,7 +249,9 @@
   "group": "дерева",
   "batch": 0,
   "reason": "модна велика рослина, часті питання про листопад",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "hoya_carnosa",
@@ -213,7 +260,9 @@
   "group": "ліани",
   "batch": 0,
   "reason": "популярна квітуча ліана, легка",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "nephrolepis_exaltata",
@@ -222,7 +271,53 @@
   "group": "папороті",
   "batch": 0,
   "reason": "найпоширеніша кімнатна папороть",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
+ },
+ {
+  "id": "citrus_limon",
+  "latin": "Citrus limon",
+  "uk": "Лимон кімнатний",
+  "group": "дерева",
+  "batch": 1,
+  "reason": "дуже популярний в Україні й Польщі, плодоносить",
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
+ },
+ {
+  "id": "ocimum_basilicum",
+  "latin": "Ocimum basilicum",
+  "uk": "Базилік",
+  "group": "трави",
+  "batch": 1,
+  "reason": "найпопулярніша кухонна трава на підвіконні",
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
+ },
+ {
+  "id": "salvia_rosmarinus",
+  "latin": "Salvia rosmarinus",
+  "uk": "Розмарин",
+  "group": "трави",
+  "batch": 1,
+  "reason": "популярна кухонна трава, примхлива до поливу",
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
+ },
+ {
+  "id": "mentha",
+  "latin": "Mentha",
+  "uk": "М'ята",
+  "group": "трави",
+  "batch": 1,
+  "reason": "кухонна трава (картка на рівні роду)",
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "dracaena_fragrans",
@@ -231,7 +326,9 @@
   "group": "дерева",
   "batch": 1,
   "reason": "дуже поширена, витримує тінь",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "dracaena_reflexa",
@@ -240,7 +337,9 @@
   "group": "дерева",
   "batch": 1,
   "reason": "поширена офісна рослина",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "«загнута» вживається, також «відігнута»; «пісня Індії» - сорт"
  },
  {
   "id": "dracaena_sanderiana",
@@ -249,16 +348,20 @@
   "group": "дерева",
   "batch": 1,
   "reason": "продається всюди, часто в воді",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "cyperus_alternifolius",
   "latin": "Cyperus alternifolius",
-  "uk": "Циперус (сит'є)",
+  "uk": "Циперус черговолистий (сить)",
   "group": "листяні",
   "batch": 1,
   "reason": "поширений, любить вологу",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "alternifolius = черговолистий; «сит'є» - збірна форма, рослина - сить"
  },
  {
   "id": "yucca_gigantea",
@@ -267,7 +370,9 @@
   "group": "дерева",
   "batch": 1,
   "reason": "дуже поширена, невибаглива",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "pachira_aquatica",
@@ -276,7 +381,9 @@
   "group": "дерева",
   "batch": 1,
   "reason": "популярний подарунок",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "beaucarnea_recurvata",
@@ -285,7 +392,9 @@
   "group": "дерева",
   "batch": 1,
   "reason": "популярна, толерантна до пересушування",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "aspidistra_elatior",
@@ -294,7 +403,9 @@
   "group": "листяні",
   "batch": 1,
   "reason": "стійка до тіні, класика",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "monstera_adansonii",
@@ -303,7 +414,9 @@
   "group": "ліани",
   "batch": 1,
   "reason": "популярна ліана, часті запити",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "scindapsus_pictus",
@@ -312,16 +425,20 @@
   "group": "ліани",
   "batch": 1,
   "reason": "популярна, схожа на епіпремнум",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "«строкатий» - поширена торгова назва; буквально pictus - розфарбований"
  },
  {
   "id": "rhaphidophora_tetrasperma",
   "latin": "Rhaphidophora tetrasperma",
-  "uk": "Рафідофора чотирьохнасінна (міні-монстера)",
+  "uk": "Рафідофора чотиринасінна (міні-монстера)",
   "group": "ліани",
   "batch": 1,
   "reason": "популярна в соцмережах",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "правопис числівникової основи: чотиринасінна"
  },
  {
   "id": "philodendron_bipinnatifidum",
@@ -330,34 +447,42 @@
   "group": "листяні",
   "batch": 1,
   "reason": "велика декоративна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "philodendron_melanochrysum",
   "latin": "Philodendron melanochrysum",
-  "uk": "Філодендрон чорне золото",
+  "uk": "Філодендрон меланохрізум (чорне золото)",
   "group": "ліани",
   "batch": 1,
   "reason": "колекційна, популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "усталена в колекціонерів транслітерація виду; «чорне золото» - торгова назва"
  },
  {
   "id": "dieffenbachia_seguine",
   "latin": "Dieffenbachia seguine",
-  "uk": "Діфенбахія",
+  "uk": "Дифенбахія",
   "group": "листяні",
   "batch": 1,
   "reason": "дуже поширена, токсична, потрібна обережність",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": "орфографія: після д – и (Дифенбахія), не «Діфенбахія»"
  },
  {
   "id": "alocasia_amazonica",
   "latin": "Alocasia amazonica",
-  "uk": "Алоказія Амазонська",
+  "uk": "Алоказія амазонська",
   "group": "листяні",
   "batch": 1,
   "reason": "популярна, примхлива, багато питань",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": "видовий епітет з малої літери"
  },
  {
   "id": "anthurium_andraeanum",
@@ -366,7 +491,9 @@
   "group": "квітучі",
   "batch": 1,
   "reason": "поширений подарунок, квітне",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "hedera_helix",
@@ -375,7 +502,9 @@
   "group": "ліани",
   "batch": 1,
   "reason": "класика, токсичний для тварин",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "cissus_rhombifolia",
@@ -384,7 +513,9 @@
   "group": "ліани",
   "batch": 1,
   "reason": "легка, популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "asparagus_setaceus",
@@ -393,7 +524,9 @@
   "group": "листяні",
   "batch": 1,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "asparagus_densiflorus",
@@ -402,7 +535,9 @@
   "group": "листяні",
   "batch": 1,
   "reason": "поширений, токсичний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "«Шпренгера» - назва сорту 'Sprengeri', на практиці вживана"
  },
  {
   "id": "fatsia_japonica",
@@ -411,43 +546,86 @@
   "group": "дерева",
   "batch": 1,
   "reason": "витримує прохолоду",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "cordyline_fruticosa",
   "latin": "Cordyline fruticosa",
   "uk": "Кордиліна",
   "group": "дерева",
-  "batch": 1,
+  "batch": 2,
   "reason": "яскраве листя",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "codiaeum_variegatum",
   "latin": "Codiaeum variegatum",
-  "uk": "Кротон (кодієум)",
+  "uk": "Кодіеум (кротон)",
   "group": "листяні",
-  "batch": 1,
+  "batch": 2,
   "reason": "яскрава, примхлива",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "у ботанічних довідниках рід Codiaeum - кодіеум; кротон - побутова назва"
  },
  {
   "id": "fittonia_albivenis",
   "latin": "Fittonia albivenis",
   "uk": "Фітонія",
   "group": "листяні",
-  "batch": 1,
+  "batch": 2,
   "reason": "популярна міні-рослина",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "hypoestes_phyllostachya",
   "latin": "Hypoestes phyllostachya",
   "uk": "Гіпестес (рослина-веснянка)",
   "group": "листяні",
-  "batch": 1,
+  "batch": 2,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "«рослина-веснянка» - побутова, ок"
+ },
+ {
+  "id": "laurus_nobilis",
+  "latin": "Laurus nobilis",
+  "uk": "Лавр шляхетний",
+  "group": "дерева",
+  "batch": 2,
+  "reason": "популярний у кімнатній культурі, кухонне листя",
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
+ },
+ {
+  "id": "olea_europaea",
+  "latin": "Olea europaea",
+  "uk": "Олива європейська (оливкове дерево)",
+  "group": "дерева",
+  "batch": 2,
+  "reason": "популярне дерево в Польщі й Україні",
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
+ },
+ {
+  "id": "persea_americana",
+  "latin": "Persea americana",
+  "uk": "Авокадо (з кісточки)",
+  "group": "дерева",
+  "batch": 2,
+  "reason": "дуже популярне вирощування з кісточки",
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "howea_forsteriana",
@@ -456,7 +634,9 @@
   "group": "пальми",
   "batch": 2,
   "reason": "найпоширеніша кімнатна пальма",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "chamaedorea_elegans",
@@ -465,7 +645,9 @@
   "group": "пальми",
   "batch": 2,
   "reason": "компактна, безпечна для тварин за джерелами",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "dypsis_lutescens",
@@ -474,7 +656,9 @@
   "group": "пальми",
   "batch": 2,
   "reason": "дуже поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "lutescens - жовтіючий; «жовтуватий» вживається"
  },
  {
   "id": "rhapis_excelsa",
@@ -483,7 +667,9 @@
   "group": "пальми",
   "batch": 2,
   "reason": "стійка, повільна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "phoenix_roebelenii",
@@ -492,25 +678,31 @@
   "group": "пальми",
   "batch": 2,
   "reason": "поширена декоративна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "livistona_chinensis",
   "latin": "Livistona chinensis",
-  "uk": "Ліністона китайська",
+  "uk": "Лівістона китайська",
   "group": "пальми",
   "batch": 2,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": "рід Livistona - Лівістона (не «Ліністона»)"
  },
  {
   "id": "cycas_revoluta",
   "latin": "Cycas revoluta",
-  "uk": "Цикас повислий (саговник)",
+  "uk": "Цикас завитий (саговник)",
   "group": "пальми",
   "batch": 2,
   "reason": "токсичний, потрібні застереження",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "revoluta - завитий/відігнутий; «повислий» невиправдано"
  },
  {
   "id": "strelitzia_reginae",
@@ -519,7 +711,9 @@
   "group": "дерева",
   "batch": 2,
   "reason": "популярна квітуча",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "strelitzia_nicolai",
@@ -528,7 +722,9 @@
   "group": "дерева",
   "batch": 2,
   "reason": "велика декоративна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "musa_acuminata",
@@ -537,7 +733,9 @@
   "group": "дерева",
   "batch": 2,
   "reason": "часті запити",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "Musa acuminata - «банан загострений»; кімнатний банан - зазвичай сорт 'Dwarf Cavendish'; назва узагальнена"
  },
  {
   "id": "ficus_microcarpa",
@@ -546,25 +744,31 @@
   "group": "дерева",
   "batch": 2,
   "reason": "популярний бонсай-подібний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "мікрокарпа - поширена транслітерація, також «дрібноплідний»"
  },
  {
   "id": "ficus_pumila",
   "latin": "Ficus pumila",
-  "uk": "Фікус карликовий",
+  "uk": "Фікус карликовий (повзучий)",
   "group": "ліани",
   "batch": 2,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "побутово «карликовий», у довідниках також «повзучий»"
  },
  {
   "id": "ficus_binnendijkii",
   "latin": "Ficus binnendijkii",
-  "uk": "Фікус Бінендійка (алі)",
+  "uk": "Фікус Біннендійка (алі)",
   "group": "дерева",
   "batch": 2,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "прізвище Binnendijk - Біннендійк (подвоєне н)"
  },
  {
   "id": "ficus_benghalensis",
@@ -573,7 +777,9 @@
   "group": "дерева",
   "batch": 2,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "schefflera_actinophylla",
@@ -582,7 +788,9 @@
   "group": "дерева",
   "batch": 2,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "polyscias_fruticosa",
@@ -591,7 +799,9 @@
   "group": "дерева",
   "batch": 2,
   "reason": "декоративний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "radermachera_sinica",
@@ -600,79 +810,97 @@
   "group": "дерева",
   "batch": 2,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "murraya_paniculata",
   "latin": "Murraya paniculata",
-  "uk": "Муррайя",
+  "uk": "Муррая волотиста",
   "group": "дерева",
   "batch": 2,
   "reason": "квітуча, ароматна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "uk.wikipedia: рід Муррая; paniculata - волотиста"
  },
  {
   "id": "citrus_x_microcarpa",
   "latin": "Citrus × microcarpa",
   "uk": "Каламондин (кімнатний цитрус)",
   "group": "дерева",
-  "batch": 2,
+  "batch": 3,
   "reason": "дуже популярний, плодоносить",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "coffea_arabica",
   "latin": "Coffea arabica",
   "uk": "Кавове дерево",
   "group": "дерева",
-  "batch": 2,
+  "batch": 3,
   "reason": "популярне",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "tetrastigma_voinierianum",
   "latin": "Tetrastigma voinierianum",
   "uk": "Тетрастигма",
   "group": "ліани",
-  "batch": 2,
+  "batch": 3,
   "reason": "велика ліана",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "cissus_antarctica",
   "latin": "Cissus antarctica",
   "uk": "Цисус антарктичний",
   "group": "ліани",
-  "batch": 2,
+  "batch": 3,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "chamaedorea_seifrizii",
   "latin": "Chamaedorea seifrizii",
   "uk": "Хамедорея Сейфріца (бамбукова пальма)",
   "group": "пальми",
-  "batch": 2,
+  "batch": 3,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "dracaena_surculosa",
   "latin": "Dracaena surculosa",
   "uk": "Драцена крапчаста",
   "group": "дерева",
-  "batch": 2,
+  "batch": 3,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "також «золотий пил»; «крапчаста» вживається"
  },
  {
   "id": "ravenea_rivularis",
   "latin": "Ravenea rivularis",
   "uk": "Равенея",
   "group": "пальми",
-  "batch": 2,
+  "batch": 3,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "echeveria_elegans",
@@ -681,7 +909,9 @@
   "group": "сукуленти",
   "batch": 3,
   "reason": "дуже популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "haworthiopsis_attenuata",
@@ -690,7 +920,9 @@
   "group": "сукуленти",
   "batch": 3,
   "reason": "дуже популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "рід Haworthiopsis часто продається як «Гавортія» (також Хавортія)"
  },
  {
   "id": "haworthia_cooperi",
@@ -699,7 +931,9 @@
   "group": "сукуленти",
   "batch": 3,
   "reason": "популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "aloe_aristata",
@@ -708,7 +942,9 @@
   "group": "сукуленти",
   "batch": 3,
   "reason": "поширене",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "aloe_arborescens",
@@ -717,7 +953,9 @@
   "group": "сукуленти",
   "batch": 3,
   "reason": "поширене",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "kalanchoe_blossfeldiana",
@@ -726,7 +964,9 @@
   "group": "сукуленти",
   "batch": 3,
   "reason": "поширена квітуча",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "kalanchoe_daigremontiana",
@@ -735,7 +975,9 @@
   "group": "сукуленти",
   "batch": 3,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "kalanchoe_tomentosa",
@@ -744,7 +986,9 @@
   "group": "сукуленти",
   "batch": 3,
   "reason": "популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "sedum_morganianum",
@@ -753,7 +997,9 @@
   "group": "сукуленти",
   "batch": 3,
   "reason": "популярна підвісна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "український рід Sedum - очиток; «седум» вживається в садівництві"
  },
  {
   "id": "sedum_rubrotinctum",
@@ -762,7 +1008,9 @@
   "group": "сукуленти",
   "batch": 3,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "побутово «седум/очиток»; rubrotinctum - червонобарвний"
  },
  {
   "id": "sempervivum_tectorum",
@@ -771,7 +1019,9 @@
   "group": "сукуленти",
   "batch": 3,
   "reason": "поширене",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "lithops",
@@ -780,7 +1030,9 @@
   "group": "сукуленти",
   "batch": 3,
   "reason": "цікаві, складний полив",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "graptopetalum_paraguayense",
@@ -789,25 +1041,31 @@
   "group": "сукуленти",
   "batch": 3,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "curio_rowleyanus",
   "latin": "Curio rowleyanus",
-  "uk": "Кліняя Раулі (нитка перлів)",
+  "uk": "Сенеціо Роулі (нитка перлів)",
   "group": "сукуленти",
   "batch": 3,
   "reason": "популярна підвісна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": "«Кліняя» - калька з Kleinia; сучасна/усталена назва через Senecio (жовтозілля); Rowley - Роулі"
  },
  {
   "id": "curio_radicans",
   "latin": "Curio radicans",
-  "uk": "Кліня (банановий ланцюжок)",
+  "uk": "Сенеціо повзучий (банановий ланцюжок)",
   "group": "сукуленти",
   "batch": 3,
   "reason": "популярна підвісна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "замість «Кліня»; Senecio radicans - сенеціо; повзучий - за habit"
  },
  {
   "id": "portulacaria_afra",
@@ -816,16 +1074,20 @@
   "group": "сукуленти",
   "batch": 3,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "aeonium_arboreum",
   "latin": "Aeonium arboreum",
-  "uk": "Еонієм деревоподібний",
+  "uk": "Еоніум деревоподібний",
   "group": "сукуленти",
   "batch": 3,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": "рід Aeonium - Еоніум (не «Еонієм»)"
  },
  {
   "id": "crassula_perforata",
@@ -834,70 +1096,86 @@
   "group": "сукуленти",
   "batch": 3,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "crassula_arborescens",
   "latin": "Crassula arborescens",
   "uk": "Красула деревоподібна",
   "group": "сукуленти",
-  "batch": 3,
+  "batch": 4,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "ceropegia_woodii",
   "latin": "Ceropegia woodii",
   "uk": "Церопегія Вуда",
   "group": "сукуленти",
-  "batch": 3,
+  "batch": 4,
   "reason": "популярна підвісна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "hoya_kerrii",
   "latin": "Hoya kerrii",
   "uk": "Хойя Керрі (серце)",
   "group": "сукуленти",
-  "batch": 3,
+  "batch": 4,
   "reason": "подарунок на день закоханих",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "euphorbia_trigona",
   "latin": "Euphorbia trigona",
   "uk": "Молочай тригранний",
   "group": "сукуленти",
-  "batch": 3,
+  "batch": 4,
   "reason": "поширений, токсичний сік",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "euphorbia_milii",
   "latin": "Euphorbia milii",
   "uk": "Молочай Мілля",
   "group": "сукуленти",
-  "batch": 3,
+  "batch": 4,
   "reason": "поширений, токсичний сік",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "euphorbia_pulcherrima",
   "latin": "Euphorbia pulcherrima",
   "uk": "Пуансетія (різдвяна зірка)",
   "group": "квітучі",
-  "batch": 3,
+  "batch": 4,
   "reason": "сезонно дуже популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "adenium_obesum",
   "latin": "Adenium obesum",
   "uk": "Аденіум",
   "group": "сукуленти",
-  "batch": 3,
+  "batch": 4,
   "reason": "квітуча, токсична",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "saintpaulia_ionantha",
@@ -906,7 +1184,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "одна з найпопулярніших",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "streptocarpus",
@@ -915,7 +1195,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "популярний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "sinningia_speciosa",
@@ -924,7 +1206,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "begonia_rex",
@@ -933,7 +1217,9 @@
   "group": "листяні",
   "batch": 4,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "begonia_semperflorens",
@@ -942,7 +1228,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "hibiscus_rosa_sinensis",
@@ -951,7 +1239,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "дуже популярний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "pelargonium_zonale",
@@ -960,7 +1250,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "дуже популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "cyclamen_persicum",
@@ -969,7 +1261,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "сезонний, токсичний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "clivia_miniata",
@@ -978,7 +1272,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "hippeastrum_hybrid",
@@ -987,7 +1283,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "сезонно популярний, токсичний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "gardenia_jasminoides",
@@ -996,7 +1294,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "популярна, примхлива",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "jasminum_polyanthum",
@@ -1005,7 +1305,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "rhododendron_simsii",
@@ -1014,7 +1316,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "сезонна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "impatiens_walleriana",
@@ -1023,7 +1327,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "abutilon",
@@ -1032,7 +1338,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "fuchsia_hybrida",
@@ -1041,7 +1349,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "bougainvillea_glabra",
@@ -1050,7 +1360,9 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "crossandra_infundibuliformis",
@@ -1059,70 +1371,86 @@
   "group": "квітучі",
   "batch": 4,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "justicia_brandegeeana",
   "latin": "Justicia brandegeeana",
   "uk": "Юстиція (креветкова рослина)",
   "group": "квітучі",
-  "batch": 4,
+  "batch": 5,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "pachystachys_lutea",
   "latin": "Pachystachys lutea",
   "uk": "Пахістахіс жовтий",
   "group": "квітучі",
-  "batch": 4,
+  "batch": 5,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "aphelandra_squarrosa",
   "latin": "Aphelandra squarrosa",
   "uk": "Афеландра",
   "group": "квітучі",
-  "batch": 4,
+  "batch": 5,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "episcia_cupreata",
   "latin": "Episcia cupreata",
   "uk": "Епісція",
   "group": "квітучі",
-  "batch": 4,
+  "batch": 5,
   "reason": "популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "aeschynanthus_radicans",
   "latin": "Aeschynanthus radicans",
   "uk": "Есхінантус",
   "group": "квітучі",
-  "batch": 4,
+  "batch": 5,
   "reason": "підвісна, популярний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "schlumbergera_truncata",
   "latin": "Schlumbergera truncata",
   "uk": "Шлюмбергера (декабрист)",
   "group": "квітучі",
-  "batch": 4,
+  "batch": 5,
   "reason": "дуже популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "hatiora_gaertneri",
   "latin": "Hatiora gaertneri",
   "uk": "Хатіора (великодній кактус)",
   "group": "квітучі",
-  "batch": 4,
+  "batch": 5,
   "reason": "популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "goeppertia_orbifolia",
@@ -1131,7 +1459,9 @@
   "group": "марантові",
   "batch": 5,
   "reason": "дуже популярна, примхлива",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "орбіфолія - також «кругла»; вживане"
  },
  {
   "id": "goeppertia_lancifolia",
@@ -1140,7 +1470,9 @@
   "group": "марантові",
   "batch": 5,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "goeppertia_ornata",
@@ -1149,25 +1481,31 @@
   "group": "марантові",
   "batch": 5,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "ornata - прикрашена; вживаність помірна"
  },
  {
   "id": "goeppertia_roseopicta",
   "latin": "Goeppertia roseopicta",
-  "uk": "Калатея рожево-фарбована",
+  "uk": "Калатея розеопікта",
   "group": "марантові",
   "batch": 5,
   "reason": "популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "«рожево-фарбована» - невстановлена калька; використано транслітерований вид"
  },
  {
   "id": "goeppertia_zebrina",
   "latin": "Goeppertia zebrina",
-  "uk": "Калатея зебровидна",
+  "uk": "Калатея зебрина",
   "group": "марантові",
   "batch": 5,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "у магазинах/довідниках - «зебрина»"
  },
  {
   "id": "ctenanthe_setosa",
@@ -1176,7 +1514,9 @@
   "group": "марантові",
   "batch": 5,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "stromanthe_sanguinea",
@@ -1185,7 +1525,9 @@
   "group": "марантові",
   "batch": 5,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "asplenium_nidus",
@@ -1194,7 +1536,9 @@
   "group": "папороті",
   "batch": 5,
   "reason": "дуже популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "adiantum_raddianum",
@@ -1203,7 +1547,9 @@
   "group": "папороті",
   "batch": 5,
   "reason": "популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "platycerium_bifurcatum",
@@ -1212,7 +1558,9 @@
   "group": "папороті",
   "batch": 5,
   "reason": "популярна колекційна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "pteris_cretica",
@@ -1221,7 +1569,9 @@
   "group": "папороті",
   "batch": 5,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "cyrtomium_falcatum",
@@ -1230,7 +1580,9 @@
   "group": "папороті",
   "batch": 5,
   "reason": "стійка",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "blechnum_gibbum",
@@ -1239,7 +1591,9 @@
   "group": "папороті",
   "batch": 5,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "davallia_canariensis",
@@ -1248,7 +1602,9 @@
   "group": "папороті",
   "batch": 5,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "selaginella_kraussiana",
@@ -1257,7 +1613,9 @@
   "group": "папороті",
   "batch": 5,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "tradescantia_spathacea",
@@ -1266,16 +1624,20 @@
   "group": "листяні",
   "batch": 5,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "tradescantia_pallida",
   "latin": "Tradescantia pallida",
-  "uk": "Традесканція блідо-фіолетова",
+  "uk": "Традесканція бліда (сетекреазія пурпурова)",
   "group": "листяні",
   "batch": 5,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "pallida - бліда; побутово сетекреазія пурпурова"
  },
  {
   "id": "callisia_repens",
@@ -1284,70 +1646,86 @@
   "group": "листяні",
   "batch": 5,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "plectranthus_scutellarioides",
   "latin": "Plectranthus scutellarioides",
   "uk": "Колеус",
   "group": "листяні",
-  "batch": 5,
+  "batch": 6,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "plectranthus_verticillatus",
   "latin": "Plectranthus verticillatus",
   "uk": "Плектрантус (шведський плющ)",
   "group": "листяні",
-  "batch": 5,
+  "batch": 6,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "gynura_aurantiaca",
   "latin": "Gynura aurantiaca",
   "uk": "Гінура",
   "group": "листяні",
-  "batch": 5,
+  "batch": 6,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "pilea_cadierei",
   "latin": "Pilea cadierei",
   "uk": "Пілея Кадьє",
   "group": "листяні",
-  "batch": 5,
+  "batch": 6,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "pilea_microphylla",
   "latin": "Pilea microphylla",
   "uk": "Пілея дрібнолиста",
   "group": "листяні",
-  "batch": 5,
+  "batch": 6,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "peperomia_argyreia",
   "latin": "Peperomia argyreia",
   "uk": "Пеперомія срібляста (кавун)",
   "group": "листяні",
-  "batch": 5,
+  "batch": 6,
   "reason": "дуже популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "назва узгоджена; «кавун» - побутова"
  },
  {
   "id": "peperomia_caperata",
   "latin": "Peperomia caperata",
   "uk": "Пеперомія зморшкувата",
   "group": "листяні",
-  "batch": 5,
+  "batch": 6,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "guzmania_lingulata",
@@ -1356,7 +1734,9 @@
   "group": "бромелієві",
   "batch": 6,
   "reason": "дуже популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "aechmea_fasciata",
@@ -1365,7 +1745,9 @@
   "group": "бромелієві",
   "batch": 6,
   "reason": "популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "vriesea_splendens",
@@ -1374,7 +1756,9 @@
   "group": "бромелієві",
   "batch": 6,
   "reason": "популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "також «Врізея/Вризея»"
  },
  {
   "id": "tillandsia_ionantha",
@@ -1383,7 +1767,9 @@
   "group": "бромелієві",
   "batch": 6,
   "reason": "повітряна рослина, популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "усталеної перекладної назви немає, використано транслітерацію"
  },
  {
   "id": "tillandsia_cyanea",
@@ -1392,7 +1778,9 @@
   "group": "бромелієві",
   "batch": 6,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "neoregelia_carolinae",
@@ -1401,7 +1789,9 @@
   "group": "бромелієві",
   "batch": 6,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "cymbidium_hybrid",
@@ -1410,7 +1800,9 @@
   "group": "орхідеї",
   "batch": 6,
   "reason": "популярний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "dendrobium_nobile",
@@ -1419,7 +1811,9 @@
   "group": "орхідеї",
   "batch": 6,
   "reason": "популярний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "paphiopedilum",
@@ -1428,7 +1822,9 @@
   "group": "орхідеї",
   "batch": 6,
   "reason": "популярний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "oncidium_hybrid",
@@ -1437,7 +1833,9 @@
   "group": "орхідеї",
   "batch": 6,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "epiphyllum_oxypetalum",
@@ -1446,7 +1844,9 @@
   "group": "кактуси",
   "batch": 6,
   "reason": "популярний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "rhipsalis_baccifera",
@@ -1455,25 +1855,31 @@
   "group": "кактуси",
   "batch": 6,
   "reason": "популярний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "opuntia_microdasys",
   "latin": "Opuntia microdasys",
-  "uk": "Опунція дрібноглоста",
+  "uk": "Опунція дрібноглохідна",
   "group": "кактуси",
   "batch": 6,
   "reason": "дуже поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "low",
+  "uk_note": "«дрібноглоста» сумнівне; microdasys = з дрібними глохідіями; усталеної назви не знайдено, можна «Опунція мікродазіс»"
  },
  {
   "id": "mammillaria_elongata",
   "latin": "Mammillaria elongata",
-  "uk": "Мамілярія подовжена",
+  "uk": "Маммілярія подовжена",
   "group": "кактуси",
   "batch": 6,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": "рід Mammillaria - Маммілярія (подвоєне м)"
  },
  {
   "id": "echinocactus_grusonii",
@@ -1482,7 +1888,9 @@
   "group": "кактуси",
   "batch": 6,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "gymnocalycium_mihanovichii",
@@ -1491,16 +1899,20 @@
   "group": "кактуси",
   "batch": 6,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "cereus_repandus",
   "latin": "Cereus repandus",
-  "uk": "Цереус перуанський (торгова назва C. peruvianus)",
+  "uk": "Цереус перуанський",
   "group": "кактуси",
   "batch": 6,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "прибрано технічну дужку; C. repandus часто продається як C. peruvianus"
  },
  {
   "id": "echinopsis",
@@ -1509,70 +1921,86 @@
   "group": "кактуси",
   "batch": 6,
   "reason": "квітучий",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "rebutia",
   "latin": "Rebutia",
   "uk": "Ребуція",
   "group": "кактуси",
-  "batch": 6,
+  "batch": 7,
   "reason": "квітуча",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "cleistocactus_strausii",
   "latin": "Cleistocactus strausii",
   "uk": "Клейстокактус Штрауса",
   "group": "кактуси",
-  "batch": 6,
+  "batch": 7,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "oxalis_triangularis",
   "latin": "Oxalis triangularis",
   "uk": "Оксаліс трикутний",
   "group": "листяні",
-  "batch": 6,
+  "batch": 7,
   "reason": "популярний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "українською також «Кислиця трикутна»; «оксаліс» поширено"
  },
  {
   "id": "soleirolia_soleirolii",
   "latin": "Soleirolia soleirolii",
   "uk": "Солейролія",
   "group": "листяні",
-  "batch": 6,
+  "batch": 7,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "mimosa_pudica",
   "latin": "Mimosa pudica",
   "uk": "Мімоза сором'язлива",
   "group": "листяні",
-  "batch": 6,
+  "batch": 7,
   "reason": "цікава, популярна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "ardisia_crenata",
   "latin": "Ardisia crenata",
   "uk": "Ардизія",
   "group": "дерева",
-  "batch": 6,
+  "batch": 7,
   "reason": "плодоносить",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "nertera_granadensis",
   "latin": "Nertera granadensis",
   "uk": "Нертера",
   "group": "листяні",
-  "batch": 6,
+  "batch": 7,
   "reason": "сезонна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "anthurium_scherzerianum",
@@ -1581,16 +2009,9 @@
   "group": "квітучі",
   "batch": 7,
   "reason": "поширений",
-  "legacy": false
- },
- {
-  "id": "anthurium_crystallinum",
-  "latin": "Anthurium crystallinum",
-  "uk": "Антуріум кришталевий",
-  "group": "листяні",
-  "batch": 7,
-  "reason": "колекційний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "alocasia_zebrina",
@@ -1599,7 +2020,9 @@
   "group": "листяні",
   "batch": 7,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "alocasia_macrorrhizos",
@@ -1608,16 +2031,20 @@
   "group": "листяні",
   "batch": 7,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "великокоренева - калька macrorrhizos; усталеність помірна"
  },
  {
   "id": "caladium_bicolor",
   "latin": "Caladium bicolor",
-  "uk": "Калядіум",
+  "uk": "Каладіум",
   "group": "листяні",
   "batch": 7,
   "reason": "сезонний",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": "рід Caladium - Каладіум (не «Калядіум»)"
  },
  {
   "id": "colocasia_esculenta",
@@ -1626,16 +2053,9 @@
   "group": "листяні",
   "batch": 7,
   "reason": "поширена",
-  "legacy": false
- },
- {
-  "id": "homalomena_rubescens",
-  "latin": "Homalomena rubescens",
-  "uk": "Гомаломена",
-  "group": "листяні",
-  "batch": 7,
-  "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "philodendron_brandtianum",
@@ -1644,7 +2064,9 @@
   "group": "ліани",
   "batch": 7,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "philodendron_erubescens",
@@ -1653,7 +2075,9 @@
   "group": "ліани",
   "batch": 7,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "zamia_furfuracea",
@@ -1662,7 +2086,9 @@
   "group": "пальми",
   "batch": 7,
   "reason": "поширена, токсична",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "aglaonema_modestum",
@@ -1671,7 +2097,9 @@
   "group": "листяні",
   "batch": 7,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "aglaonema_crispum",
@@ -1680,16 +2108,9 @@
   "group": "листяні",
   "batch": 7,
   "reason": "поширена",
-  "legacy": false
- },
- {
-  "id": "monstera_obliqua",
-  "latin": "Monstera obliqua",
-  "uk": "Монстера косолиста",
-  "group": "ліани",
-  "batch": 7,
-  "reason": "колекційна",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "crispum - кучерява/хвиляста; помірна усталеність"
  },
  {
   "id": "epipremnum_pinnatum",
@@ -1698,25 +2119,9 @@
   "group": "ліани",
   "batch": 7,
   "reason": "поширений",
-  "legacy": false
- },
- {
-  "id": "dionaea_muscipula",
-  "latin": "Dionaea muscipula",
-  "uk": "Венерина мухоловка",
-  "group": "листяні",
-  "batch": 7,
-  "reason": "цікава, складна",
-  "legacy": false
- },
- {
-  "id": "nepenthes_hybrid",
-  "latin": "Nepenthes hybrid",
-  "uk": "Непентес",
-  "group": "листяні",
-  "batch": 7,
-  "reason": "цікавий",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "gasteria",
@@ -1725,7 +2130,9 @@
   "group": "сукуленти",
   "batch": 7,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "haworthia_retusa",
@@ -1734,7 +2141,9 @@
   "group": "сукуленти",
   "batch": 7,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "«притуплена» - переклад retusa; усталеність помірна"
  },
  {
   "id": "agave_americana",
@@ -1743,25 +2152,9 @@
   "group": "сукуленти",
   "batch": 7,
   "reason": "поширена",
-  "legacy": false
- },
- {
-  "id": "pachypodium_lamerei",
-  "latin": "Pachypodium lamerei",
-  "uk": "Пахіподіум Ламера",
-  "group": "сукуленти",
-  "batch": 7,
-  "reason": "поширений",
-  "legacy": false
- },
- {
-  "id": "stapelia",
-  "latin": "Stapelia",
-  "uk": "Стапелія",
-  "group": "сукуленти",
-  "batch": 7,
-  "reason": "цікава",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "euphorbia_tirucalli",
@@ -1770,16 +2163,20 @@
   "group": "сукуленти",
   "batch": 7,
   "reason": "поширений, токсичний сік",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "curio_articulatus",
   "latin": "Curio articulatus",
-  "uk": "Кліня членистая (свічка)",
+  "uk": "Сенеціо членистий (свічка)",
   "group": "сукуленти",
   "batch": 7,
   "reason": "поширений",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "medium",
+  "uk_note": "замість російської кальки «членистая»; Senecio articulatus"
  },
  {
   "id": "pelargonium_peltatum",
@@ -1788,7 +2185,9 @@
   "group": "квітучі",
   "batch": 7,
   "reason": "поширена",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  },
  {
   "id": "dracaena_angolensis",
@@ -1797,6 +2196,8 @@
   "group": "сукуленти",
   "batch": 7,
   "reason": "поширена, відрізняється від сансевієрії",
-  "legacy": false
+  "legacy": false,
+  "uk_conf": "high",
+  "uk_note": ""
  }
 ]

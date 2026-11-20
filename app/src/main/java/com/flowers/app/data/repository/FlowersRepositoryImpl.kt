@@ -11,6 +11,7 @@ import com.flowers.app.data.local.entity.CatalogPlantEntity
 import com.flowers.app.data.local.entity.PlantEntity
 import com.flowers.app.data.model.SymptomTreeRoot
 import com.flowers.app.data.preferences.UserPreferences
+import com.flowers.app.data.remote.AndroidNetworkChecker
 import com.flowers.app.data.remote.GeminiPlantService
 import com.flowers.app.data.remote.GeneratePlantResult
 import com.flowers.app.domain.ReminderCalculator
@@ -32,7 +33,7 @@ class FlowersRepositoryImpl(
 ) : FlowersRepository {
 
     override val userPreferences: UserPreferences = UserPreferences(context)
-    private val geminiPlantService = GeminiPlantService(catalogDao, carePodDao)
+    private val geminiPlantService = GeminiPlantService(catalogDao, carePodDao, AndroidNetworkChecker(context))
     private var cachedSymptomTree: SymptomTreeRoot? = null
 
     init {

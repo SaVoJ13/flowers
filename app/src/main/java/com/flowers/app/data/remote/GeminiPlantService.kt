@@ -46,18 +46,23 @@ sealed class GeneratePlantResult {
 
 class GeminiPlantService(
     private val catalogDao: CatalogDao,
-    private val carePodDao: CarePodDao
+    private val carePodDao: CarePodDao,
+    private val networkChecker: NetworkChecker,
+    /** Виклик моделі; за замовчуванням Firebase AI Logic. Підміняється в тестах. */
+    private val generateText: suspend (String) -> String? = { prompt -> defaultModel.generateContent(prompt).text }
 ) {
     private val gson = Gson()
 
-    private val generativeModel by lazy {
-        Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-            modelName = GEMINI_MODEL,
-            generationConfig = generationConfig {
-                responseMimeType = "application/json"
-                temperature = 0.2f
-            }
-        )
+    private companion object {
+        val defaultModel by lazy {
+            Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+                modelName = GEMINI_MODEL,
+                generationConfig = generationConfig {
+                    responseMimeType = "application/json"
+                    temperature = 0.2f
+                }
+            )
+        }
     }
 
     suspend fun generatePlantCareCard(
@@ -68,11 +73,15 @@ class GeminiPlantService(
             return@withContext GeneratePlantResult.Error("Вкажіть назву рослини для пошуку.")
         }
 
+        // Немає мережі: одразу повідомляємо, без запиту до ШІ.
+        if (!networkChecker.isOnline()) {
+            return@withContext GeneratePlantResult.Error(AiErrorMapper.MSG_NO_INTERNET)
+        }
+
         val prompt = AiPrompt.plantCareCard(trimmedQuery)
 
         try {
-            val response = generativeModel.generateContent(prompt)
-            val responseText = response.text ?: ""
+            val responseText = generateText(prompt) ?: ""
             val generated = parseGeminiResponse(responseText)
 
             if (generated != null) {

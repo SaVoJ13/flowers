@@ -10,7 +10,7 @@
 `Flowers: Plant Care` (19)
 
 ### Short description (≤ 80 chars)
-`Gentle care reminders, plant tips and an AI plant care card.` (58)
+`Gentle care reminders, plant tips and an AI plant care card.` (60)
 
 ### Full description (≤ 4000 chars)
 ```

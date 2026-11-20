@@ -8,7 +8,7 @@
 3. Складання скриптом: `app/src/main/assets/catalog/{b00,sources,manifest}.json` (+ копії в `docs/content/catalog/`), `contentVersion: 1`.
 4. Валідатор + `OriginalityValidator`: 54/54 тести (включно з файлами в assets).
 
-## Рішення щодо безпеки (консервативні)
+## Рішення щодо безпеки (початкові; ЗАСТАРІЛО в частині sansevieria/dracaena_marginata, див. розділ QA нижче: після QA обидві TOXIC)
 - `dracaena_marginata`: pets/children = UNKNOWN (джерело NC State описує *D. reflexa* var. *angustifolia*).
 - `sansevieria`, `maranta`: UNKNOWN (джерела не дали явного твердження).
 - `NON_TOXIC` (небезпечніший напрямок помилки) лише для `chlorophytum`, `peperomia`, `calathea` і лише для котів/собак із тегів NC State (діти UNKNOWN): QA перевіряє 100 % прапорців.

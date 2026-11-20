@@ -1474,7 +1474,7 @@
         "watering": "Підтримуйте ґрунт рівномірно вологим у сезон росту, а взимку поливайте рідше. Не лишайте воду в розетці стебел, бо вони легко гниють.",
         "light": "Підходить яскраве розсіяне або непряме світло. Надто багато сонця вибілює барву листя.",
         "soil": "Звичайний субстрат для кімнатних рослин, що лишається вологим. Погано дренований ґрунт веде до загнивання коренів.",
-        "tip": "Рослині потрібне вологе повітря: ставте горщик на піддон із мокрим камінням або зволожуйте кімнату. Надміру добрив і фтор опікають листя."
+        "tip": "Рослині потрібне вологе повітря: ставте горщик на піддон із мокрим камінням або зволожуйте кімнату. Надлишок добрив і фтор опікають листя."
       },
       "en": {
         "name": "Prayer plant",
@@ -1657,8 +1657,7 @@
         "name": "Peacock plant",
         "aliases": [
           "Calathea makoyana",
-          "Calathea",
-          "Cathedral windows"
+          "Calathea"
         ],
         "summary": "A showy plant with intricately patterned leaves. It is fussy about humidity, so it suits someone ready to give it attention.",
         "watering": "Keep the soil moist but never wet or soggy, and check it regularly. Too much water leads to root rot.",

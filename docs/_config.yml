@@ -1,3 +1,4 @@
+# УВАГА: exclude це заборонний список. Новий .md у корені docs/ або в docs/privacy/ потрапить на публічний сайт автоматично; додавайте його сюди, якщо він внутрішній.
 title: Flowers
 description: Догляд за кімнатними рослинами / Houseplant care
 theme: jekyll-theme-minimal

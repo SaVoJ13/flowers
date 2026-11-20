@@ -42,7 +42,7 @@ The report button ("Поскаржитися на відповідь ШІ") send
 - the text of the card you report and the plant name;
 - the reason you chose and your **optional comment** (do not put personal data in it);
 - the app version, time of the report and a technical end-of-retention date.
-There are no accounts, and your device or account identifiers are **not attached** to the report. Only the developer can see reports, in the Firebase console. Purpose: fixing mistakes and improving the safety of answers. **Retention: up to 12 months.** The developer deletes reports manually (automatic deletion is not available on the free plan); after a move to a paid Firebase plan deletion will be automatic.
+There are no accounts, and your device or account identifiers are **not attached** to the report. Only the developer can see reports, in the Firebase console. Purpose: fixing mistakes and improving the safety of answers. **Retention: up to 12 months.** Automatic deletion is not available on the free plan, so at least once every 12 months the developer manually deletes **all** reports created before the cleanup date; no report is therefore kept longer than 12 months. After a move to a paid Firebase plan deletion will become automatic.
 Because a report is not linked to you, we can find and delete a specific one only if you give its exact text and approximate time.
 
 ## 5. What we do not do

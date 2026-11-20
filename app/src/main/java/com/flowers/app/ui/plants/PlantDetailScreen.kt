@@ -51,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.flowers.app.data.local.entity.CareEventEntity
 import com.flowers.app.ui.components.AiDisclaimerText
+import com.flowers.app.ui.components.AiReportButton
 import com.flowers.app.ui.components.CarePodCard
 import com.flowers.app.ui.components.SafetyNotice
 import java.text.SimpleDateFormat
@@ -204,7 +205,10 @@ fun PlantDetailScreen(
                         )
                         uiState.species?.let { species ->
                             Spacer(modifier = Modifier.height(4.dp))
-                            if (species.isAiGenerated) AiDisclaimerText()
+                            if (species.isAiGenerated) {
+                                AiDisclaimerText()
+                                AiReportButton(species)
+                            }
                             SafetyNotice(toxic = !species.isAiGenerated && species.toxicToPets)
                         }
                         Spacer(modifier = Modifier.height(8.dp))

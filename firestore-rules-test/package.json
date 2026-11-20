@@ -1,0 +1,14 @@
+{
+  "name": "flowers-firestore-rules-test",
+  "private": true,
+  "type": "module",
+  "description": "Тести правил Firestore (TASK-027) в емуляторі. Запуск: npm install && npm test (потрібні Node 18+ і Java 21+).",
+  "scripts": {
+    "test": "firebase emulators:exec --config ../firebase.json --only firestore --project demo-flowers \"node --test rules.test.mjs\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "6.0.0",
+    "firebase": "13.4.0",
+    "firebase-tools": "15.37.0"
+  }
+}

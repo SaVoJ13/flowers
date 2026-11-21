@@ -114,10 +114,10 @@
       "toxicParts": [],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "NC State позначає базилік як нетоксичний для котів і собак. Явного твердження про безпеку для дітей у джерелах немає.",
-        "en": "NC State tags basil as non-toxic for cats and dogs. The sources make no explicit statement on safety for children.",
-        "ru": "NC State отмечает базилик как нетоксичный для кошек и собак. Явного утверждения о безопасности для детей в источниках нет.",
-        "pl": "NC State oznacza bazylię jako nietoksyczną dla kotów i psów. Źródła nie zawierają wyraźnej informacji o bezpieczeństwie dla dzieci."
+        "uk": "NC State описує базилік як нетоксичний для котів і собак. Явного твердження про безпеку для дітей у джерелах немає.",
+        "en": "NC State lists basil as non-toxic for cats and dogs. The sources make no explicit statement on safety for children.",
+        "ru": "NC State описывает базилик как нетоксичный для кошек и собак. Явного утверждения о безопасности для детей в источниках нет.",
+        "pl": "NC State opisuje bazylię jako nietoksyczną dla kotów i psów. Źródła nie zawierają wyraźnej informacji o bezpieczeństwie dla dzieci."
       },
       "sourceIds": [
         "ncsu_basil"
@@ -208,10 +208,10 @@
       "toxicParts": [],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "NC State позначає розмарин як нетоксичний для котів і собак. Явного твердження про безпеку для дітей у джерелах немає.",
-        "en": "NC State tags rosemary as non-toxic for cats and dogs. The sources make no explicit statement on safety for children.",
-        "ru": "NC State отмечает розмарин как нетоксичный для кошек и собак. Явного утверждения о безопасности для детей в источниках нет.",
-        "pl": "NC State oznacza rozmaryn jako nietoksyczny dla kotów i psów. Źródła nie zawierają wyraźnej informacji o bezpieczeństwie dla dzieci."
+        "uk": "NC State описує розмарин як нетоксичний для котів і собак. Явного твердження про безпеку для дітей у джерелах немає.",
+        "en": "NC State lists rosemary as non-toxic for cats and dogs. The sources make no explicit statement on safety for children.",
+        "ru": "NC State описывает розмарин как нетоксичный для кошек и собак. Явного утверждения о безопасности для детей в источниках нет.",
+        "pl": "NC State opisuje rozmaryn jako nietoksyczny dla kotów i psów. Źródła nie zawierają wyraźnej informacji o bezpieczeństwie dla dzieci."
       },
       "sourceIds": [
         "ncsu_rosemary"
@@ -303,10 +303,10 @@
       ],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "За NC State м'ята колосиста слабкотоксична для котів і собак (ефірні олії; блювання й діарея при поїданні великої кількості). RHS зазначає, що м'ята болотна (M. pulegium) шкідлива при поїданні.",
-        "en": "NC State rates spearmint low-severity toxic for cats and dogs (essential oils; vomiting and diarrhea after large amounts). RHS notes pennyroyal (M. pulegium) is harmful if eaten.",
-        "ru": "По NC State мята колосовая слаботоксична для кошек и собак (эфирные масла; рвота и диарея при поедании большого количества). RHS отмечает, что мята болотная (M. pulegium) вредна при поедании.",
-        "pl": "Według NC State mięta zielona jest słabo toksyczna dla kotów i psów (olejki eteryczne; wymioty i biegunka po zjedzeniu dużej ilości). RHS podaje, że mięta polej (M. pulegium) jest szkodliwa po zjedzeniu."
+        "uk": "За даними NC State, м’ята колосиста має низьку токсичність для котів і собак: поїдання великої кількості може спричинити блювання та діарею. Безпека для дітей не підтверджена.",
+        "en": "NC State rates spearmint low-severity toxic to cats and dogs: eating a large amount may cause vomiting and diarrhea. Safety for children is not confirmed.",
+        "ru": "По данным NC State, мята колосистая слаботоксична для кошек и собак: поедание большого количества может вызвать рвоту и диарею. Безопасность для детей не подтверждена.",
+        "pl": "Według NC State mięta zielona ma niską toksyczność dla kotów i psów: zjedzenie dużej ilości może wywołać wymioty i biegunkę. Bezpieczeństwo dla dzieci nie jest potwierdzone."
       },
       "sourceIds": [
         "ncsu_spearmint",
@@ -894,10 +894,10 @@
       ],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "Низька тяжкість (NC State): для котів можливий розлад травлення. Отруйне лише насіння, можливо, канцерогенне для людей; кімнатні рослини насіння не дають. Дані щодо собак відсутні.",
-        "en": "Low severity (NC State): may cause digestive upset in cats. Only the seeds are poisonous, possibly carcinogenic to people; houseplants never produce seeds. No data for dogs.",
-        "ru": "Низкая тяжесть (NC State): у кошек возможно расстройство пищеварения. Ядовиты только семена, возможно канцерогенные для людей; комнатные растения семян не дают. Данных о собаках нет.",
-        "pl": "Niskie nasilenie (NC State): u kotów możliwe zaburzenia trawienia. Trujące są tylko nasiona, możliwie rakotwórcze dla ludzi; rośliny doniczkowe nie wydają nasion. Brak danych o psach."
+        "uk": "За даними NC State, насіння пахіри може спричинити розлад травлення в котів; для людей воно може становити небезпеку. Тяжкість оцінено як низьку. Даних щодо собак немає.",
+        "en": "NC State reports that Pachira seeds may cause digestive upset in cats and may be harmful to people. The stated severity is low. No safety information is given for dogs.",
+        "ru": "По данным NC State, семена пахиры могут вызвать расстройство пищеварения у кошек и быть опасными для людей. Указана низкая степень тяжести. Данных о собаках нет.",
+        "pl": "Według NC State nasiona pachiry mogą wywołać zaburzenia trawienia u kotów i być szkodliwe dla ludzi. Podane nasilenie jest niskie. Brak danych o psach."
       },
       "sourceIds": [
         "ncsu_pachira_aquatica"
@@ -988,10 +988,10 @@
       "toxicParts": [],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "NC State позначає рослину як нетоксичну для котів і собак. Дані щодо дітей у джерелах відсутні; краї листя можуть бути гострими.",
-        "en": "NC State tags this plant as non-toxic for cats and dogs. The sources give no data for children; leaf edges can be sharp.",
-        "ru": "NC State отмечает растение как нетоксичное для кошек и собак. Данных о детях в источниках нет; края листьев могут быть острыми.",
-        "pl": "NC State oznacza roślinę jako nietoksyczną dla kotów i psów. Źródła nie podają danych dla dzieci; brzegi liści mogą być ostre."
+        "uk": "NC State описує рослину як нетоксичну для котів і собак. Дані щодо дітей у джерелах відсутні; краї листя можуть бути гострими.",
+        "en": "NC State lists this plant as non-toxic for cats and dogs. The sources give no data for children; leaf edges can be sharp.",
+        "ru": "NC State описывает растение как нетоксичное для кошек и собак. Данных о детях в источниках нет; края листьев могут быть острыми.",
+        "pl": "NC State opisuje roślinę jako nietoksyczną dla kotów i psów. Źródła nie podają danych dla dzieci; brzegi liści mogą być ostre."
       },
       "sourceIds": [
         "ncsu_beaucarnea"
@@ -1085,10 +1085,10 @@
       "toxicParts": [],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "NC State позначає аспідистру як нетоксичну для котів і собак. Дані щодо безпеки для дітей у джерелах відсутні.",
-        "en": "NC State tags aspidistra as non-toxic for cats and dogs. The sources give no safety data for children.",
-        "ru": "NC State отмечает аспидистру как нетоксичную для кошек и собак. Данных о безопасности для детей в источниках нет.",
-        "pl": "NC State oznacza aspidistrę jako nietoksyczną dla kotów i psów. Źródła nie podają danych o bezpieczeństwie dla dzieci."
+        "uk": "NC State описує аспідистру як нетоксичну для котів і собак. Дані щодо безпеки для дітей у джерелах відсутні.",
+        "en": "NC State lists aspidistra as non-toxic for cats and dogs. The sources give no safety data for children.",
+        "ru": "NC State описывает аспидистру как нетоксичную для кошек и собак. Данных о безопасности для детей в источниках нет.",
+        "pl": "NC State opisuje aspidistrę jako nietoksyczną dla kotów i psów. Źródła nie podają danych o bezpieczeństwie dla dzieci."
       },
       "sourceIds": [
         "ncsu_aspidistra"
@@ -1282,10 +1282,10 @@
       ],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "NC State позначає рослину як отруйну й проблемну для котів і собак; тяжкість і отруйна частина не вказані. Дані щодо дітей у джерелах відсутні.",
-        "en": "NC State marks this plant as poisonous and a problem for cats and dogs; severity and poisonous part are not stated. The sources give no data for children.",
-        "ru": "NC State отмечает растение как ядовитое и опасное для кошек и собак; тяжесть и ядовитая часть не указаны. Данных о детях в источниках нет.",
-        "pl": "NC State oznacza roślinę jako trującą i problem dla kotów i psów; nasilenie i trująca część nie są podane. Źródła nie podają danych dla dzieci."
+        "uk": "За даними NC State, сциндапсус може зашкодити котам і собакам. Джерело не уточнює тяжкість або отруйну частину; безпека для дітей не підтверджена.",
+        "en": "NC State warns that satin pothos may harm cats and dogs. It does not state a severity or toxic part, and the cited sources do not confirm safety for children.",
+        "ru": "По данным NC State, сциндапсус может навредить кошкам и собакам. Источник не уточняет тяжесть или ядовитую часть; безопасность для детей не подтверждена.",
+        "pl": "Według NC State scindapsus może zaszkodzić kotom i psom. Źródło nie określa nasilenia ani trującej części; bezpieczeństwo dla dzieci nie zostało potwierdzone."
       },
       "sourceIds": [
         "ncsu_scindapsus"
@@ -2372,7 +2372,7 @@
       ],
       "sourcesDisagree": true,
       "explanation": {
-        "uk": "Джерела розходяться: NC State вважає рослину нетоксичною для котів і собак, а RHS відносить її до потенційно шкідливих, плоди не можна їсти людям і тваринам.",
+        "uk": "Джерела розходяться: За даними NC State, рослину нетоксичною для котів і собак, а RHS відносить її до потенційно шкідливих, плоди не можна їсти людям і тваринам.",
         "en": "Sources disagree: NC State lists it as non-toxic for cats and dogs, while RHS rates it potentially harmful and says the fruit should not be eaten by people or pets.",
         "ru": "Источники расходятся: NC State считает растение нетоксичным для кошек и собак, а RHS относит его к потенциально вредным, плоды нельзя есть людям и животным.",
         "pl": "Źródła się różnią: NC State uznaje roślinę za nietoksyczną dla kotów i psów, a RHS za potencjalnie szkodliwą; owoców nie powinni jeść ludzie ani zwierzęta."

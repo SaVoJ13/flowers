@@ -2,7 +2,7 @@
   "zamioculcas": {
     "cats": "ncsu_zz: \"This plant has a medium toxicity to cats and dogs.\"; tag \"#problem for cats\"; Poison Severity: Medium",
     "dogs": "ncsu_zz: \"This plant has a medium toxicity to cats and dogs.\"; tag \"#problem for dogs\"",
-    "children": "ncsu_zz: Poison Severity \"Medium\", \"#poisonous\"; rhs_zz: \"Harmful if eaten; skin/eye irritant.\" (no Problem for Children tag)",
+    "children": "Рівень TOXIC за правилом для дітей: NC State не має тегу для людей; RHS «Harmful if eaten» без тяжкості (QA 2026-11-21). Раніше було MODERATE.",
     "disagreementNote": null,
     "changeVsCurrent": "Без зміни напрямку (TOXIC залишається токсичним), уточнено тяжкість: MODERATE для котів, собак і дітей за NC State (Medium). Clemson і RHS підтверджують шкідливість без тяжкості.",
     "previous": {
@@ -79,7 +79,7 @@
   "ficus_elastica": {
     "cats": "ncsu_rubber: \"Problem for Cats\"; clemson_rubber: \"Keep these plants away from any pets or young children that tend to eat plants.\"",
     "dogs": "ncsu_rubber: \"Problem for Dogs\"; clemson_rubber: sap \"may irritate skin or the stomach if eaten\"",
-    "children": "clemson_rubber: \"The sticky white sap may irritate skin or the stomach if eaten.\" (irritant)",
+    "children": "Рівень TOXIC: clemson_rubber описує подразнення шкіри/шлунку соком і радить тримати подалі від дітей, тяжкість не названа (QA 2026-11-21). Раніше було LOW.",
     "disagreementNote": null,
     "changeVsCurrent": "Тварини лишаються TOXIC; для дітей уточнено LOW (подразник, Clemson) замість загального TOXIC; отруйна частина SAP.",
     "previous": {
@@ -99,11 +99,11 @@
     }
   },
   "dracaena_marginata": {
-    "cats": "ncsu_dracaena_reflexa: \"This plant is toxic to cats and dogs if ingested.\"; \"low severity poison characteristics\"; \"Cats may have dilated pupils.\"",
-    "dogs": "ncsu_dracaena_reflexa: \"This plant is toxic to cats and dogs if ingested.\"; Poison Severity \"Low\"",
+    "cats": "ncsu_dracaena_reflexa_angustifolia: Poison Severity: Low; «Toxic to humans, cats, and dogs»; Problem for Cats/Dogs/Children (QA 2026-11-21).",
+    "dogs": "ncsu_dracaena_reflexa_angustifolia: Poison Severity: Low; «Toxic to humans, cats, and dogs»; Problem for Cats/Dogs/Children (QA 2026-11-21).",
     "children": "ncsu_dracaena_reflexa_angustifolia (previously known as Dracaena marginata): Problems: Problem for Children; «Toxic to humans, cats, and dogs»; Poison Severity: Low. (Виправлено після QA: раніше хибне джерело var. reflexa.)",
     "disagreementNote": null,
-    "changeVsCurrent": "Напрямок той самий; тяжкість LOW. Застереження: оцінка з сторінки D. reflexa var. reflexa, у витягу якої D. marginata не згадана; для дітей твердження ухильне («Some types...»). Clemson про токсичність не пише.",
+    "changeVsCurrent": "TOXIC -> LOW для кішок, собак і дітей; джерело виправлено на ncsu_dracaena_reflexa_angustifolia (D. marginata як попередня назва).",
     "previous": {
       "pets": "TOXIC",
       "children": "TOXIC"
@@ -147,7 +147,7 @@
     "dogs": "ncsu_syngonium_podophyllum: \"This plant has medium severity poison characteristics.\"; tag \"#problem for dogs\"; clemson: \"Pet Safety: Not pet safe\"",
     "children": "ncsu_syngonium_podophyllum (поле Problems): Poisonous to Humans; Poison Severity: Medium. (Виправлено після QA: раніше помилково UNKNOWN.)",
     "disagreementNote": null,
-    "changeVsCurrent": "Changed: pets TOXIC -> MODERATE (NC State medium severity); children TOXIC -> UNKNOWN because neither source makes an explicit statement about children/humans.",
+    "changeVsCurrent": "Діти: TOXIC -> MODERATE (NC State «Poisonous to Humans», Medium); коти/собаки TOXIC -> MODERATE.",
     "previous": {
       "pets": "TOXIC",
       "children": "TOXIC"
@@ -332,7 +332,7 @@
   "dracaena_reflexa": {
     "cats": "ncsu_dracaena_reflexa: Poison Severity: Low; \"This plant is toxic to cats and dogs if ingested.\"; tag #problem for cats",
     "dogs": "ncsu_dracaena_reflexa: Poison Severity: Low; \"This plant is toxic to cats and dogs if ingested.\"; tag #problem for dogs",
-    "children": "ncsu_dracaena_reflexa only says \"Some types of dracaena can be toxic to humans also.\" (not species-specific; no Problem for Children tag). rhs_dracaena_reflexa: no toxicity data.",
+    "children": "ncsu_dracaena_reflexa: речення про людей «If ingested, mouth and throat irritation…», Poison Severity: Low (QA 2026-11-21). Раніше було UNKNOWN.",
     "disagreementNote": null,
     "changeVsCurrent": "pets TOXIC -> cats/dogs LOW (severity refined from NC State 'Low'); children stays UNKNOWN (only a generic 'some types of dracaena' remark).",
     "previous": {

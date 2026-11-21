@@ -20,7 +20,9 @@ class CatalogValidatorTest {
         }
     """.trimIndent()
 
-    private fun text(name: String, lang: String): JsonObject {
+    private fun num(id: String) = Math.abs(id.hashCode())
+
+    private fun text(name: String, lang: String, id: String): JsonObject {
         val latin = lang == "en" || lang == "pl"
         val body = if (latin) listOf(
             "Short description of the plant for the validator test.", "Water when the top soil layer has dried.",
@@ -30,8 +32,8 @@ class CatalogValidatorTest {
             "Яскраве розсіяне світло без прямого сонця.", "Легкий дренований ґрунт для кімнатних рослин.", "Повертайте горщик раз на тиждень до світла."
         )
         return JsonObject().also { o ->
-            o.addProperty("name", name)
-            o.add("aliases", JsonArray().also { it.add(if (latin) "alias" else "псевдонім") })
+            o.addProperty("name", "$name ${num(id)}")
+            o.add("aliases", JsonArray().also { it.add((if (latin) "alias " else "псевдонім ") + num(id)) })
             o.addProperty("summary", body[0]); o.addProperty("watering", body[1]); o.addProperty("light", body[2])
             o.addProperty("soil", body[3]); o.addProperty("tip", body[4])
         }
@@ -44,8 +46,8 @@ class CatalogValidatorTest {
           "care": {"difficulty": "EASY", "lightMin": "MEDIUM", "lightMax": "HIGH", "checkIntervalDays": 7, "humidity": "MEDIUM", "soil": "UNIVERSAL"},
           "safety": {"pets": "UNKNOWN", "children": "UNKNOWN", "sourceIds": []},
           "i18n": {
-            "uk": ${text("Тестова рослина", "uk")}, "ru": ${text("Тестовое растение", "ru")},
-            "en": ${text("Test plant", "en")}, "pl": ${text("Roslina testowa", "pl")}
+            "uk": ${text("Тестова рослина", "uk", id)}, "ru": ${text("Тестовое растение", "ru", id)},
+            "en": ${text("Test plant", "en", id)}, "pl": ${text("Roslina testowa", "pl", id)}
           },
           "sourceIds": ["src_a", "src_b"],
           "review": {"authoredBy": "agent", "factChecked": "2026-12-01", "ownerSampled": false,
@@ -370,6 +372,38 @@ class CatalogValidatorTest {
         } finally {
             tmp.deleteRecursively()
         }
+    }
+
+    // ---- унікальність назв/псевдонімів між картками (рішення Власника 2026-11-21) ----
+
+    private fun withAlias(pid: String, lang: String, alias: String, name: String? = null): JsonObject = card(pid).also {
+        val t = it.getAsJsonObject("i18n").getAsJsonObject(lang)
+        t.get("aliases").asJsonArray.add(alias)
+        if (name != null) t.addProperty("name", name)
+    }
+
+    @Test fun `same alias in the same language in two cards is rejected`() {
+        val e = errorsFor(listOf(withAlias("plant_a", "uk", "Грошове дерево"), withAlias("plant_b", "uk", "Грошове дерево")))
+        assertHas(e, "уже вжито в картці plant_a")
+    }
+
+    @Test fun `alias comparison ignores case and extra spaces`() {
+        val e = errorsFor(listOf(withAlias("plant_a", "en", "Money tree"), withAlias("plant_b", "en", "  money   TREE ")))
+        assertHas(e, "уже вжито")
+    }
+
+    @Test fun `alias equal to another cards name is rejected`() {
+        val e = errorsFor(listOf(card("plant_a"), withAlias("plant_b", "uk", "Тестова рослина ${num("plant_a")}")))
+        assertHas(e, "уже вжито в картці plant_a")
+    }
+
+    @Test fun `same alias in different languages is allowed`() {
+        val e = errorsFor(listOf(withAlias("plant_a", "en", "Monstera"), withAlias("plant_b", "pl", "Monstera")))
+        assertEquals(emptyList<String>(), e)
+    }
+
+    @Test fun `name and alias of the same card may coincide`() {
+        assertEquals(emptyList<String>(), errorsFor(listOf(withAlias("plant_a", "uk", "Тестова рослина ${num("plant_a")}"))))
     }
 
     // ---- OriginalityValidator на синтетичних даних ----

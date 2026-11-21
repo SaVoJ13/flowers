@@ -14,11 +14,23 @@
       "soil": "CACTUS_MIX"
     },
     "safety": {
-      "pets": "TOXIC",
-      "children": "TOXIC",
+      "cats": "MODERATE",
+      "dogs": "MODERATE",
+      "children": "MODERATE",
+      "toxicParts": [
+        "LEAVES"
+      ],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "Помірно токсичний для котів і собак; отруйне листя (оксалат кальцію), при поїданні у великій кількості можливі блювання та діарея. Для людей тяжкість середня.",
+        "en": "Moderately toxic to cats and dogs; the leaves contain calcium oxalate and may cause vomiting and diarrhea if eaten in quantity. Medium severity for people.",
+        "ru": "Умеренно токсичен для кошек и собак; ядовиты листья (оксалат кальция), при поедании в большом количестве возможны рвота и диарея. Для людей тяжесть средняя.",
+        "pl": "Umiarkowanie toksyczny dla kotów i psów; liście zawierają szczawian wapnia i zjedzone w większej ilości mogą wywołać wymioty i biegunkę. Średnia szkodliwość dla ludzi."
+      },
       "sourceIds": [
         "ncsu_zz",
-        "clemson_zz"
+        "clemson_zz",
+        "rhs_zz"
       ]
     },
     "i18n": {
@@ -107,8 +119,24 @@
       "soil": "CACTUS_MIX"
     },
     "safety": {
-      "pets": "TOXIC",
-      "children": "TOXIC",
+      "cats": "LOW",
+      "dogs": "LOW",
+      "children": "LOW",
+      "toxicParts": [
+        "FLOWERS",
+        "FRUIT",
+        "LEAVES",
+        "ROOTS",
+        "SAP",
+        "STEMS"
+      ],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "Слабко токсична для котів, собак і дітей при поїданні (сапоніни): можливі блювання, нудота, діарея, слинотеча. Отруйні листя, стебла, корені, квіти, плоди та сік.",
+        "en": "Low-severity toxicity for cats, dogs and children if eaten (saponins): vomiting, nausea, diarrhea, drooling. Leaves, stems, roots, flowers, fruit and sap are listed.",
+        "ru": "Слабо токсична для кошек, собак и детей при поедании (сапонины): возможны рвота, тошнота, диарея, слюнотечение. Ядовиты листья, стебли, корни, цветки, плоды и сок.",
+        "pl": "Słabo toksyczna dla kotów, psów i dzieci po zjedzeniu (saponiny): wymioty, nudności, biegunka, ślinienie. Trujące są liście, łodygi, korzenie, kwiaty, owoce i sok."
+      },
       "sourceIds": [
         "ncsu_snake",
         "rhs_sansevieria"
@@ -197,8 +225,24 @@
       "soil": "AROID_MIX"
     },
     "safety": {
-      "pets": "TOXIC",
-      "children": "TOXIC",
+      "cats": "MODERATE",
+      "dogs": "MODERATE",
+      "children": "MODERATE",
+      "toxicParts": [
+        "FLOWERS",
+        "FRUIT",
+        "LEAVES",
+        "ROOTS",
+        "SEEDS",
+        "STEMS"
+      ],
+      "sourcesDisagree": true,
+      "explanation": {
+        "uk": "Токсичний для котів, собак і дітей через оксалат кальцію: подразнення рота, слинотеча, блювання. Отруйні всі частини. Джерела розходяться щодо тяжкості (середня чи слабка).",
+        "en": "Toxic to cats, dogs and children due to calcium oxalate: mouth irritation, drooling, vomiting. All parts are listed. Sources disagree on severity (medium vs mild).",
+        "ru": "Токсичен для кошек, собак и детей из-за оксалата кальция: раздражение рта, слюнотечение, рвота. Ядовиты все части. Источники расходятся в оценке тяжести (средняя или слабая).",
+        "pl": "Toksyczny dla kotów, psów i dzieci z powodu szczawianu wapnia: podrażnienie jamy ustnej, ślinienie, wymioty. Trujące są wszystkie części. Źródła się różnią co do nasilenia."
+      },
       "sourceIds": [
         "ncsu_pothos",
         "clemson_pothos"
@@ -269,7 +313,8 @@
         "ru": false,
         "pl": false
       }
-    }
+    },
+    "notes": "Розбіжність джерел безпеки (EN): Severity differs: ncsu_pothos rates poison severity Medium (Problem for Cats/Dogs, Poisonous to Humans), while clemson_pothos says \"All parts of a pothos are mildly toxic if ingested\" and to keep it from children and pets. The more cautious MODERATE is used."
   },
   {
     "id": "monstera",
@@ -286,8 +331,25 @@
       "soil": "AROID_MIX"
     },
     "safety": {
-      "pets": "TOXIC",
-      "children": "TOXIC",
+      "cats": "LOW",
+      "dogs": "LOW",
+      "children": "LOW",
+      "toxicParts": [
+        "LEAVES",
+        "STEMS",
+        "ROOTS",
+        "FLOWERS",
+        "FRUIT",
+        "SEEDS",
+        "SAP"
+      ],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "Слабко токсична для котів, собак і людей (оксалат кальцію): печіння в роті, слинотеча, блювання, переважно при поїданні у великій кількості. Сік може подразнювати шкіру.",
+        "en": "Low-severity toxicity for cats, dogs and people (calcium oxalate): mouth burning, drooling, vomiting, mainly if eaten in large amounts. The sap may irritate skin.",
+        "ru": "Слабо токсична для кошек, собак и людей (оксалат кальция): жжение во рту, слюнотечение, рвота, в основном при поедании в большом количестве. Сок может раздражать кожу.",
+        "pl": "Słabo toksyczna dla kotów, psów i ludzi (szczawian wapnia): pieczenie w ustach, ślinienie, wymioty, głównie po zjedzeniu dużej ilości. Sok może podrażniać skórę."
+      },
       "sourceIds": [
         "ncsu_monstera",
         "rhs_monstera"
@@ -373,8 +435,19 @@
       "soil": "MOISTURE_RETAINING"
     },
     "safety": {
-      "pets": "TOXIC",
-      "children": "TOXIC",
+      "cats": "MODERATE",
+      "dogs": "MODERATE",
+      "children": "MODERATE",
+      "toxicParts": [
+        "LEAVES"
+      ],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "Помірно токсичний для котів, собак і дітей: листя з оксалатом кальцію при поїданні у великій кількості спричиняє біль і печіння в роті, слинотечу, блювання.",
+        "en": "Moderately toxic to cats, dogs and children: the leaves contain calcium oxalate and, if eaten in quantity, cause mouth pain and burning, drooling and vomiting.",
+        "ru": "Умеренно токсичен для кошек, собак и детей: листья с оксалатом кальция при поедании в большом количестве вызывают боль и жжение во рту, слюнотечение, рвоту.",
+        "pl": "Umiarkowanie toksyczny dla kotów, psów i dzieci: liście ze szczawianem wapnia zjedzone w większej ilości wywołują ból i pieczenie w ustach, ślinienie i wymioty."
+      },
       "sourceIds": [
         "ncsu_spathiphyllum",
         "rhs_spathiphyllum"
@@ -462,8 +535,17 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "pets": "NON_TOXIC",
+      "cats": "NON_TOXIC",
+      "dogs": "NON_TOXIC",
       "children": "UNKNOWN",
+      "toxicParts": [],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "За NC State нетоксичний для котів і собак (лише теги). Даних про безпеку для дітей у джерелах немає.",
+        "en": "NC State tags it as non-toxic for cats and dogs (tags only). The sources give no information on safety for children.",
+        "ru": "По данным NC State нетоксичен для кошек и собак (только теги). Данных о безопасности для детей в источниках нет.",
+        "pl": "Według NC State nietoksyczny dla kotów i psów (tylko tagi). Źródła nie podają informacji o bezpieczeństwie dla dzieci."
+      },
       "sourceIds": [
         "ncsu_spider"
       ]
@@ -537,8 +619,7 @@
         "ru": false,
         "pl": false
       }
-    },
-    "notes": "Безпека для котів і собак лише з тегів NC State (без речення в тексті)."
+    }
   },
   {
     "id": "crassula",
@@ -555,8 +636,19 @@
       "soil": "CACTUS_MIX"
     },
     "safety": {
-      "pets": "TOXIC",
+      "cats": "TOXIC",
+      "dogs": "TOXIC",
       "children": "UNKNOWN",
+      "toxicParts": [
+        "UNSPECIFIED"
+      ],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "NC State позначає рослину як проблемну для котів і собак, без тяжкості та отруйної частини. Даних про дітей у джерелах немає.",
+        "en": "NC State flags it as a problem for cats and dogs, without severity or toxic part. The sources give no information about children.",
+        "ru": "NC State отмечает растение как проблемное для кошек и собак, без указания тяжести и ядовитой части. Данных о детях в источниках нет.",
+        "pl": "NC State oznacza roślinę jako problem dla kotów i psów, bez podania nasilenia ani trującej części. Źródła nie podają danych o dzieciach."
+      },
       "sourceIds": [
         "ncsu_jade"
       ]
@@ -646,11 +738,22 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "pets": "TOXIC",
-      "children": "TOXIC",
+      "cats": "TOXIC",
+      "dogs": "TOXIC",
+      "children": "LOW",
+      "toxicParts": [
+        "SAP"
+      ],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "Проблемний для котів і собак (тяжкість не вказана). Білий липкий сік може подразнювати шкіру або шлунок при поїданні, тому рослину тримають подалі від дітей і тварин.",
+        "en": "A problem for cats and dogs (severity not given). The sticky white sap may irritate skin or the stomach if eaten, so keep it away from children and pets.",
+        "ru": "Проблемен для кошек и собак (тяжесть не указана). Белый липкий сок может раздражать кожу или желудок при поедании, поэтому растение держат подальше от детей и животных.",
+        "pl": "Problem dla kotów i psów (nasilenie nie podane). Lepki biały sok może podrażniać skórę lub żołądek po zjedzeniu, więc roślinę trzyma się z dala od dzieci i zwierząt."
+      },
       "sourceIds": [
-        "clemson_rubber",
-        "ncsu_rubber"
+        "ncsu_rubber",
+        "clemson_rubber"
       ]
     },
     "i18n": {
@@ -740,8 +843,19 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "pets": "TOXIC",
+      "cats": "TOXIC",
+      "dogs": "TOXIC",
       "children": "UNKNOWN",
+      "toxicParts": [
+        "UNSPECIFIED"
+      ],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "NC State позначає фікус як проблемний для котів і собак, без тяжкості та отруйної частини. Даних про дітей у джерелах немає.",
+        "en": "NC State flags it as a problem for cats and dogs, without severity or toxic part. The sources give no information about children.",
+        "ru": "NC State отмечает фикус как проблемный для кошек и собак, без указания тяжести и ядовитой части. Данных о детях в источниках нет.",
+        "pl": "NC State oznacza fikusa jako problem dla kotów i psów, bez podania nasilenia ani trującej części. Źródła nie podają danych o dzieciach."
+      },
       "sourceIds": [
         "ncsu_weeping"
       ]
@@ -831,8 +945,21 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "pets": "TOXIC",
-      "children": "TOXIC",
+      "cats": "LOW",
+      "dogs": "LOW",
+      "children": "LOW",
+      "toxicParts": [
+        "FRUIT",
+        "LEAVES",
+        "SAP"
+      ],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "Слабко токсична для котів і собак при поїданні (сапоніни): слабкість, слинотеча, блювання; у котів розширені зіниці. Деякі драцени токсичні й для людей. Отруйні листя, плоди, сік.",
+        "en": "Low-severity toxicity for cats and dogs if eaten (saponins): weakness, drooling, vomiting; cats may have dilated pupils. Some dracaenas are toxic to people. Leaves, fruit, sap.",
+        "ru": "Слабо токсична для кошек и собак при поедании (сапонины): слабость, слюнотечение, рвота; у кошек расширенные зрачки. Некоторые драцены токсичны и для людей. Ядовиты листья, плоды, сок.",
+        "pl": "Słabo toksyczna dla kotów i psów po zjedzeniu (saponiny): osłabienie, ślinienie, wymioty; u kotów rozszerzone źrenice. Niektóre dracenki są toksyczne dla ludzi. Liście, owoce, sok."
+      },
       "sourceIds": [
         "ncsu_dracaena_reflexa"
       ]
@@ -923,8 +1050,17 @@
       "soil": "LIGHT_AIRY"
     },
     "safety": {
-      "pets": "NON_TOXIC",
+      "cats": "NON_TOXIC",
+      "dogs": "NON_TOXIC",
       "children": "UNKNOWN",
+      "toxicParts": [],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "Джерела позначають пеперомію як нетоксичну для котів і собак. Даних щодо безпеки для дітей у джерелах немає.",
+        "en": "Sources list peperomia as non-toxic to cats and dogs. They give no information about safety for children.",
+        "ru": "Источники отмечают пеперомию как нетоксичную для кошек и собак. Данных о безопасности для детей в источниках нет.",
+        "pl": "Źródła podają, że peperomia jest nietoksyczna dla kotów i psów. Brak danych o bezpieczeństwie dla dzieci."
+      },
       "sourceIds": [
         "ncsu_peperomia_obtusifolia",
         "clemson_peperomia"
@@ -995,8 +1131,7 @@
         "ru": false,
         "pl": false
       }
-    },
-    "notes": "Безпека для котів і собак лише з тегів NC State (без речення в тексті)."
+    }
   },
   {
     "id": "aglaonema",
@@ -1013,8 +1148,25 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "pets": "TOXIC",
-      "children": "TOXIC",
+      "cats": "LOW",
+      "dogs": "LOW",
+      "children": "LOW",
+      "toxicParts": [
+        "LEAVES",
+        "STEMS",
+        "ROOTS",
+        "FLOWERS",
+        "FRUIT",
+        "SEEDS",
+        "SAP"
+      ],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "Аглаонема має низьку токсичність: кристали оксалату кальцію подразнюють рот і шкіру. Насамперед небезпечна для котів і собак, може зашкодити й людям. Отруйні всі частини та сік.",
+        "en": "Aglaonema has low-severity toxicity: calcium oxalate crystals irritate the mouth and skin. Mainly a concern for cats and dogs, but can affect people too. All parts and the sap are listed as toxic.",
+        "ru": "Аглаонема обладает низкой токсичностью: кристаллы оксалата кальция раздражают рот и кожу. В первую очередь опасна для кошек и собак, может навредить и людям. Ядовиты все части и сок.",
+        "pl": "Aglaonema ma niską toksyczność: kryształy szczawianu wapnia podrażniają usta i skórę. Dotyczy głównie kotów i psów, ale może zaszkodzić też ludziom. Trujące są wszystkie części i sok."
+      },
       "sourceIds": [
         "ncsu_aglaonema",
         "clemson_chinese_evergreen"
@@ -1099,8 +1251,24 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "pets": "TOXIC",
-      "children": "TOXIC",
+      "cats": "LOW",
+      "dogs": "LOW",
+      "children": "LOW",
+      "toxicParts": [
+        "LEAVES",
+        "STEMS",
+        "ROOTS",
+        "FLOWERS",
+        "FRUIT",
+        "SAP"
+      ],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "Філодендрон має низьку токсичність для котів, собак і дітей: оксалат кальцію спричиняє біль і набряк рота, слинотечу, блювання. Отруйні всі частини, сік подразнює шкіру.",
+        "en": "Philodendron has low-severity toxicity for cats, dogs and children: calcium oxalate causes mouth pain and swelling, drooling and vomiting. All parts are toxic; the sap irritates skin.",
+        "ru": "Филодендрон обладает низкой токсичностью для кошек, собак и детей: оксалат кальция вызывает боль и отёк рта, слюнотечение, рвоту. Ядовиты все части, сок раздражает кожу.",
+        "pl": "Filodendron ma niską toksyczność dla kotów, psów i dzieci: szczawian wapnia powoduje ból i obrzęk ust, ślinienie i wymioty. Trujące są wszystkie części, sok podrażnia skórę."
+      },
       "sourceIds": [
         "ncsu_philodendron_hederaceum",
         "isu_philodendrons"
@@ -1188,8 +1356,24 @@
       "soil": "LIGHT_AIRY"
     },
     "safety": {
-      "pets": "TOXIC",
-      "children": "TOXIC",
+      "cats": "MODERATE",
+      "dogs": "MODERATE",
+      "children": "UNKNOWN",
+      "toxicParts": [
+        "LEAVES",
+        "STEMS",
+        "ROOTS",
+        "FLOWERS",
+        "SEEDS",
+        "SAP"
+      ],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "Сингоніум має середню токсичність для котів і собак: оксалат кальцію подразнює рот, спричиняє слинотечу й блювання. Отруйні листя, стебла, корені, квіти, насіння та сік. Даних щодо дітей немає.",
+        "en": "Syngonium has medium-severity toxicity for cats and dogs: calcium oxalate irritates the mouth, causing drooling and vomiting. Leaves, stems, roots, flowers, seeds and sap are toxic. No data on children.",
+        "ru": "Сингониум обладает средней токсичностью для кошек и собак: оксалат кальция раздражает рот, вызывает слюнотечение и рвоту. Ядовиты листья, стебли, корни, цветы, семена и сок. Данных о детях нет.",
+        "pl": "Zroślicha ma średnią toksyczność dla kotów i psów: szczawian wapnia podrażnia usta, powoduje ślinienie i wymioty. Trujące są liście, łodygi, korzenie, kwiaty, nasiona i sok. Brak danych o dzieciach."
+      },
       "sourceIds": [
         "ncsu_syngonium_podophyllum",
         "clemson_arrowhead_vine"
@@ -1276,8 +1460,20 @@
       "soil": "CACTUS_MIX"
     },
     "safety": {
-      "pets": "TOXIC",
-      "children": "TOXIC",
+      "cats": "LOW",
+      "dogs": "LOW",
+      "children": "LOW",
+      "toxicParts": [
+        "LEAVES",
+        "SAP"
+      ],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "Алое вера має низьку токсичність для котів, собак і людей: при поїданні листя можливі спазми в животі, діарея, червона сеча; латекс подразнює шкіру.",
+        "en": "Aloe vera has low-severity toxicity for cats, dogs and people: eating the leaves may cause abdominal cramping, diarrhea and red urine; the latex irritates skin.",
+        "ru": "Алоэ вера обладает низкой токсичностью для кошек, собак и людей: при поедании листьев возможны спазмы в животе, диарея, красная моча; латекс раздражает кожу.",
+        "pl": "Aloes zwyczajny ma niską toksyczność dla kotów, psów i ludzi: zjedzenie liści może wywołać skurcze brzucha, biegunkę i czerwony mocz; lateks podrażnia skórę."
+      },
       "sourceIds": [
         "ncsu_aloe_vera"
       ]
@@ -1367,8 +1563,20 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "pets": "TOXIC",
-      "children": "TOXIC",
+      "cats": "LOW",
+      "dogs": "LOW",
+      "children": "LOW",
+      "toxicParts": [
+        "LEAVES",
+        "SAP"
+      ],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "Традесканція має низьку токсичність для котів, собак і дітей: при поїданні подразнює рот і шлунок. Листя та сік можуть подразнювати шкіру; RHS називає її шкірним алергеном.",
+        "en": "Tradescantia has low-severity toxicity for cats, dogs and children: eating it irritates the mouth and stomach. Leaves and sap can irritate skin; RHS lists it as a skin allergen.",
+        "ru": "Традесканция обладает низкой токсичностью для кошек, собак и детей: при поедании раздражает рот и желудок. Листья и сок могут раздражать кожу; RHS называет её кожным аллергеном.",
+        "pl": "Trzykrotka ma niską toksyczność dla kotów, psów i dzieci: zjedzona podrażnia usta i żołądek. Liście i sok mogą podrażniać skórę; RHS określa ją jako alergen skórny."
+      },
       "sourceIds": [
         "ncsu_tradescantia_zebrina",
         "rhs_tradescantia_zebrina",
@@ -1459,8 +1667,17 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "pets": "UNKNOWN",
+      "cats": "UNKNOWN",
+      "dogs": "UNKNOWN",
       "children": "UNKNOWN",
+      "toxicParts": [],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "Безпека для тварин і дітей не підтверджена джерелами.",
+        "en": "Safety for pets and children is not confirmed by the sources.",
+        "ru": "Безопасность для животных и детей не подтверждена источниками.",
+        "pl": "Bezpieczeństwo dla zwierząt i dzieci nie jest potwierdzone przez źródła."
+      },
       "sourceIds": []
     },
     "i18n": {
@@ -1547,8 +1764,19 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "pets": "TOXIC",
-      "children": "UNKNOWN",
+      "cats": "SEVERE",
+      "dogs": "SEVERE",
+      "children": "LOW",
+      "toxicParts": [
+        "ALL_PARTS"
+      ],
+      "sourcesDisagree": true,
+      "explanation": {
+        "uk": "Шефлера шкідлива для котів і собак: жування листя подразнює рот і горло, спричиняє слинотечу й блювання. Джерела розходяться щодо тяжкості (низька чи серйозна). Сік може подразнювати шкіру людей.",
+        "en": "Schefflera is harmful to cats and dogs: chewing leaves irritates the mouth and throat, causing drooling and vomiting. Sources disagree on severity (low vs serious). The sap can irritate human skin.",
+        "ru": "Шефлера вредна для кошек и собак: жевание листьев раздражает рот и горло, вызывает слюнотечение и рвоту. Источники расходятся в оценке тяжести (низкая или серьёзная). Сок может раздражать кожу людей.",
+        "pl": "Szeflera jest szkodliwa dla kotów i psów: żucie liści podrażnia usta i gardło, powoduje ślinienie i wymioty. Źródła się różnią co do nasilenia (niskie czy poważne). Sok może podrażniać skórę ludzi."
+      },
       "sourceIds": [
         "ncsu_schefflera_arboricola"
       ]
@@ -1617,7 +1845,8 @@
         "ru": false,
         "pl": false
       }
-    }
+    },
+    "notes": "Розбіжність джерел безпеки (EN): ncsu_schefflera_arboricola is internally inconsistent: Poison Severity field says 'Low', but the description says 'All parts of this plant are seriously toxic to dogs and cats.' The more cautious reading (SEVERE) was chosen for cats/dogs; needs QA. illinois_umbrella_"
   },
   {
     "id": "calathea",
@@ -1634,8 +1863,17 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "pets": "NON_TOXIC",
+      "cats": "NON_TOXIC",
+      "dogs": "NON_TOXIC",
       "children": "UNKNOWN",
+      "toxicParts": [],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "NC State позначає калатею Макоя як нетоксичну для котів і собак (лише тегами). Даних щодо безпеки для дітей у джерелах немає.",
+        "en": "NC State tags Goeppertia makoyana as non-toxic to cats and dogs (tags only). The sources give no information about safety for children.",
+        "ru": "NC State отмечает калатею Макоя как нетоксичную для кошек и собак (только тегами). Данных о безопасности для детей в источниках нет.",
+        "pl": "NC State oznacza kalateę Makoya jako nietoksyczną dla kotów i psów (tylko tagami). Brak danych o bezpieczeństwie dla dzieci."
+      },
       "sourceIds": [
         "ncsu_goeppertia_makoyana"
       ]
@@ -1705,8 +1943,7 @@
         "ru": false,
         "pl": false
       }
-    },
-    "notes": "Безпека для котів і собак лише з тегів NC State (без речення в тексті)."
+    }
   },
   {
     "id": "begonia",
@@ -1723,10 +1960,23 @@
       "soil": "LIGHT_AIRY"
     },
     "safety": {
-      "pets": "TOXIC",
-      "children": "TOXIC",
+      "cats": "LOW",
+      "dogs": "LOW",
+      "children": "LOW",
+      "toxicParts": [
+        "ROOTS",
+        "SAP"
+      ],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "Бегонія має низьку токсичність для котів, собак і дітей: при поїданні можливі блювання та слинотеча. Найотруйніші підземні корені; сік може подразнювати шкіру.",
+        "en": "Begonia has low-severity toxicity for cats, dogs and children: eating it may cause vomiting and salivation. The underground roots are the most toxic part; the sap can irritate skin.",
+        "ru": "Бегония обладает низкой токсичностью для кошек, собак и детей: при поедании возможны рвота и слюнотечение. Наиболее ядовиты подземные корни; сок может раздражать кожу.",
+        "pl": "Begonia ma niską toksyczność dla kotów, psów i dzieci: zjedzenie może wywołać wymioty i ślinienie. Najbardziej trujące są korzenie; sok może podrażniać skórę."
+      },
       "sourceIds": [
-        "ncsu_begonia_cane_types"
+        "ncsu_begonia_cane_types",
+        "rhs_begonia_maculata"
       ]
     },
     "i18n": {
@@ -1793,8 +2043,7 @@
         "ru": false,
         "pl": false
       }
-    },
-    "notes": "Джерело безпеки (NC State) описує групу бегоній, де B. maculata згадана як сорт; перевірити QA."
+    }
   },
   {
     "id": "pilea_peperomioides",
@@ -1811,8 +2060,17 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "pets": "NON_TOXIC",
+      "cats": "NON_TOXIC",
+      "dogs": "NON_TOXIC",
       "children": "NON_TOXIC",
+      "toxicParts": [],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "За даними NC State, рослина безпечна для домашніх тварин і дітей. Друге джерело (PSU) токсичність не згадує.",
+        "en": "According to NC State, the plant is safe for pets and children. The second source (PSU) does not mention toxicity.",
+        "ru": "По данным NC State, растение безопасно для домашних животных и детей. Второй источник (PSU) токсичность не упоминает.",
+        "pl": "Według NC State roślina jest bezpieczna dla zwierząt domowych i dzieci. Drugie źródło (PSU) nie wspomina o toksyczności."
+      },
       "sourceIds": [
         "ncsu_pilea"
       ]
@@ -1898,8 +2156,17 @@
       "soil": "ORCHID_BARK"
     },
     "safety": {
-      "pets": "NON_TOXIC",
+      "cats": "NON_TOXIC",
+      "dogs": "NON_TOXIC",
       "children": "UNKNOWN",
+      "toxicParts": [],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "NC State позначає фаленопсис як нетоксичний для котів і собак. Даних про безпеку для дітей у джерелах немає.",
+        "en": "NC State tags Phalaenopsis as non-toxic for cats and dogs. The sources give no data on safety for children.",
+        "ru": "NC State отмечает фаленопсис как нетоксичный для кошек и собак. Данных о безопасности для детей в источниках нет.",
+        "pl": "NC State oznacza falenopsis jako nietoksyczny dla kotów i psów. Źródła nie podają danych o bezpieczeństwie dla dzieci."
+      },
       "sourceIds": [
         "ncsu_phalaenopsis"
       ]
@@ -1967,8 +2234,7 @@
         "ru": false,
         "pl": false
       }
-    },
-    "notes": "Картка на рівні роду/групи гібридів; безпека для котів і собак лише з тегів NC State."
+    }
   },
   {
     "id": "ficus_lyrata",
@@ -1985,8 +2251,24 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "pets": "TOXIC",
-      "children": "TOXIC",
+      "cats": "LOW",
+      "dogs": "LOW",
+      "children": "LOW",
+      "toxicParts": [
+        "LEAVES",
+        "STEMS",
+        "SAP",
+        "ROOTS",
+        "FLOWERS",
+        "FRUIT"
+      ],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "За NC State рослина слабкотоксична для котів, собак і дітей: усі частини, зокрема сік, містять оксалати кальцію, що подразнюють рот при поїданні.",
+        "en": "NC State rates it low-severity toxic for cats, dogs and children: all parts, including sap, contain calcium oxalates that irritate the mouth if eaten.",
+        "ru": "По NC State растение слаботоксично для кошек, собак и детей: все части, включая сок, содержат оксалаты кальция, раздражающие рот при поедании.",
+        "pl": "Według NC State roślina jest słabo toksyczna dla kotów, psów i dzieci: wszystkie części, w tym sok, zawierają szczawiany wapnia drażniące usta po zjedzeniu."
+      },
       "sourceIds": [
         "ncsu_ficus"
       ]
@@ -2069,8 +2351,17 @@
       "soil": "AROID_MIX"
     },
     "safety": {
-      "pets": "NON_TOXIC",
+      "cats": "NON_TOXIC",
+      "dogs": "NON_TOXIC",
       "children": "UNKNOWN",
+      "toxicParts": [],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "NC State позначає хойю як нетоксичну для котів і собак. Даних про безпеку для дітей у джерелах немає.",
+        "en": "NC State tags Hoya carnosa as non-toxic for cats and dogs. The sources give no data on safety for children.",
+        "ru": "NC State отмечает хойю как нетоксичную для кошек и собак. Данных о безопасности для детей в источниках нет.",
+        "pl": "NC State oznacza hoję jako nietoksyczną dla kotów i psów. Źródła nie podają danych o bezpieczeństwie dla dzieci."
+      },
       "sourceIds": [
         "ncsu_hoya"
       ]
@@ -2138,8 +2429,7 @@
         "ru": false,
         "pl": false
       }
-    },
-    "notes": "Безпека для котів і собак лише з тегів NC State (без речення в тексті)."
+    }
   },
   {
     "id": "nephrolepis_exaltata",
@@ -2156,8 +2446,17 @@
       "soil": "MOISTURE_RETAINING"
     },
     "safety": {
-      "pets": "NON_TOXIC",
+      "cats": "NON_TOXIC",
+      "dogs": "NON_TOXIC",
       "children": "UNKNOWN",
+      "toxicParts": [],
+      "sourcesDisagree": false,
+      "explanation": {
+        "uk": "NC State позначає нефролепіс як нетоксичний для котів і собак. Даних про безпеку для дітей у джерелах немає.",
+        "en": "NC State tags Boston fern as non-toxic for cats and dogs. The sources give no data on safety for children.",
+        "ru": "NC State отмечает нефролепис как нетоксичный для кошек и собак. Данных о безопасности для детей в источниках нет.",
+        "pl": "NC State oznacza nefrolepis jako nietoksyczny dla kotów i psów. Źródła nie podają danych o bezpieczeństwie dla dzieci."
+      },
       "sourceIds": [
         "ncsu_nephrolepis"
       ]
@@ -2225,7 +2524,6 @@
         "ru": false,
         "pl": false
       }
-    },
-    "notes": "Безпека для котів і собак лише з тегів NC State; джерела розходяться щодо родини (Lomariopsidaceae/Polypodiaceae)."
+    }
   }
 ]

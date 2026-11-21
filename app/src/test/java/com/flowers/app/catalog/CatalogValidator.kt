@@ -36,12 +36,22 @@ object CatalogValidator {
     val LEVELS = listOf("NON_TOXIC", "LOW", "MODERATE", "SEVERE", "TOXIC", "UNKNOWN")
     private val TOXIC_LEVELS = setOf("LOW", "MODERATE", "SEVERE", "TOXIC")
     val PARTS = listOf("LEAVES", "STEMS", "SAP", "ROOTS", "BULBS", "FLOWERS", "FRUIT", "BERRIES", "SEEDS", "ALL_PARTS", "UNSPECIFIED")
+    /** Вузькі маркери «джерела розходяться» (без хибних збігів на «Different parts», «różni się zależnie od części»). */
     private val DISAGREE_MARKERS = mapOf(
-        "uk" to Regex("розходят|не збігаються", RegexOption.IGNORE_CASE),
-        "ru" to Regex("расходят|не совпадают", RegexOption.IGNORE_CASE),
-        "pl" to Regex("różni|rozbieżn|sprzeczn", RegexOption.IGNORE_CASE),
-        "en" to Regex("disagree|differ|conflict", RegexOption.IGNORE_CASE)
+        "uk" to Regex("(джерел\\p{L}*|дані|даних)[^.]{0,40}(розходят|не збігаються)|розходят", RegexOption.IGNORE_CASE),
+        "ru" to Regex("(источник\\p{L}*|данные)[^.]{0,40}(расходят|не совпадают)|расходят", RegexOption.IGNORE_CASE),
+        "pl" to Regex("(źródł\\p{L}*|dane|danych)[^.]{0,40}(różni|rozbieżn|sprzeczn)", RegexOption.IGNORE_CASE),
+        "en" to Regex("(sources?|data)\\s+(disagree|differ|conflict)|conflicting (sources|data)", RegexOption.IGNORE_CASE)
     )
+    /** Нейтральний текст для картки, де всі рівні UNKNOWN. */
+    private val UNKNOWN_MARKERS = mapOf(
+        "uk" to Regex("не підтверджен", RegexOption.IGNORE_CASE),
+        "ru" to Regex("не подтвержд", RegexOption.IGNORE_CASE),
+        "pl" to Regex("nie jest potwierdz|nie potwierdz|niepotwierdz", RegexOption.IGNORE_CASE),
+        "en" to Regex("not confirmed", RegexOption.IGNORE_CASE)
+    )
+    private val UK_FORBIDDEN = Regex("[ыэёъ]")
+    private val RU_FORBIDDEN = Regex("[іїєґ]")
     private val EXPLANATION_LEN = 15..250
     const val SCHEMA = 2
     val SOURCE_KINDS = listOf("extension", "botanical", "society", "other")
@@ -232,9 +242,16 @@ object CatalogValidator {
             for (lang in LANGS) {
                 val t = ex.str(lang, "$sw.explanation.$lang", errors, EXPLANATION_LEN) ?: continue
                 val cyr = CYRILLIC.containsMatchIn(t)
-                if ((lang == "uk" || lang == "ru") && !cyr) errors += "$sw.explanation.$lang: очікується кирилиця"
+                if ((lang == "uk" || lang == "ru") && (!cyr || t.count { CYRILLIC.matches(it.toString()) } * 2 <= t.count { it.isLetter() })) {
+                    errors += "$sw.explanation.$lang: очікується переважно кирилиця"
+                }
+                if (lang == "uk" && UK_FORBIDDEN.containsMatchIn(t.lowercase())) errors += "$sw.explanation.$lang: російські літери (ы э ё ъ) в українському тексті"
+                if (lang == "ru" && RU_FORBIDDEN.containsMatchIn(t.lowercase())) errors += "$sw.explanation.$lang: українські літери (і ї є ґ) у російському тексті"
                 if ((lang == "en" || lang == "pl") && NON_LATIN.containsMatchIn(t)) errors += "$sw.explanation.$lang: кирилиця або грецькі літери"
-                if (disagrees && !DISAGREE_MARKERS.getValue(lang).containsMatchIn(t)) errors += "$sw.explanation.$lang: при sourcesDisagree=true пояснення має прямо сказати, що джерела розходяться"
+                val saysDisagree = DISAGREE_MARKERS.getValue(lang).containsMatchIn(t)
+                if (disagrees && !saysDisagree) errors += "$sw.explanation.$lang: при sourcesDisagree=true пояснення має прямо сказати, що джерела розходяться"
+                if (!disagrees && saysDisagree) errors += "$sw.explanation.$lang: пояснення згадує розбіжність джерел, але sourcesDisagree=false"
+                if (!anyClaim && !UNKNOWN_MARKERS.getValue(lang).containsMatchIn(t)) errors += "$sw.explanation.$lang: для всіх UNKNOWN потрібен нейтральний текст «не підтверджено джерелами»"
             }
         }
         s.get("aspcaUrl")?.let { u ->

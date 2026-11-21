@@ -438,6 +438,35 @@ class CatalogValidatorTest {
         assertHas(safetyErrors { it.remove("explanation") }, "немає поля 'explanation'")
     }
 
+    @Test fun `wrong script and letters in explanation are rejected`() {
+        assertHas(safetyErrors { it.getAsJsonObject("explanation").addProperty("uk", "Безпека для тварин і дітей не підтверджена, это ещё нужно проверить.") }, "російські літери")
+        assertHas(safetyErrors { it.getAsJsonObject("explanation").addProperty("ru", "Безопасность для тварин і дітей не подтверждена джерелами") }, "українські літери")
+        assertHas(safetyErrors { it.getAsJsonObject("explanation").addProperty("uk", "Safety for pets and children is not confirmed я") }, "переважно кирилиця")
+    }
+
+    @Test fun `disagreement markers are narrow and reverse checked`() {
+        // «Different parts» не є розбіжністю джерел
+        val e = errorsFor {
+            toxicSafety(it)
+            val sf = it.getAsJsonObject("safety")
+            sf.add("explanation", JsonParser.parseString(
+                """{"uk": "Низька тяжкість для котів і собак; різні частини отруйні однаково.", "en": "Low severity. Different parts are poisonous to a different degree.",
+                    "ru": "Низкая тяжесть для кошек и собак; разные части ядовиты.", "pl": "Niskie nasilenie; to się różni się zależnie od części rośliny."}"""))
+        }
+        assertEquals(emptyList<String>(), e)
+        // згадка розбіжності при sourcesDisagree=false
+        val e2 = errorsFor {
+            toxicSafety(it)
+            it.getAsJsonObject("safety").getAsJsonObject("explanation").addProperty("en", "Low severity, but the sources disagree about it somewhat.")
+        }
+        assertHas(e2, "але sourcesDisagree=false")
+    }
+
+    @Test fun `all unknown needs the neutral text`() = assertHas(
+        safetyErrors { it.getAsJsonObject("explanation").addProperty("en", "Highly toxic to every pet and child at all times.") },
+        "нейтральний текст"
+    )
+
     @Test fun `schema one manifest is rejected`() = assertHas(
         CatalogValidator.validate("{\"contentVersion\":0,\"schema\":1,\"batches\":[]}", sourcesJson, emptyMap()), "manifest.schema"
     )

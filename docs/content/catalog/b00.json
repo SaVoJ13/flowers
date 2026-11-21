@@ -16,16 +16,16 @@
     "safety": {
       "cats": "MODERATE",
       "dogs": "MODERATE",
-      "children": "MODERATE",
+      "children": "TOXIC",
       "toxicParts": [
         "LEAVES"
       ],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "Помірно токсичний для котів і собак; отруйне листя (оксалат кальцію), при поїданні у великій кількості можливі блювання та діарея. Для людей тяжкість середня.",
-        "en": "Moderately toxic to cats and dogs; the leaves contain calcium oxalate and may cause vomiting and diarrhea if eaten in quantity. Medium severity for people.",
-        "ru": "Умеренно токсичен для кошек и собак; ядовиты листья (оксалат кальция), при поедании в большом количестве возможны рвота и диарея. Для людей тяжесть средняя.",
-        "pl": "Umiarkowanie toksyczny dla kotów i psów; liście zawierają szczawian wapnia i zjedzone w większej ilości mogą wywołać wymioty i biegunkę. Średnia szkodliwość dla ludzi."
+        "uk": "Помірно токсичний для котів і собак; отруйне листя (оксалат кальцію), при поїданні у великій кількості можливі блювання та діарея. Для людей джерела вказують шкоду без чіткої тяжкості.",
+        "en": "Moderately toxic to cats and dogs; the leaves contain calcium oxalate and may cause vomiting and diarrhea if eaten in quantity. Sources call it harmful to people without a clear severity.",
+        "ru": "Умеренно токсичен для кошек и собак; листья содержат оксалат кальция, при поедании в большом количестве возможны рвота и диарея. Для людей источники указывают вред без чёткой тяжести.",
+        "pl": "Umiarkowanie trujący dla kotów i psów; liście zawierają szczawian wapnia, po zjedzeniu większej ilości możliwe wymioty i biegunka. Dla ludzi źródła wskazują szkodliwość bez jasnego nasilenia."
       },
       "sourceIds": [
         "ncsu_zz",
@@ -238,10 +238,10 @@
       ],
       "sourcesDisagree": true,
       "explanation": {
-        "uk": "Токсичний для котів, собак і дітей через оксалат кальцію: подразнення рота, слинотеча, блювання. Отруйні всі частини. Джерела розходяться щодо тяжкості (середня чи слабка).",
-        "en": "Toxic to cats, dogs and children due to calcium oxalate: mouth irritation, drooling, vomiting. All parts are listed. Sources disagree on severity (medium vs mild).",
-        "ru": "Токсичен для кошек, собак и детей из-за оксалата кальция: раздражение рта, слюнотечение, рвота. Ядовиты все части. Источники расходятся в оценке тяжести (средняя или слабая).",
-        "pl": "Toksyczny dla kotów, psów i dzieci z powodu szczawianu wapnia: podrażnienie jamy ustnej, ślinienie, wymioty. Trujące są wszystkie części. Źródła się różnią co do nasilenia."
+        "uk": "Токсичний для котів, собак і дітей через оксалат кальцію: подразнення рота, слинотеча, блювання. Отруйні листя, стебла, корені, квіти, плоди й насіння. Джерела розходяться щодо тяжкості (середня чи слабка).",
+        "en": "Toxic to cats, dogs and children due to calcium oxalate: mouth irritation, drooling, vomiting. Leaves, stems, roots, flowers, fruit and seeds are toxic. Sources disagree on severity (medium vs mild).",
+        "ru": "Токсичен для кошек, собак и детей из-за оксалата кальция: раздражение рта, слюнотечение, рвота. Ядовиты листья, стебли, корни, цветки, плоды и семена. Источники расходятся в оценке тяжести (средняя или слабая).",
+        "pl": "Trujący dla kotów, psów i dzieci z powodu szczawianu wapnia: podrażnienie jamy ustnej, ślinotok, wymioty. Trujące są liście, łodygi, korzenie, kwiaty, owoce i nasiona. Źródła różnią się co do nasilenia (średnie lub łagodne)."
       },
       "sourceIds": [
         "ncsu_pothos",
@@ -314,7 +314,7 @@
         "pl": false
       }
     },
-    "notes": "Розбіжність джерел безпеки (EN): Severity differs: ncsu_pothos rates poison severity Medium (Problem for Cats/Dogs, Poisonous to Humans), while clemson_pothos says \"All parts of a pothos are mildly toxic if ingested\" and to keep it from children and pets. The more cautious MODERATE is used."
+    "notes": "Розбіжність джерел щодо тяжкості (NC State Medium, Clemson «mildly toxic»); докладно: drafts/safety.evidence.json."
   },
   {
     "id": "monstera",
@@ -740,7 +740,7 @@
     "safety": {
       "cats": "TOXIC",
       "dogs": "TOXIC",
-      "children": "LOW",
+      "children": "TOXIC",
       "toxicParts": [
         "SAP"
       ],
@@ -949,19 +949,22 @@
       "dogs": "LOW",
       "children": "LOW",
       "toxicParts": [
+        "FLOWERS",
         "FRUIT",
         "LEAVES",
-        "SAP"
+        "ROOTS",
+        "SAP",
+        "STEMS"
       ],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "Слабко токсична для котів і собак при поїданні (сапоніни): слабкість, слинотеча, блювання; у котів розширені зіниці. Деякі драцени токсичні й для людей. Отруйні листя, плоди, сік.",
-        "en": "Low-severity toxicity for cats and dogs if eaten (saponins): weakness, drooling, vomiting; cats may have dilated pupils. Some dracaenas are toxic to people. Leaves, fruit, sap.",
-        "ru": "Слабо токсична для кошек и собак при поедании (сапонины): слабость, слюнотечение, рвота; у кошек расширенные зрачки. Некоторые драцены токсичны и для людей. Ядовиты листья, плоды, сок.",
-        "pl": "Słabo toksyczna dla kotów i psów po zjedzeniu (saponiny): osłabienie, ślinienie, wymioty; u kotów rozszerzone źrenice. Niektóre dracenki są toksyczne dla ludzi. Liście, owoce, sok."
+        "uk": "Слабко токсична для котів, собак і людей при поїданні (сапоніни): слабкість, слинотеча, блювання; у котів розширені зіниці. Отруйні листя, стебла, корені, квіти, плоди й сік.",
+        "en": "Low-severity toxicity for cats, dogs and people if eaten (saponins): weakness, drooling, vomiting; cats may have dilated pupils. Leaves, stems, roots, flowers, fruit and sap are toxic.",
+        "ru": "Слабо токсична для кошек, собак и людей при поедании (сапонины): слабость, слюнотечение, рвота; у кошек расширены зрачки. Ядовиты листья, стебли, корни, цветки, плоды и сок.",
+        "pl": "Słabo trująca dla kotów, psów i ludzi po zjedzeniu (saponiny): osłabienie, ślinotok, wymioty; u kotów rozszerzone źrenice. Trujące są liście, łodygi, korzenie, kwiaty, owoce i sok."
       },
       "sourceIds": [
-        "ncsu_dracaena_reflexa"
+        "ncsu_dracaena_reflexa_angustifolia"
       ]
     },
     "i18n": {
@@ -1020,7 +1023,7 @@
     },
     "sourceIds": [
       "clemson_dracaena",
-      "ncsu_dracaena_reflexa"
+      "ncsu_dracaena_reflexa_angustifolia"
     ],
     "review": {
       "authoredBy": "agent-sonnet",
@@ -1033,7 +1036,7 @@
         "pl": false
       }
     },
-    "notes": "Джерело NC State описує Dracaena reflexa var. angustifolia, у якому D. marginata зазначена як попередня назва таксона; догляд за двома джерелами."
+    "notes": "Сторінка NC State (var. angustifolia) називає D. marginata попередньою назвою таксона."
   },
   {
     "id": "peperomia",
@@ -1358,7 +1361,7 @@
     "safety": {
       "cats": "MODERATE",
       "dogs": "MODERATE",
-      "children": "UNKNOWN",
+      "children": "MODERATE",
       "toxicParts": [
         "LEAVES",
         "STEMS",
@@ -1369,10 +1372,10 @@
       ],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "Сингоніум має середню токсичність для котів і собак: оксалат кальцію подразнює рот, спричиняє слинотечу й блювання. Отруйні листя, стебла, корені, квіти, насіння та сік. Даних щодо дітей немає.",
-        "en": "Syngonium has medium-severity toxicity for cats and dogs: calcium oxalate irritates the mouth, causing drooling and vomiting. Leaves, stems, roots, flowers, seeds and sap are toxic. No data on children.",
-        "ru": "Сингониум обладает средней токсичностью для кошек и собак: оксалат кальция раздражает рот, вызывает слюнотечение и рвоту. Ядовиты листья, стебли, корни, цветы, семена и сок. Данных о детях нет.",
-        "pl": "Zroślicha ma średnią toksyczność dla kotów i psów: szczawian wapnia podrażnia usta, powoduje ślinienie i wymioty. Trujące są liście, łodygi, korzenie, kwiaty, nasiona i sok. Brak danych o dzieciach."
+        "uk": "Сингоніум має середню токсичність для котів, собак і людей: оксалат кальцію подразнює рот, спричиняє слинотечу й блювання. Отруйні листя, стебла, корені, квіти, насіння та сік.",
+        "en": "Syngonium has medium-severity toxicity for cats, dogs and people: calcium oxalate irritates the mouth, causing drooling and vomiting. Leaves, stems, roots, flowers, seeds and sap are toxic.",
+        "ru": "Сингониум имеет среднюю токсичность для кошек, собак и людей: оксалат кальция раздражает рот, вызывает слюнотечение и рвоту. Ядовиты листья, стебли, корни, цветки, семена и сок.",
+        "pl": "Zroślicha ma średnią toksyczność dla kotów, psów i ludzi: szczawian wapnia podrażnia jamę ustną, powoduje ślinotok i wymioty. Trujące są liście, łodygi, korzenie, kwiaty, nasiona i sok."
       },
       "sourceIds": [
         "ncsu_syngonium_podophyllum",
@@ -1772,10 +1775,10 @@
       ],
       "sourcesDisagree": true,
       "explanation": {
-        "uk": "Шефлера шкідлива для котів і собак: жування листя подразнює рот і горло, спричиняє слинотечу й блювання. Джерела розходяться щодо тяжкості (низька чи серйозна). Сік може подразнювати шкіру людей.",
-        "en": "Schefflera is harmful to cats and dogs: chewing leaves irritates the mouth and throat, causing drooling and vomiting. Sources disagree on severity (low vs serious). The sap can irritate human skin.",
-        "ru": "Шефлера вредна для кошек и собак: жевание листьев раздражает рот и горло, вызывает слюнотечение и рвоту. Источники расходятся в оценке тяжести (низкая или серьёзная). Сок может раздражать кожу людей.",
-        "pl": "Szeflera jest szkodliwa dla kotów i psów: żucie liści podrażnia usta i gardło, powoduje ślinienie i wymioty. Źródła się różnią co do nasilenia (niskie czy poważne). Sok może podrażniać skórę ludzi."
+        "uk": "Шефлера шкідлива для котів і собак: жування листя подразнює рот і горло, викликає слинотечу й блювання. Дані джерела NC State не збігаються (низька чи серйозна тяжкість); показано обережніший варіант.",
+        "en": "Schefflera is harmful to cats and dogs: chewing leaves irritates the mouth and throat, causing drooling and vomiting. The NC State data disagree (low vs serious severity); the cautious level is shown.",
+        "ru": "Шеффлера вредна для кошек и собак: жевание листьев раздражает рот и горло, вызывает слюнотечение и рвоту. Данные источника NC State расходятся (низкая или серьёзная тяжесть); показан более осторожный вариант.",
+        "pl": "Szeflera jest szkodliwa dla kotów i psów: żucie liści podrażnia jamę ustną i gardło, powoduje ślinotok i wymioty. Dane źródła NC State się różnią (niskie lub poważne nasilenie); pokazano ostrożniejszy wariant."
       },
       "sourceIds": [
         "ncsu_schefflera_arboricola"
@@ -1846,7 +1849,7 @@
         "pl": false
       }
     },
-    "notes": "Розбіжність джерел безпеки (EN): ncsu_schefflera_arboricola is internally inconsistent: Poison Severity field says 'Low', but the description says 'All parts of this plant are seriously toxic to dogs and cats.' The more cautious reading (SEVERE) was chosen for cats/dogs; needs QA. illinois_umbrella_"
+    "notes": "Суперечність усередині сторінки NC State (Poison Severity Low проти «seriously toxic»): обережніший рівень; докладно: drafts/safety.evidence.json."
   },
   {
     "id": "calathea",
@@ -2043,7 +2046,8 @@
         "ru": false,
         "pl": false
       }
-    }
+    },
+    "notes": "Сторінка NC State про безпеку описує групу тростинних бегоній, де B. maculata згадана як сорт."
   },
   {
     "id": "pilea_peperomioides",
@@ -2234,7 +2238,8 @@
         "ru": false,
         "pl": false
       }
-    }
+    },
+    "notes": "Картка на рівні роду/групи гібридів."
   },
   {
     "id": "ficus_lyrata",
@@ -2524,6 +2529,7 @@
         "ru": false,
         "pl": false
       }
-    }
+    },
+    "notes": "Джерела розходяться щодо родини (Lomariopsidaceae/Polypodiaceae)."
   }
 ]

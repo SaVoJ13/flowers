@@ -90,7 +90,8 @@
         "ru": false,
         "pl": false
       }
-    }
+    },
+    "notes": "Сторінка NC State про сорт Meyer (Citrus x limon)."
   },
   {
     "id": "ocimum_basilicum",
@@ -302,8 +303,8 @@
       ],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "За NC State м'ята колоса слабкотоксична для котів і собак (ефірні олії; блювання й діарея при поїданні великої кількості). RHS зазначає, що м'ята болотна (M. pulegium) шкідлива при поїданні.",
-        "en": "NC State rates spearmint low-severity toxic for cats and dogs (essential oils; vomiting and diarrhoea after large amounts). RHS notes pennyroyal (M. pulegium) is harmful if eaten.",
+        "uk": "За NC State м'ята колосиста слабкотоксична для котів і собак (ефірні олії; блювання й діарея при поїданні великої кількості). RHS зазначає, що м'ята болотна (M. pulegium) шкідлива при поїданні.",
+        "en": "NC State rates spearmint low-severity toxic for cats and dogs (essential oils; vomiting and diarrhea after large amounts). RHS notes pennyroyal (M. pulegium) is harmful if eaten.",
         "ru": "По NC State мята колосовая слаботоксична для кошек и собак (эфирные масла; рвота и диарея при поедании большого количества). RHS отмечает, что мята болотная (M. pulegium) вредна при поедании.",
         "pl": "Według NC State mięta zielona jest słabo toksyczna dla kotów i psów (olejki eteryczne; wymioty i biegunka po zjedzeniu dużej ilości). RHS podaje, że mięta polej (M. pulegium) jest szkodliwa po zjedzeniu."
       },
@@ -373,7 +374,7 @@
         "pl": false
       }
     },
-    "notes": "Картка на рівні роду (еталон у джерелах M. spicata); для котів і собак NC State позначає низьку тяжкість (ефірні олії), RHS окремо називає M. pulegium шкідливою; для людей і дітей явного твердження немає."
+    "notes": "Картка на рівні роду (еталон у джерелах M. spicata); RHS окремо називає M. pulegium шкідливою."
   },
   {
     "id": "dracaena_fragrans",
@@ -492,7 +493,7 @@
     "safety": {
       "cats": "LOW",
       "dogs": "LOW",
-      "children": "UNKNOWN",
+      "children": "LOW",
       "toxicParts": [
         "FRUIT",
         "LEAVES",
@@ -500,10 +501,10 @@
       ],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "Токсична для котів і собак у разі поїдання, тяжкість низька (NC State). Отруйні листя, плоди й сік. Дані щодо дітей для цього виду не підтверджені.",
-        "en": "Toxic to cats and dogs if eaten, low severity (NC State). Leaves, fruits and sap are poisonous. Data for children are not confirmed for this species.",
-        "ru": "Токсична для кошек и собак при поедании, тяжесть низкая (NC State). Ядовиты листья, плоды и сок. Данные для детей по этому виду не подтверждены.",
-        "pl": "Toksyczna dla kotów i psów po zjedzeniu, niskie nasilenie (NC State). Trujące są liście, owoce i sok. Dane dla dzieci nie są potwierdzone dla tego gatunku."
+        "uk": "Токсична для котів, собак і людей у разі поїдання, тяжкість низька (NC State): подразнення рота й горла. Отруйні листя, плоди й сік.",
+        "en": "Toxic to cats, dogs and people if eaten, low severity (NC State): mouth and throat irritation. Leaves, fruit and sap are poisonous.",
+        "ru": "Токсична для кошек, собак и людей при поедании, тяжесть низкая (NC State): раздражение рта и горла. Ядовиты листья, плоды и сок.",
+        "pl": "Trująca dla kotów, psów i ludzi po zjedzeniu, niskie nasilenie (NC State): podrażnienie jamy ustnej i gardła. Trujące są liście, owoce i sok."
       },
       "sourceIds": [
         "ncsu_dracaena_reflexa"
@@ -893,7 +894,7 @@
       ],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "Низька тяжкість (NC State): для котів можливий розлад травлення. Отруйні лише насіння, можливо канцерогенні для людей; кімнатні рослини насіння не дають. Дані щодо собак відсутні.",
+        "uk": "Низька тяжкість (NC State): для котів можливий розлад травлення. Отруйне лише насіння, можливо, канцерогенне для людей; кімнатні рослини насіння не дають. Дані щодо собак відсутні.",
         "en": "Low severity (NC State): may cause digestive upset in cats. Only the seeds are poisonous, possibly carcinogenic to people; houseplants never produce seeds. No data for dogs.",
         "ru": "Низкая тяжесть (NC State): у кошек возможно расстройство пищеварения. Ядовиты только семена, возможно канцерогенные для людей; комнатные растения семян не дают. Данных о собаках нет.",
         "pl": "Niskie nasilenie (NC State): u kotów możliwe zaburzenia trawienia. Trujące są tylko nasiona, możliwie rakotwórcze dla ludzi; rośliny doniczkowe nie wydają nasion. Brak danych o psach."
@@ -1453,7 +1454,8 @@
         "ru": false,
         "pl": false
       }
-    }
+    },
+    "notes": "Одне з джерел описує догляд за філодендроном; Rhaphidophora згадано як близьку рослину."
   },
   {
     "id": "philodendron_bipinnatifidum",
@@ -2152,7 +2154,8 @@
         "ru": false,
         "pl": false
       }
-    }
+    },
+    "notes": "Сторінка NC State про синонім Cissus alata."
   },
   {
     "id": "asparagus_setaceus",
@@ -2179,7 +2182,7 @@
       "sourcesDisagree": false,
       "explanation": {
         "uk": "Помірно токсичний для котів, собак і дітей: ягоди при поїданні викликають біль у животі, блювання й діарею; сік подразнює шкіру.",
-        "en": "Moderately toxic to cats, dogs and children: eating the berries causes abdominal pain, vomiting and diarrhoea; the sap irritates skin.",
+        "en": "Moderately toxic to cats, dogs and children: eating the berries causes abdominal pain, vomiting and diarrhea; the sap irritates skin.",
         "ru": "Умеренно токсичен для кошек, собак и детей: ягоды при поедании вызывают боль в животе, рвоту и диарею; сок раздражает кожу.",
         "pl": "Umiarkowanie toksyczny dla kotów, psów i dzieci: zjedzenie jagód powoduje ból brzucha, wymioty i biegunkę; sok drażni skórę."
       },
@@ -2443,6 +2446,6 @@
         "pl": false
       }
     },
-    "notes": "Розбіжність джерел безпеки (EN): ncstate_fatsia tags the plant '#non-toxic for cats' and '#non-toxic for dogs', while rhs_fatsia lists it as 'Potentially harmful' with 'Pets: Fruit are ornamental - not to be eaten'. The more cautious level (TOXIC, severity unspecified) is used. clemson_fatsia has no"
+    "notes": "Теги NC State «non-toxic for cats/dogs» суперечать RHS («Potentially harmful»): взято обережніший рівень; докладно: drafts/safety.evidence.json."
   }
 ]

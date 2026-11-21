@@ -10,9 +10,12 @@
 ## Результат міграції (30 із 50 карток змінили оцінку)
 - Уточнення тяжкості `TOXIC` → `LOW/MODERATE/SEVERE`; `dieffenbachia_seguine` і `schefflera` → `SEVERE` (schefflera: `sourcesDisagree`, суперечність усередині NC State: «Low» проти «seriously toxic»).
 - `pachira_aquatica`: коти `LOW`, собаки `UNKNOWN`, діти `LOW`, лише `SEEDS`.
-- `syngonium`: діти `TOXIC` → `UNKNOWN` (джерела не підтверджують); `fatsia_japonica`: `UNKNOWN` → `TOXIC` з `sourcesDisagree` (RHS «Potentially harmful» проти тегів NC State).
+- `syngonium`: діти `MODERATE` (NC State «Poisonous to Humans», Medium; початкова міграція помилково мала `UNKNOWN`, виправлено за QA); `fatsia_japonica`: `UNKNOWN` → `TOXIC` з `sourcesDisagree` (RHS «Potentially harmful» проти тегів NC State).
 - Без змін: `NON_TOXIC` для котів і собак лишається у chlorophytum, peperomia, calathea, phalaenopsis_hybrid, hoya_carnosa, nephrolepis_exaltata, ocimum_basilicum, salvia_rosmarinus, beaucarnea_recurvata, aspidistra_elatior, cissus_rhombifolia; pilea_peperomioides NON_TOXIC для всіх трьох; `UNKNOWN` лишається в maranta, citrus_limon, cyperus_alternifolius.
 - Судження агентів, які варто перевірити QA: `dracaena_marginata` (NC State описує *D. reflexa*, агент не знайшов в ній *D. marginata*; суперечить попередній примітці), `epipremnum` `sourcesDisagree` (NC State Medium проти Clemson «mildly»), правило «TOXIC без тяжкості + low severity = LOW».
 
 ## Не зроблено
 Імпортер і UI (TASK-037); вибірка Власника; затвердження формату.
+
+## QA (Opus, 20 карток глибоко + 48 сторінок NC State скриптом) → Needs changes → виправлено
+Виправлено: `syngonium` діти → `MODERATE`; `dracaena_marginata` використовувала хибне джерело (var. reflexa), тепер `ncsu_dracaena_reflexa_angustifolia`: діти `LOW`, отруйні частини з джерела; `ficus_elastica` діти `LOW` → `TOXIC` (джерело описує шкоду без названої тяжкості); `zamioculcas` діти `MODERATE` → `TOXIC`; `dracaena_reflexa` діти `UNKNOWN` → `LOW`; правило для дітей записано у FORMAT.md; `notes` перебудовано (без обрізання й англійської суміші, небезпекові примітки повернуто); тексти (`pachira` uk, `mentha` uk «колосиста», `schefflera` ×4, `epipremnum` ×4 узгоджено з `toxicParts`, diarrhea); валідатор: заборона ы э ё ъ / і ї є ґ, переважно кирилиця, вужчі маркери розбіжності, зворотна перевірка, нейтральний текст для всіх UNKNOWN; FORMAT.md: порядок рівнів, що перевіряє QA. Правило суперечностей лишається (виняток QA: джерело без тяжкості з сильнішим формулюванням, напр. «seriously», «fatal», є суперечністю: у наявних картках таких немає).

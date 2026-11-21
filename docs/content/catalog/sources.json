@@ -251,6 +251,12 @@
     "url": "https://plants.ces.ncsu.edu/plants/dracaena-reflexa-var-reflexa",
     "kind": "extension"
   },
+  "ncsu_dracaena_reflexa_angustifolia": {
+    "title": "NC State Extension Plant Toolbox: Dracaena reflexa var. angustifolia (Dracaena marginata)",
+    "publisher": "NC State Extension",
+    "url": "https://plants.ces.ncsu.edu/plants/dracaena-reflexa-var-angustifolia/",
+    "kind": "extension"
+  },
   "ncsu_ds": {
     "title": "Dieffenbachia seguine",
     "publisher": "NC State Extension Plant Toolbox",

@@ -101,7 +101,7 @@
   "dracaena_marginata": {
     "cats": "ncsu_dracaena_reflexa: \"This plant is toxic to cats and dogs if ingested.\"; \"low severity poison characteristics\"; \"Cats may have dilated pupils.\"",
     "dogs": "ncsu_dracaena_reflexa: \"This plant is toxic to cats and dogs if ingested.\"; Poison Severity \"Low\"",
-    "children": "ncsu_dracaena_reflexa: \"Some types of dracaena can be toxic to humans also.\" (hedged; no Problem for Children tag)",
+    "children": "ncsu_dracaena_reflexa_angustifolia (previously known as Dracaena marginata): Problems: Problem for Children; «Toxic to humans, cats, and dogs»; Poison Severity: Low. (Виправлено після QA: раніше хибне джерело var. reflexa.)",
     "disagreementNote": null,
     "changeVsCurrent": "Напрямок той самий; тяжкість LOW. Застереження: оцінка з сторінки D. reflexa var. reflexa, у витягу якої D. marginata не згадана; для дітей твердження ухильне («Some types...»). Clemson про токсичність не пише.",
     "previous": {
@@ -145,7 +145,7 @@
   "syngonium": {
     "cats": "ncsu_syngonium_podophyllum: \"This plant has medium severity poison characteristics.\"; tag \"#problem for cats\"",
     "dogs": "ncsu_syngonium_podophyllum: \"This plant has medium severity poison characteristics.\"; tag \"#problem for dogs\"; clemson: \"Pet Safety: Not pet safe\"",
-    "children": "No 'Problem for Children' or 'Poisonous to Humans' on NC State page; Clemson mentions only pets.",
+    "children": "ncsu_syngonium_podophyllum (поле Problems): Poisonous to Humans; Poison Severity: Medium. (Виправлено після QA: раніше помилково UNKNOWN.)",
     "disagreementNote": null,
     "changeVsCurrent": "Changed: pets TOXIC -> MODERATE (NC State medium severity); children TOXIC -> UNKNOWN because neither source makes an explicit statement about children/humans.",
     "previous": {

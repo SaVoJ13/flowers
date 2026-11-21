@@ -67,6 +67,9 @@ private fun AiReportDialog(plant: CatalogPlantEntity, onDismiss: () -> Unit) {
     var sending by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<String?>(null) }
     var sent by remember { mutableStateOf(false) }
+    var queued by remember { mutableStateOf(false) }
+    // Один ID документа на діалог: повторне надсилання не створює дубль (TASK-048).
+    val docId = remember { app.aiReportRepository.newReportId() }
 
     AlertDialog(
         onDismissRequest = { if (!sending) onDismiss() },
@@ -74,7 +77,7 @@ private fun AiReportDialog(plant: CatalogPlantEntity, onDismiss: () -> Unit) {
         text = {
             Column {
                 if (sent) {
-                    Text(AiReportRepository.MSG_THANKS)
+                    Text(if (queued) AiReportRepository.MSG_QUEUED else AiReportRepository.MSG_THANKS)
                 } else {
                     Text(ReportTexts.REASON_HINT, style = MaterialTheme.typography.labelLarge)
                     Column(Modifier.selectableGroup()) {
@@ -131,8 +134,9 @@ private fun AiReportDialog(plant: CatalogPlantEntity, onDismiss: () -> Unit) {
                             val pods = runCatching { app.repository.getPodsForSpecies(plant.id).first() }
                                 .getOrDefault(emptyList())
                             val report = AiReport.forPlantCard(plant, pods, reason, comment, appVersion(context))
-                            when (val r = app.aiReportRepository.submit(report)) {
+                            when (val r = app.aiReportRepository.submit(docId, report)) {
                                 ReportResult.Sent -> sent = true
+                                ReportResult.Queued -> { queued = true; sent = true }
                                 is ReportResult.Failed -> message = r.message
                             }
                             sending = false

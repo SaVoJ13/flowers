@@ -68,41 +68,79 @@ class AiReportTest {
 
     private fun report() = AiReport.forPlantCard(plant(), emptyList(), ReportReason.WRONG, "", "1.0.0")
 
-    @Test
-    fun `offline does not call sink and returns offline message`() = runBlocking {
-        var called = false
-        val r = AiReportRepository(NetworkChecker { false }, ReportSink { called = true }).submit(report())
-        assertFalse(called)
-        assertEquals(ReportResult.Failed(AiReportRepository.MSG_OFFLINE), r)
+    /** Підроблений Sink: фіксує старти записів; поведінка підтвердження задається. */
+    private class FakeSink(private val ack: suspend () -> Unit = {}, private val failOnStart: Boolean = false) : ReportSink {
+        val started = mutableListOf<Pair<String, Map<String, Any>>>()
+        private var counter = 0
+        override fun newId() = "id${++counter}"
+        override fun start(docId: String, fields: Map<String, Any>): ReportWrite {
+            if (failOnStart) throw IllegalStateException("start failed")
+            started += docId to fields
+            return ReportWrite { ack() }
+        }
     }
 
     @Test
-    fun `online success writes fields once`() = runBlocking {
-        val written = mutableListOf<Map<String, Any>>()
-        val r = AiReportRepository(NetworkChecker { true }, ReportSink { written.add(it) }).submit(report())
+    fun `offline still queues the write and returns queued, not an error`() = runBlocking {
+        val sink = FakeSink()
+        val r = AiReportRepository(NetworkChecker { false }, sink).submit("d1", report())
+        assertEquals(ReportResult.Queued, r)
+        assertEquals(1, sink.started.size)
+        assertEquals("d1", sink.started[0].first)
+    }
+
+    @Test
+    fun `online success writes fields once with given id`() = runBlocking {
+        val sink = FakeSink()
+        val r = AiReportRepository(NetworkChecker { true }, sink).submit("d1", report())
         assertEquals(ReportResult.Sent, r)
-        assertEquals(1, written.size)
-        assertEquals("plant_card", written[0]["feature"])
+        assertEquals(1, sink.started.size)
+        assertEquals("plant_card", sink.started[0].second["feature"])
     }
 
     @Test
-    fun `sink failure returns failed message`() = runBlocking {
-        val r = AiReportRepository(NetworkChecker { true }, ReportSink { throw IllegalStateException("PERMISSION_DENIED") }).submit(report())
+    fun `server rejection returns failed message`() = runBlocking {
+        val sink = FakeSink(ack = { throw IllegalStateException("PERMISSION_DENIED") })
+        val r = AiReportRepository(NetworkChecker { true }, sink).submit("d1", report())
         assertEquals(ReportResult.Failed(AiReportRepository.MSG_FAILED), r)
     }
 
     @Test
-    fun `hanging sink times out`() = runBlocking {
-        val r = AiReportRepository(NetworkChecker { true }, ReportSink { delay(10_000) }, timeoutMs = 50).submit(report())
+    fun `hanging server ack times out into queued, not an error`() = runBlocking {
+        val sink = FakeSink(ack = { delay(10_000) })
+        val r = AiReportRepository(NetworkChecker { true }, sink, timeoutMs = 50).submit("d1", report())
+        assertEquals(ReportResult.Queued, r)
+        assertEquals(1, sink.started.size)
+    }
+
+    @Test
+    fun `failure to start the write is a failure`() = runBlocking {
+        val r = AiReportRepository(NetworkChecker { true }, FakeSink(failOnStart = true)).submit("d1", report())
         assertEquals(ReportResult.Failed(AiReportRepository.MSG_FAILED), r)
+    }
+
+    @Test
+    fun `retry in the same dialog reuses the same document id so no duplicate is created`() = runBlocking {
+        val sink = FakeSink(ack = { delay(10_000) })
+        val repo = AiReportRepository(NetworkChecker { true }, sink, timeoutMs = 20)
+        val id = repo.newReportId()
+        repo.submit(id, report())
+        repo.submit(id, report())
+        assertEquals(listOf(id, id), sink.started.map { it.first })
+        assertEquals(1, sink.started.map { it.first }.toSet().size)
+    }
+
+    @Test
+    fun `new dialog gets a new document id`() {
+        val repo = AiReportRepository(NetworkChecker { true }, FakeSink())
+        assertTrue(repo.newReportId() != repo.newReportId())
     }
 
     @Test
     fun `caller cancellation is not swallowed`() {
+        val sink = FakeSink(ack = { throw CancellationException("cancel") })
         val result = runCatching {
-            runBlocking {
-                AiReportRepository(NetworkChecker { true }, ReportSink { throw CancellationException("cancel") }).submit(report())
-            }
+            runBlocking { AiReportRepository(NetworkChecker { true }, sink).submit("d1", report()) }
         }
         assertTrue(result.exceptionOrNull() is CancellationException)
     }

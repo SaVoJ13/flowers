@@ -128,6 +128,7 @@ private fun AiReportDialog(plant: CatalogPlantEntity, onDismiss: () -> Unit) {
                 TextButton(
                     enabled = !sending,
                     onClick = {
+                        if (sending) return@TextButton
                         sending = true
                         message = null
                         scope.launch {

@@ -211,7 +211,7 @@
           "Потос",
           "Золотистий потос"
         ],
-        "summary": "Витка рослина, яку легко вирощувати: добре росте на яскравому розсіяному світлі й довго витримує слабке. Після обрізання стає пишнішим.",
+        "summary": "Витка рослина, яку легко вирощувати: добре росте на яскравому розсіяному світлі й довго витримує слабке. Після обрізання стає пишнішою.",
         "watering": "Дайте ґрунту просохнути між поливами, а потім поливайте рясно. Постійно мокрий ґрунт призводить до гниття коріння, жовтіння листя й чорніння країв.",
         "light": "Любить яскраве розсіяне світло, а слабке світло терпить довго, але строкате листя в півтіні блякне. Надто сильне сонце теж шкодить.",
         "soil": "Підійде повітряний, добре дренований і багатий на органіку ґрунт. Пересаджуйте раз на один-два роки.",
@@ -403,7 +403,7 @@
         "summary": "An elegant plant with dark leaves and white blooms that copes well with shade. It likes warmth and humid air.",
         "watering": "Keep the soil moist but not soggy, and let it dry slightly between waterings. Watering from below works well. While it grows, misting the leaves also helps.",
         "light": "It prefers partial to deep shade and dislikes direct sun. In very deep shade flowering may weaken.",
-        "soil": "Choose a mix high in organic matter and a large pot, letting the roots stay a little snug.",
+        "soil": "Choose a mix high in organic matter and a pot that is not too large, so the roots stay a little snug.",
         "tip": "Brown leaf tips come from too much direct sun, dry soil or dry air. Wipe the leaves, feed monthly while it grows, and watch out for mealybugs."
       },
       "ru": {
@@ -427,7 +427,7 @@
         "summary": "Elegancka roślina o ciemnych liściach i białych pochwach kwiatowych, która dobrze znosi cień. Lubi ciepło i wilgotne powietrze.",
         "watering": "Utrzymuj podłoże wilgotne, ale nie rozmokłe, i pozwól mu lekko przeschnąć między podlewaniami. Można podlewać od dołu. W okresie wzrostu dobrze też zraszać liście.",
         "light": "Woli półcień, a nawet głęboki cień, nie lubi bezpośredniego słońca. W bardzo głębokim cieniu kwitnienie może osłabnąć.",
-        "soil": "Sprawdzi się podłoże bogate w materię organiczną w dużej doniczce; korzenie powinny być trochę ściśnięte.",
+        "soil": "Sprawdzi się podłoże bogate w materię organiczną w niezbyt dużej doniczce; korzenie powinny być trochę ściśnięte.",
         "tip": "Brązowe końcówki liści pojawiają się od zbyt ostrego słońca, przesuszenia lub suchego powietrza. Przecieraj liście, nawoź co miesiąc w okresie wzrostu i pilnuj, czy nie ma wełnowców."
       }
     },
@@ -1205,7 +1205,7 @@
         "watering": "Давайте субстрату трохи підсохнути між поливами, але не допускайте повного пересихання. Орієнтуйтеся на стан ґрунту, а не на дату в календарі.",
         "light": "Підходить яскраве або помірне розсіяне світло чи півтінь. Повне сонце випалює або вибілює листя. Строкатим формам світла потрібно більше.",
         "soil": "Добре підходить суміш у рівних частках торфу або кокосового волокна, вермикуліту та перліту: вона вологоємна, але легка.",
-        "tip": "Якщо листя стає однотонно зеленим, світла замало: пересуньте рослину ближче до вікна. Висока вологість повітря йому до душі."
+        "tip": "Якщо листя стає однотонно зеленим, світла замало: пересуньте рослину ближче до вікна. Висока вологість повітря їй до душі."
       },
       "en": {
         "name": "Arrowhead vine",
@@ -1473,7 +1473,7 @@
         "summary": "Декоративнолистяна рослина з візерунчастим листям. Любить вологе повітря, тому потребує трохи більше уваги.",
         "watering": "Підтримуйте ґрунт рівномірно вологим у сезон росту, а взимку поливайте рідше. Не лишайте воду в розетці стебел, бо вони легко гниють.",
         "light": "Підходить яскраве розсіяне або непряме світло. Від надлишку сонця листя вицвітає.",
-        "soil": "Звичайний субстрат для кімнатних рослин, що лишається вологим. Погано дренований ґрунт веде до загнивання коренів.",
+        "soil": "Звичайний субстрат для кімнатних рослин, що лишається вологим. Погано дренований ґрунт призводить до загнивання коренів.",
         "tip": "Рослині потрібне вологе повітря: ставте горщик на піддон із мокрим камінням або зволожуйте кімнату. Надлишок добрив і фтор обпікають листя."
       },
       "en": {

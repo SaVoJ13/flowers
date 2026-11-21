@@ -44,7 +44,9 @@ class CatalogValidatorTest {
         {
           "id": "$id", "latin": "Testus plantus", "family": "Testaceae", "retired": false, "replacedBy": null,
           "care": {"difficulty": "EASY", "lightMin": "MEDIUM", "lightMax": "HIGH", "checkIntervalDays": 7, "humidity": "MEDIUM", "soil": "UNIVERSAL"},
-          "safety": {"pets": "UNKNOWN", "children": "UNKNOWN", "sourceIds": []},
+          "safety": {"cats": "UNKNOWN", "dogs": "UNKNOWN", "children": "UNKNOWN", "toxicParts": [], "sourcesDisagree": false, "sourceIds": [],
+                      "explanation": {"uk": "Безпека для тварин і дітей не підтверджена джерелами.", "en": "Safety for pets and children is not confirmed by sources.",
+                                      "ru": "Безопасность для животных и детей не подтверждена источниками.", "pl": "Bezpieczeństwo dla zwierząt i dzieci nie jest potwierdzone źródłami."}},
           "i18n": {
             "uk": ${text("Тестова рослина", "uk", id)}, "ru": ${text("Тестовое растение", "ru", id)},
             "en": ${text("Test plant", "en", id)}, "pl": ${text("Roslina testowa", "pl", id)}
@@ -57,7 +59,7 @@ class CatalogValidatorTest {
     ).asJsonObject
 
     private fun manifest(version: Int = 0, batches: List<String> = listOf("b00")) =
-        """{"contentVersion": $version, "schema": 1, "batches": [${batches.joinToString(",") { "\"$it\"" }}]}"""
+        """{"contentVersion": $version, "schema": 2, "batches": [${batches.joinToString(",") { "\"$it\"" }}]}"""
 
     private fun rawErrors(cards: List<JsonObject>, version: Int = 1, sources: String = sourcesJson) =
         CatalogValidator.validate(manifest(version), sources, mapOf("b00" to JsonArray().also { a -> cards.forEach { a.add(it) } }.toString()))
@@ -78,11 +80,18 @@ class CatalogValidatorTest {
         assertEquals(emptyList<String>(), errorsFor(listOf(card())))
     }
 
+    /** Токсична (MODERATE) для котів, отруйні листя, джерело src_a. */
+    private fun toxicSafety(card: JsonObject, parts: String = "[\"LEAVES\"]") {
+        val sf = card.getAsJsonObject("safety")
+        sf.addProperty("cats", "MODERATE"); sf.addProperty("dogs", "MODERATE")
+        sf.add("toxicParts", JsonParser.parseString(parts))
+        sf.add("sourceIds", JsonArray().also { a -> a.add("src_a") })
+    }
+
     @Test
     fun `safe flags with sources pass`() {
         val e = errorsFor {
-            it.getAsJsonObject("safety").addProperty("pets", "TOXIC")
-            it.getAsJsonObject("safety").add("sourceIds", JsonArray().also { a -> a.add("src_a") })
+            toxicSafety(it)
             it.getAsJsonObject("safety").addProperty("aspcaUrl", "https://www.aspca.org/pet-care/x")
         }
         assertEquals(emptyList<String>(), e)
@@ -284,11 +293,11 @@ class CatalogValidatorTest {
     )
 
     @Test fun `duplicate json keys are rejected`() = assertHas(
-        CatalogValidator.validate("{\"contentVersion\":1,\"contentVersion\":0,\"schema\":1,\"batches\":[]}", sourcesJson, emptyMap()), "дубль ключа"
+        CatalogValidator.validate("{\"contentVersion\":1,\"contentVersion\":0,\"schema\":2,\"batches\":[]}", sourcesJson, emptyMap()), "дубль ключа"
     )
 
     @Test fun `unquoted keys single quotes and trailing text are rejected`() {
-        listOf("{contentVersion:0,schema:1,batches:[]}", "{'contentVersion':0,'schema':1,'batches':[]}", "{\"contentVersion\":0,\"schema\":1,\"batches\":[]} x", "{\"contentVersion\":0,\"schema\":1,\"batches\":[],}")
+        listOf("{contentVersion:0,schema:2,batches:[]}", "{'contentVersion':0,'schema':2,'batches':[]}", "{\"contentVersion\":0,\"schema\":2,\"batches\":[]} x", "{\"contentVersion\":0,\"schema\":2,\"batches\":[],}")
             .forEach { assertHas(CatalogValidator.validate(it, sourcesJson, emptyMap()), "не JSON") }
     }
 
@@ -303,7 +312,7 @@ class CatalogValidatorTest {
 
     @Test fun `duplicate safety sources are rejected`() = assertHas(
         errorsFor {
-            it.getAsJsonObject("safety").addProperty("pets", "TOXIC")
+            toxicSafety(it)
             it.getAsJsonObject("safety").add("sourceIds", JsonParser.parseString("[\"src_a\",\"src_a\"]"))
         },
         "safety.sourceIds: дублі"
@@ -373,6 +382,94 @@ class CatalogValidatorTest {
             tmp.deleteRecursively()
         }
     }
+
+    // ---- безпека schema 2 (ADR-020) ----
+
+    private fun safetyErrors(mutate: (JsonObject) -> Unit) = errorsFor { mutate(it.getAsJsonObject("safety")) }
+
+    @Test fun `schema one safety fields are rejected`() = assertHas(safetyErrors { it.addProperty("pets", "TOXIC") }, "зайве поле 'pets'")
+
+    @Test fun `bad level`() = assertHas(safetyErrors { it.addProperty("cats", "HIGH") }, "safety.cats")
+
+    @Test fun `toxic level needs a toxic part`() = assertHas(
+        errorsFor { toxicSafety(it, "[]") }, "потрібна отруйна частина"
+    )
+
+    @Test fun `non toxic and unknown levels need empty toxic parts`() = assertHas(
+        safetyErrors { it.add("toxicParts", JsonParser.parseString("[\"LEAVES\"]")) }, "має бути порожнім"
+    )
+
+    @Test fun `bad or duplicate toxic part`() {
+        assertHas(errorsFor { toxicSafety(it, "[\"ROOT\"]") }, "toxicParts")
+        assertHas(errorsFor { toxicSafety(it, "[\"LEAVES\",\"LEAVES\"]") }, "toxicParts: дублі")
+        assertHas(errorsFor { toxicSafety(it, "[\"ALL_PARTS\",\"SEEDS\"]") }, "не поєднуються")
+    }
+
+    @Test fun `non toxic claim needs a source and is allowed with one`() {
+        assertHas(safetyErrors { it.addProperty("cats", "NON_TOXIC") }, "потребує safety.sourceIds")
+        assertEquals(emptyList<String>(), errorsFor {
+            val sf = it.getAsJsonObject("safety"); sf.addProperty("cats", "NON_TOXIC"); sf.addProperty("dogs", "NON_TOXIC")
+            sf.add("sourceIds", JsonArray().also { a -> a.add("src_a") })
+        })
+    }
+
+    @Test fun `disagreement must be said in every language of the explanation`() {
+        val e = errorsFor { toxicSafety(it); it.getAsJsonObject("safety").addProperty("sourcesDisagree", true) }
+        CatalogValidator.LANGS.forEach { assertHas(e, "safety.explanation.$it: при sourcesDisagree=true") }
+        val ok = errorsFor {
+            toxicSafety(it)
+            val sf = it.getAsJsonObject("safety"); sf.addProperty("sourcesDisagree", true)
+            sf.add("explanation", JsonParser.parseString(
+                """{"uk": "Низька тяжкість, але джерела розходяться; показано обережніший варіант.", "en": "Low severity, but the sources disagree; the more cautious level is shown.",
+                    "ru": "Низкая тяжесть, но источники расходятся; показан более осторожный вариант.", "pl": "Niskie nasilenie, ale źródła się różnią; pokazano ostrożniejszy wariant."}"""))
+        }
+        assertEquals(emptyList<String>(), ok)
+    }
+
+    @Test fun `disagreement without any claim is rejected`() = assertHas(
+        safetyErrors { it.addProperty("sourcesDisagree", true) }, "без жодного рівня"
+    )
+
+    @Test fun `explanation needs four languages with right scripts and limits`() {
+        assertHas(safetyErrors { it.getAsJsonObject("explanation").remove("pl") }, "explanation: немає мови pl")
+        assertHas(safetyErrors { it.getAsJsonObject("explanation").addProperty("en", "Безпека невідома для тварин") }, "кирилиця або грецькі")
+        assertHas(safetyErrors { it.getAsJsonObject("explanation").addProperty("uk", "Short") }, "safety.explanation.uk")
+        assertHas(safetyErrors { it.getAsJsonObject("explanation").addProperty("uk", "я".repeat(251)) }, "safety.explanation.uk")
+        assertHas(safetyErrors { it.remove("explanation") }, "немає поля 'explanation'")
+    }
+
+    @Test fun `wrong script and letters in explanation are rejected`() {
+        assertHas(safetyErrors { it.getAsJsonObject("explanation").addProperty("uk", "Безпека для тварин і дітей не підтверджена, это ещё нужно проверить.") }, "російські літери")
+        assertHas(safetyErrors { it.getAsJsonObject("explanation").addProperty("ru", "Безопасность для тварин і дітей не подтверждена джерелами") }, "українські літери")
+        assertHas(safetyErrors { it.getAsJsonObject("explanation").addProperty("uk", "Safety for pets and children is not confirmed я") }, "переважно кирилиця")
+    }
+
+    @Test fun `disagreement markers are narrow and reverse checked`() {
+        // «Different parts» не є розбіжністю джерел
+        val e = errorsFor {
+            toxicSafety(it)
+            val sf = it.getAsJsonObject("safety")
+            sf.add("explanation", JsonParser.parseString(
+                """{"uk": "Низька тяжкість для котів і собак; різні частини отруйні однаково.", "en": "Low severity. Different parts are poisonous to a different degree.",
+                    "ru": "Низкая тяжесть для кошек и собак; разные части ядовиты.", "pl": "Niskie nasilenie; to się różni się zależnie od części rośliny."}"""))
+        }
+        assertEquals(emptyList<String>(), e)
+        // згадка розбіжності при sourcesDisagree=false
+        val e2 = errorsFor {
+            toxicSafety(it)
+            it.getAsJsonObject("safety").getAsJsonObject("explanation").addProperty("en", "Low severity, but the sources disagree about it somewhat.")
+        }
+        assertHas(e2, "але sourcesDisagree=false")
+    }
+
+    @Test fun `all unknown needs the neutral text`() = assertHas(
+        safetyErrors { it.getAsJsonObject("explanation").addProperty("en", "Highly toxic to every pet and child at all times.") },
+        "нейтральний текст"
+    )
+
+    @Test fun `schema one manifest is rejected`() = assertHas(
+        CatalogValidator.validate("{\"contentVersion\":0,\"schema\":1,\"batches\":[]}", sourcesJson, emptyMap()), "manifest.schema"
+    )
 
     // ---- унікальність назв/псевдонімів між картками (рішення Власника 2026-11-21) ----
 

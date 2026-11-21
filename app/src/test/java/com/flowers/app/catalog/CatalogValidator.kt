@@ -116,6 +116,7 @@ object CatalogValidator {
         presentBatchFiles.filter { it !in batchNames }.forEach { errors += "файл $it.json лежить у каталозі, але не вказаний у manifest.batches" }
 
         val seenIds = HashMap<String, String>()
+        val nameOwners = HashMap<String, String>()
         val replacements = ArrayList<Triple<String, String, String>>()
         for (b in batchNames) {
             val text = batches[b] ?: continue
@@ -137,6 +138,7 @@ object CatalogValidator {
                 }
                 val id = validateCard(el, where, sourceIds, errors)
                 if (id != null) {
+                    collectNames(el, id, nameOwners, errors)
                     seenIds.put(id, where)?.let { errors += "$where: id '$id' дублює $it" }
                     val rb = el.get("replacedBy")
                     if (rb != null && rb.isJsonPrimitive && rb.asJsonPrimitive.isString) replacements += Triple(where, id, rb.asString)
@@ -160,6 +162,25 @@ object CatalogValidator {
             }
         }
         return errors
+    }
+
+    /**
+     * Назва чи псевдонім у ОДНІЙ мові не може повторюватися в двох різних картках (напр. «Грошове дерево» і в пахіри, і в красули).
+     * Порівняння без регістру й зайвих пробілів; назва й псевдонім однієї картки можуть збігатися.
+     */
+    private fun collectNames(card: JsonObject, id: String, owners: MutableMap<String, String>, errors: MutableList<String>) {
+        val i18n = card.get("i18n") as? JsonObject ?: return
+        for (lang in LANGS) {
+            val t = i18n.get(lang) as? JsonObject ?: continue
+            val values = ArrayList<String>()
+            (t.get("name") as? com.google.gson.JsonPrimitive)?.takeIf { it.isString }?.let { values += it.asString }
+            (t.get("aliases") as? JsonArray)?.forEach { a -> if (a.isJsonPrimitive && a.asJsonPrimitive.isString) values += a.asString }
+            for (v in values) {
+                val key = lang + "|" + v.trim().lowercase().replace(Regex("\\s+"), " ")
+                val prev = owners.putIfAbsent(key, id)
+                if (prev != null && prev != id) errors += "$id.i18n.$lang: назва/псевдонім '$v' уже вжито в картці $prev"
+            }
+        }
     }
 
     private fun validateSources(src: JsonObject, ids: MutableSet<String>, errors: MutableList<String>) {

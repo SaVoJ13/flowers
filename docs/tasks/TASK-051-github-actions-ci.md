@@ -1,0 +1,39 @@
+# TASK-051 — мінімальний GitHub Actions CI
+
+## Мета
+
+Додати перевірку pull request перед злиттям: JDK 21, усі локальні unit-тести, release bundle і базові release-запобіжники без публікації та без використання реальних секретів.
+
+## Реалізація
+
+- Workflow: `.github/workflows/android-ci.yml`; події: pull request, push у `main`, ручний запуск.
+- Мінімальні права: лише `contents: read`; паралельні застарілі запуски скасовуються.
+- Офіційні actions pinned на повні SHA: `actions/checkout` v7.0.1, `actions/setup-java` v6.2.0, `gradle/actions` v6.4.1 (перевірено за офіційними репозиторіями 2026-11-22).
+- Справжній `app/google-services.json` не читається й не передається в GitHub. Workflow створює тимчасовий фіктивний файл лише для компіляції; CI AAB непридатний для публікації.
+- Команда: `./gradlew --no-daemon --no-parallel --stacktrace testDebugUnitTest bundleRelease`.
+- Після збірки CI перевіряє: AAB існує; у release dex немає debug App Check provider і є Play Integrity provider; tracked-файли не містять шаблону реального Google API-ключа.
+
+## Критерії
+
+1. Workflow синтаксично валідний і запускається на PR.
+2. Job `Tests and release bundle` зелений.
+3. Реальні Firebase-конфігурація, upload-ключ і паролі не потрапляють у workflow, логи, artifacts або Git.
+4. Незалежна QA іншою моделлю — `QA Verified`.
+5. Після злиття CI-гілки PR #29 оновлюється від `main`, отримує зелений CI й лише тоді зливається.
+
+## Журнал 2026-11-22
+
+- Створено окрему гілку `codex/task-051-github-actions-ci` від `origin/main`.
+- Локальна smoke-перевірка виконана в чистому `git archive` без реального `google-services.json`, лише з тимчасовою CI-only конфігурацією: `BUILD SUCCESSFUL`; 154/154 тести, 0 failures/errors/skipped; AAB створено.
+- Перевірки AAB: `DebugAppCheckProviderFactory` відсутній, `PlayIntegrityAppCheckProviderFactory` присутній; шаблон реального Google API-ключа у tracked-файлах не знайдено.
+- Перший GitHub run `45049900198` зупинився до Gradle з `./gradlew: Permission denied` (Windows checkout не зберіг executable bit). Додано явний `chmod +x gradlew`; тести застосунку в цьому run не запускались.
+- Незалежна QA: `Needs changes` (P2) — звичайний `git grep` надрукував би знайдений API-ключ у Actions log перед падінням. Замінено на quiet mode `git grep -qE`; лог міститиме лише безпечне загальне повідомлення.
+- Наступний крок: PR, реальний GitHub Actions run і незалежна QA.
+
+### Фінальна перевірка 2026-11-22
+
+- PR #30, GitHub run `45050316454`: `SUCCESS`, job `Tests and release bundle` — 4m22s; усі кроки, включно з unit tests, release bundle і safeguards, зелені.
+- Є лише інформаційна annotation: Gradle 8.12.1 застарілий. Версію навмисно не оновлюємо в цьому завданні за рішенням Власника; ненавмисне оновлення раніше відхилено.
+- Повторна незалежна QA іншою моделлю після виправлення quiet scan: `QA Verified`. Секретів у PR diff немає.
+- TASK-051 виконано; PR #30 готовий до злиття після зеленого check для фінального closeout-коміту.
+

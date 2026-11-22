@@ -1,0 +1,552 @@
+{
+  "zamioculcas": {
+    "cats": "ncsu_zz: \"This plant has a medium toxicity to cats and dogs.\"; tag \"#problem for cats\"; Poison Severity: Medium",
+    "dogs": "ncsu_zz: \"This plant has a medium toxicity to cats and dogs.\"; tag \"#problem for dogs\"",
+    "children": "Рівень TOXIC за правилом для дітей: NC State не має тегу для людей; RHS «Harmful if eaten» без тяжкості (QA 2026-11-21). Раніше було MODERATE.",
+    "disagreementNote": null,
+    "changeVsCurrent": "Коти й собаки: TOXIC -> MODERATE за NC State (Medium). Діти лишаються TOXIC: RHS називає рослину шкідливою при поїданні без оцінки тяжкості.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "sansevieria": {
+    "cats": "ncsu_snake: \"This plant has low severity poison characteristics.\"; \"Problem for Cats\"; \"dilated pupils (cats)\"",
+    "dogs": "ncsu_snake: \"low severity poison characteristics\"; \"Problem for Dogs\"",
+    "children": "ncsu_snake: \"Problem for Children\", Poison Severity \"Low\"; rhs_sansevieria: \"Harmful if eaten.\"",
+    "disagreementNote": null,
+    "changeVsCurrent": "Напрямок той самий (токсична), але тяжкість LOW для всіх груп за NC State (Low); RHS лише «Harmful if eaten» без тяжкості, тож це не суперечність.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "epipremnum": {
+    "cats": "ncsu_pothos: \"This plant has medium severity poison characteristics.\"; \"Problem for Cats\"",
+    "dogs": "ncsu_pothos: \"medium severity poison characteristics\"; \"Problem for Dogs\"",
+    "children": "ncsu_pothos: \"Poisonous to Humans\", severity Medium; clemson_pothos: \"All parts of a pothos are mildly toxic if ingested.\"",
+    "disagreementNote": "Severity differs: ncsu_pothos rates poison severity Medium (Problem for Cats/Dogs, Poisonous to Humans), while clemson_pothos says \"All parts of a pothos are mildly toxic if ingested\" and to keep it from children and pets. The more cautious MODERATE is used.",
+    "changeVsCurrent": "Напрямок той самий; уточнено MODERATE для всіх груп (обережніший рівень), позначено розбіжність NC State (Medium) і Clemson (mildly toxic).",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "monstera": {
+    "cats": "ncsu_monstera: \"This plant has low severity poison characteristics.\"; \"Problem for Cats\"",
+    "dogs": "ncsu_monstera: \"low severity poison characteristics\"; \"Problem for Dogs\"",
+    "children": "ncsu_monstera: \"Poisonous to Humans\", Poison Severity \"Low\"; rhs_monstera: \"Harmful if eaten; skin/eye irritant.\"",
+    "disagreementNote": null,
+    "changeVsCurrent": "Напрямок той самий; тяжкість LOW за NC State («Only if eaten in large quantities»). RHS підтверджує шкідливість і подразнення без тяжкості.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "spathiphyllum": {
+    "cats": "ncsu_spathiphyllum: \"This plant has medium severity poison characteristics.\"; \"Problem for Cats\"",
+    "dogs": "ncsu_spathiphyllum: \"medium severity poison characteristics\"; \"Problem for Dogs\"",
+    "children": "ncsu_spathiphyllum: \"Problem for Children\", \"Poisonous to Humans\", Poison Severity \"Medium\"",
+    "disagreementNote": null,
+    "changeVsCurrent": "Напрямок той самий; тяжкість MODERATE за NC State (сторінка роду Spathiphyllum, не окремо S. wallisii). RHS: «Harmful if eaten; skin/eye irritant» для людей і тварин.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "chlorophytum": {
+    "cats": null,
+    "dogs": null,
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
+    "previous": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "crassula": {
+    "cats": "ncsu_jade: \"Problem for Cats\" (no severity given)",
+    "dogs": "ncsu_jade: \"Problem for Dogs\" (no severity given)",
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "Без змін: тварини TOXIC (тяжкість не вказана), діти UNKNOWN. Penn State про токсичність не пише.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "ficus_elastica": {
+    "cats": "ncsu_rubber: \"Problem for Cats\"; clemson_rubber: \"Keep these plants away from any pets or young children that tend to eat plants.\"",
+    "dogs": "ncsu_rubber: \"Problem for Dogs\"; clemson_rubber: sap \"may irritate skin or the stomach if eaten\"",
+    "children": "Рівень TOXIC: clemson_rubber описує подразнення шкіри/шлунку соком і радить тримати подалі від дітей, тяжкість не названа (QA 2026-11-21). Раніше було LOW.",
+    "disagreementNote": null,
+    "changeVsCurrent": "Коти й собаки лишаються TOXIC; діти лишаються TOXIC, бо Clemson описує шкоду без названої тяжкості. Отруйна частина — SAP.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "ficus_benjamina": {
+    "cats": "ncsu_weeping: \"Problem for Cats\" (no severity given)",
+    "dogs": "ncsu_weeping: \"Problem for Dogs\" (no severity given)",
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "Без змін: тварини TOXIC, діти UNKNOWN. Clemson про токсичність не пише.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "dracaena_marginata": {
+    "cats": "ncsu_dracaena_reflexa_angustifolia: Poison Severity: Low; «Toxic to humans, cats, and dogs»; Problem for Cats/Dogs/Children (QA 2026-11-21).",
+    "dogs": "ncsu_dracaena_reflexa_angustifolia: Poison Severity: Low; «Toxic to humans, cats, and dogs»; Problem for Cats/Dogs/Children (QA 2026-11-21).",
+    "children": "ncsu_dracaena_reflexa_angustifolia (previously known as Dracaena marginata): Problems: Problem for Children; «Toxic to humans, cats, and dogs»; Poison Severity: Low. (Виправлено після QA: раніше хибне джерело var. reflexa.)",
+    "disagreementNote": null,
+    "changeVsCurrent": "TOXIC -> LOW для кішок, собак і дітей; джерело виправлено на ncsu_dracaena_reflexa_angustifolia (D. marginata як попередня назва).",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "peperomia": {
+    "cats": null,
+    "dogs": null,
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
+    "previous": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "aglaonema": {
+    "cats": "ncsu_aglaonema: \"This plant has low severity poison characteristics.\" ... more of a concern for dogs, cats, and horses; clemson: \"Toxic to cats and dogs\"",
+    "dogs": "ncsu_aglaonema: \"This plant has low severity poison characteristics.\"; clemson_chinese_evergreen: \"Leaves can be toxic to pets, particularly dogs and cats.\"",
+    "children": "ncsu_aglaonema: calcium oxalate crystals \"toxic if ingested or if the juice/sap is touched (dermatitis)\"; can affect humans too; severity Low",
+    "disagreementNote": null,
+    "changeVsCurrent": "Refined: TOXIC -> LOW for cats, dogs and children (NC State genus page gives Low severity; Clemson confirms toxic to cats/dogs without severity). Note: NC State page is genus-level.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "philodendron": {
+    "cats": "ncsu_philodendron_hederaceum: \"This plant has low severity poison characteristics.\"; tag \"#problem for cats\"",
+    "dogs": "ncsu_philodendron_hederaceum: \"This plant has low severity poison characteristics.\"; tag \"#problem for dogs\"",
+    "children": "ncsu_philodendron_hederaceum: \"Poisonous to Humans\", tag \"#problem for children\", severity Low; isu: \"Keep philodendrons away from children and pets\"",
+    "disagreementNote": null,
+    "changeVsCurrent": "Refined: TOXIC -> LOW for cats, dogs and children (NC State Low severity; Iowa State 'poisonous' without severity, consistent).",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "syngonium": {
+    "cats": "ncsu_syngonium_podophyllum: \"This plant has medium severity poison characteristics.\"; tag \"#problem for cats\"",
+    "dogs": "ncsu_syngonium_podophyllum: \"This plant has medium severity poison characteristics.\"; tag \"#problem for dogs\"; clemson: \"Pet Safety: Not pet safe\"",
+    "children": "ncsu_syngonium_podophyllum (поле Problems): Poisonous to Humans; Poison Severity: Medium. (Виправлено після QA: раніше помилково UNKNOWN.)",
+    "disagreementNote": null,
+    "changeVsCurrent": "Діти: TOXIC -> MODERATE (NC State «Poisonous to Humans», Medium); коти/собаки TOXIC -> MODERATE.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "aloe_vera": {
+    "cats": "ncsu_aloe_vera: \"This plant has low severity poison characteristics.\"; tag \"#problem for cats\"",
+    "dogs": "ncsu_aloe_vera: \"This plant has low severity poison characteristics.\"; tag \"#problem for dogs\"",
+    "children": "ncsu_aloe_vera: \"Poisonous to Humans\"; \"Causes low toxicity if eaten.\"",
+    "disagreementNote": null,
+    "changeVsCurrent": "Refined: TOXIC -> LOW for cats, dogs and children (NC State Low severity, 'Poisonous to Humans'). Penn State page has no toxicity statement and is not used.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "tradescantia": {
+    "cats": "ncsu_tradescantia_zebrina: \"This plant has low severity poison characteristics.\"; tag problem for cats",
+    "dogs": "ncsu_tradescantia_zebrina: \"This plant has low severity poison characteristics.\"; tag problem for dogs",
+    "children": "ncsu: \"If ingested by pets or humans, mouth and stomach irritation can result.\"; tag problem for children; rhs: \"Skin allergen.\"",
+    "disagreementNote": null,
+    "changeVsCurrent": "Refined: TOXIC -> LOW for cats, dogs and children (NC State Low severity; RHS and UW-Madison mention only skin irritation, consistent).",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "maranta": {
+    "cats": "None of the three pages (NC State, RHS, Illinois) has any toxicity statement or tag.",
+    "dogs": "None of the three pages (NC State, RHS, Illinois) has any toxicity statement or tag.",
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "No change: all UNKNOWN; no source contains toxicity data.",
+    "previous": {
+      "pets": "UNKNOWN",
+      "children": "UNKNOWN"
+    }
+  },
+  "schefflera": {
+    "cats": "ncsu_schefflera_arboricola: \"All parts of this plant are seriously toxic to dogs and cats.\" vs field \"Poison Severity: Low\"; \"It is harmful to cats and dogs if leaves are chewed.\"",
+    "dogs": "ncsu_schefflera_arboricola: \"All parts of this plant are seriously toxic to dogs and cats.\" vs field \"Poison Severity: Low\"",
+    "children": "ncsu_schefflera_arboricola: \"Poisonous to Humans\"; \"Sap can be irritating to people with sensitive skin.\"; severity Low",
+    "disagreementNote": "ncsu_schefflera_arboricola is internally inconsistent: Poison Severity field says 'Low', but the description says 'All parts of this plant are seriously toxic to dogs and cats.' The more cautious reading (SEVERE) was chosen for cats/dogs; needs QA. illinois_umbrella_tree has no toxicity data.",
+    "changeVsCurrent": "Changed: pets TOXIC -> SEVERE (cautious choice due to internal NC State conflict Low vs 'seriously toxic'); children UNKNOWN -> LOW (NC State lists 'Poisonous to Humans').",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "calathea": {
+    "cats": null,
+    "dogs": null,
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
+    "previous": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "begonia": {
+    "cats": "ncsu_begonia_cane_types: \"This plant has low severity poison characteristics.\"; \"vomiting, and salivation in dogs/cats\"; tag problem for cats",
+    "dogs": "ncsu_begonia_cane_types: \"This plant has low severity poison characteristics.\"; \"vomiting, and salivation in dogs/cats\"; tag problem for dogs",
+    "children": "ncsu_begonia_cane_types: tag \"#problem for children\", \"Poisonous to Humans\", severity Low; rhs: \"not to be eaten. Wear gloves\"",
+    "disagreementNote": null,
+    "changeVsCurrent": "Refined: TOXIC -> LOW for cats, dogs and children (NC State cane-begonia group page, B. maculata listed as cultivar). RHS gives a generic 'Ornamental bulbs - not to be eaten' warning (humans and pets) without severity; treated as consistent, not as a disagreement.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "pilea_peperomioides": {
+    "cats": "NC State description: \"with the bonus of being safe for pets and children.\"; tag #pet friendly",
+    "dogs": "NC State description: \"with the bonus of being safe for pets and children.\"; tag #pet friendly",
+    "children": "NC State description: \"with the bonus of being safe for pets and children.\"",
+    "disagreementNote": null,
+    "changeVsCurrent": "Без змін: pets NON_TOXIC, children NON_TOXIC підтверджено реченням NC State («safe for pets and children»). PSU про токсичність мовчить.",
+    "previous": {
+      "pets": "NON_TOXIC",
+      "children": "NON_TOXIC"
+    }
+  },
+  "phalaenopsis_hybrid": {
+    "cats": null,
+    "dogs": null,
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
+    "previous": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "ficus_lyrata": {
+    "cats": "NC State: Poison Severity \"Low\"; \"This plant has low severity poison characteristics.\"; tag Problem for Cats",
+    "dogs": "NC State: Poison Severity \"Low\"; tag Problem for Dogs",
+    "children": "NC State: Poison Severity \"Low\"; tags Problem for Children, Poisonous to Humans",
+    "disagreementNote": null,
+    "changeVsCurrent": "Уточнення: TOXIC -> LOW для котів, собак і дітей (NC State: Poison Severity Low, нерозчинні оксалати кальцію). Частини: кора, квіти, плоди, листя, корені, сік, стебла (кору віднесено до STEMS).",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "hoya_carnosa": {
+    "cats": null,
+    "dogs": null,
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
+    "previous": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "nephrolepis_exaltata": {
+    "cats": null,
+    "dogs": null,
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
+    "previous": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "citrus_limon": {
+    "cats": null,
+    "dogs": null,
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "Без змін: усе UNKNOWN. Ні Wisconsin, ні NC State (Meyer) не містять полів чи тегів токсичності; є лише тег #edible fruits, що не є оцінкою безпеки для тварин.",
+    "previous": {
+      "pets": "UNKNOWN",
+      "children": "UNKNOWN"
+    }
+  },
+  "ocimum_basilicum": {
+    "cats": "NC State tag \"#non-toxic for cats\"",
+    "dogs": "NC State tag \"#non-toxic for dogs\"",
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "Без змін: pets NON_TOXIC (теги NC State), children UNKNOWN (теги #children/#edible описують використання, а не безпеку). Clemson та Illinois про токсичність рослини мовчать.",
+    "previous": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "salvia_rosmarinus": {
+    "cats": "NC State tag \"#non-toxic for cats\"",
+    "dogs": "NC State tag \"#non-toxic for dogs\"",
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "Без змін: pets NON_TOXIC (теги NC State), children UNKNOWN (теги #children's garden/#playground plant описують використання, не безпеку). PSU та RHS про токсичність мовчать.",
+    "previous": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "mentha": {
+    "cats": "NC State (M. spicata): \"This plant has low severity poison characteristics.\"; tag Problem for Cats; toxic principle Essential Oils",
+    "dogs": "NC State (M. spicata): Poison Severity Low; tag Problem for Dogs; \"Vomiting and diarrhea with large ingestions\"",
+    "children": "No child/human tag on NC State. RHS only for M. pulegium: \"listed as 'harmful if eaten' in the HTA ... guide\" (species-specific, not genus-wide)",
+    "disagreementNote": null,
+    "changeVsCurrent": "Уточнення: pets TOXIC -> LOW для котів і собак (NC State: low severity, ефірні олії; отруйну частину не вказано). Children залишається UNKNOWN: RHS «harmful if eaten» стосується лише M. pulegium, а не роду.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "dracaena_fragrans": {
+    "cats": "NC State: \"This plant has low severity poison characteristics.\"; \"Toxic, if ingested, by cats, dogs, and humans\"; tag Problem for Cats",
+    "dogs": "NC State: Poison Severity Low; \"Toxic, if ingested, by cats, dogs, and humans\"; tag Problem for Dogs",
+    "children": "NC State: Poison Severity Low; tag Problem for Children; \"Toxic, if ingested, by cats, dogs, and humans\"",
+    "disagreementNote": null,
+    "changeVsCurrent": "Уточнення: TOXIC -> LOW для котів, собак і дітей (NC State: Poison Severity Low, сапоніни). Clemson про токсичність мовчить.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "dracaena_reflexa": {
+    "cats": "ncsu_dracaena_reflexa: Poison Severity: Low; \"This plant is toxic to cats and dogs if ingested.\"; tag #problem for cats",
+    "dogs": "ncsu_dracaena_reflexa: Poison Severity: Low; \"This plant is toxic to cats and dogs if ingested.\"; tag #problem for dogs",
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "pets TOXIC -> cats/dogs LOW (severity refined from NC State 'Low'); children stays UNKNOWN (only a generic 'some types of dracaena' remark).",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "dracaena_sanderiana": {
+    "cats": "ncsu_dracaena_braunii: Poison Severity: Low; \"Toxic, if ingested, for cats and dogs.\"; tag #problem for cats. clemson_lucky_bamboo: \"Lucky bamboo is toxic to pets\"",
+    "dogs": "ncsu_dracaena_braunii: Poison Severity: Low; \"Toxic, if ingested, for cats and dogs.\"; tag #problem for dogs. clemson_lucky_bamboo: \"toxic to pets\"",
+    "children": "ncsu_dracaena_braunii: Poison Severity: Low; \"Humans should not eat this plant.\"; tag #problem for children. clemson: \"causes skin irritation in humans\"",
+    "disagreementNote": null,
+    "changeVsCurrent": "pets TOXIC -> cats/dogs LOW, children TOXIC -> LOW (severity refined). Clemson says 'toxic' without severity; not treated as a conflict with NC State 'Low'.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "cyperus_alternifolius": {
+    "cats": null,
+    "dogs": null,
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "No change: all three sources (NC State, UNF, UAEX) contain no toxicity statements; stays UNKNOWN.",
+    "previous": {
+      "pets": "UNKNOWN",
+      "children": "UNKNOWN"
+    }
+  },
+  "yucca_gigantea": {
+    "cats": "ncsu_yucca_gigantea: Poison Severity: Low; \"The leaves and roots are toxic to humans, cats, dogs, and horses.\"; rhs: \"Pets (dogs, cats): Harmful if eaten\"",
+    "dogs": "ncsu_yucca_gigantea: Poison Severity: Low; \"Symptoms for dogs and cats: vomiting\"; rhs_yucca_elephantipes: \"Pets (dogs, cats): Harmful if eaten\"",
+    "children": "ncsu_yucca_gigantea: Poison Severity: Low; \"If ingested, toxic to humans, pets, and horses.\"; tag #problem for children",
+    "disagreementNote": null,
+    "changeVsCurrent": "pets TOXIC -> cats/dogs LOW, children TOXIC -> LOW (severity refined). RHS 'Harmful if eaten' has no severity; consistent with NC State.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "pachira_aquatica": {
+    "cats": "ncsu_pachira_aquatica: Poison Severity: Low; \"mild to moderate gastrointestinal distress for cats--vomiting, diarrhea, and drooling\"; Problem for Cats",
+    "dogs": "ncsu_pachira_aquatica: no statement and no Problem for Dogs tag; nybg_money_tree: no toxicity data.",
+    "children": "ncsu_pachira_aquatica: Poison Severity: Low; \"possible carcinogen if seeds ingested by humans\"; \"Houseplants never produce seeds.\" No Problem for Children tag.",
+    "disagreementNote": null,
+    "changeVsCurrent": "Changed: pets TOXIC -> cats LOW, dogs UNKNOWN (NC State flags only cats); children UNKNOWN -> LOW (seeds, possible carcinogen for humans).",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "beaucarnea_recurvata": {
+    "cats": null,
+    "dogs": null,
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
+    "previous": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "aspidistra_elatior": {
+    "cats": null,
+    "dogs": null,
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
+    "previous": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "monstera_adansonii": {
+    "cats": "ncsu_adansonii: Poison Severity: Low; \"This plant is toxic to humans and pets if ingested.\"; tag #problem for cats",
+    "dogs": "ncsu_adansonii: Poison Severity: Low; \"This plant is toxic to humans and pets if ingested.\"; tag #problem for dogs",
+    "children": "ncsu_adansonii: Poison Severity: Low; tag #problem for children. rhs_swiss_cheese (genus page): \"keep them away from children and pets\"",
+    "disagreementNote": null,
+    "changeVsCurrent": "pets TOXIC -> cats/dogs LOW, children TOXIC -> LOW (severity refined). RHS genus page says 'poisonous' without severity; FRUIT added from RHS (unripe fruit).",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "scindapsus_pictus": {
+    "cats": "ncsu_scindapsus: Plant Type \"Poisonous\"; tags #poisonous, #problem for cats; no severity given",
+    "dogs": "ncsu_scindapsus: Plant Type \"Poisonous\"; tags #poisonous, #problem for dogs; no severity given",
+    "children": "ncsu_scindapsus: no Problem for Children or Poisonous to Humans tag; uconn_scindapsus: no toxicity data.",
+    "disagreementNote": null,
+    "changeVsCurrent": "No change: pets TOXIC (cats/dogs TOXIC, severity unknown), children UNKNOWN.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "rhaphidophora_tetrasperma": {
+    "cats": "ncsu_rhaphidophora: Poison Severity: Low; \"Exercise caution when pets or children are nearby since it is toxic if ingested.\"; tag #problem for cats",
+    "dogs": "ncsu_rhaphidophora: Poison Severity: Low; tag #problem for dogs",
+    "children": "ncsu_rhaphidophora: Poison Severity: Low; tags #problem for children, Poisonous to Humans",
+    "disagreementNote": null,
+    "changeVsCurrent": "pets TOXIC -> cats/dogs LOW, children TOXIC -> LOW (severity refined). iastate_philodendron mentions Rhaphidophora only as a related species, so not used.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "philodendron_bipinnatifidum": {
+    "cats": "ncsu_pb: Poison Severity: Low; tag 'Problem for Cats'",
+    "dogs": "ncsu_pb: Poison Severity: Low; tag 'Problem for Dogs'",
+    "children": "ncsu_pb: Poison Severity: Low; tag 'Problem for Children'; 'Poisonous to Humans'",
+    "disagreementNote": null,
+    "changeVsCurrent": "TOXIC -> LOW for all groups: NC State gives 'Low' severity; RHS ('Harmful if eaten', pets too) and Clemson ('toxic if eaten') confirm toxicity without severity, so no conflict.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "philodendron_melanochrysum": {
+    "cats": "rhs_pm: 'Pets: Harmful if eaten; skin/eye irritant/allergen'",
+    "dogs": "rhs_pm: 'Pets: Harmful if eaten; skin/eye irritant/allergen'",
+    "children": "rhs_pm: 'Harmful if eaten'; clemson_philodendron: 'Keep philodendrons away from any pets or young children'",
+    "disagreementNote": null,
+    "changeVsCurrent": "No change: TOXIC stays for pets and children; now split into cats/dogs/children with severity unspecified (no NC State page for this species).",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "dieffenbachia_seguine": {
+    "cats": "ncsu_ds: Poison Severity: High; tag 'Problem for Cats'; 'It may be fatal to pets and livestock.'",
+    "dogs": "ncsu_ds: Poison Severity: High; tag 'Problem for Dogs'",
+    "children": "ncsu_ds: Poison Severity: High; tag 'Problem for Children'; clemson_dieff: 'causing the throat to swell and possible suffocation'",
+    "disagreementNote": null,
+    "changeVsCurrent": "TOXIC -> SEVERE for all groups (refinement): NC State 'High' severity, Clemson and RHS ('TOXIC if eaten', 'TOXIC to pets') agree.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "alocasia_amazonica": {
+    "cats": "ncsu_alocasia: Poison Severity: Medium; tag 'Problem for cats'",
+    "dogs": "ncsu_alocasia: Poison Severity: Medium; tag 'Problem for dogs'",
+    "children": "ncsu_alocasia: Poison Severity: Medium; tag 'Problem for children'; 'Poisonous to Humans'",
+    "disagreementNote": null,
+    "changeVsCurrent": "TOXIC -> MODERATE for all groups (refinement): NC State 'Medium'; RHS genus guide confirms 'toxic compounds' and irritant sap without severity or groups.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "anthurium_andraeanum": {
+    "cats": "ncsu_anth: Poison Severity: Low; tag '#problem for cats'",
+    "dogs": "ncsu_anth: Poison Severity: Low; tag '#problem for dogs'",
+    "children": "ncsu_anth: Poison Severity: Low; tag '#problem for children'; 'Poisonous to Humans'",
+    "disagreementNote": null,
+    "changeVsCurrent": "TOXIC -> LOW for all groups: NC State 'Low' severity; Clemson ('toxic to people and pets if ingested') agrees without stating severity.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "hedera_helix": {
+    "cats": "ncstate_hedera: Poison Severity: Medium; tag 'Problem for Cats'",
+    "dogs": "ncstate_hedera: Poison Severity: Medium; tag 'Problem for Dogs'",
+    "children": "ncstate_hedera: Poison Severity: Medium; 'Poisonous to Humans' (no 'Problem for Children' tag)",
+    "disagreementNote": null,
+    "changeVsCurrent": "TOXIC -> MODERATE for all groups (refinement): NC State 'Medium'; children based on 'Poisonous to Humans'. Clemson only mentions sap skin rash; RHS page has no toxicity info.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "cissus_rhombifolia": {
+    "cats": null,
+    "dogs": null,
+    "children": null,
+    "disagreementNote": null,
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
+    "previous": {
+      "pets": "NON_TOXIC",
+      "children": "UNKNOWN"
+    }
+  },
+  "asparagus_setaceus": {
+    "cats": "ncstate_asp_setaceus: Poison Severity: Medium; tag 'Problem for Cats'",
+    "dogs": "ncstate_asp_setaceus: Poison Severity: Medium; tag 'Problem for Dogs'",
+    "children": "ncstate_asp_setaceus: Poison Severity: Medium; tag 'Problem for Children'; rhs: 'fruits harmful if eaten'",
+    "disagreementNote": null,
+    "changeVsCurrent": "TOXIC -> MODERATE for all groups (refinement): NC State 'Medium'; RHS ('Skin allergen; fruits harmful if eaten') agrees.",
+    "previous": {
+      "pets": "TOXIC",
+      "children": "TOXIC"
+    }
+  },
+  "asparagus_densiflorus": {
+    "cats": null,
+    "dogs": null,
+    "children": "rhs_asp_densiflorus: 'Skin allergen; fruits are harmful if eaten.'",
+    "disagreementNote": null,
+    "changeVsCurrent": "No change: pets UNKNOWN, children TOXIC (severity not stated by RHS).",
+    "previous": {
+      "pets": "UNKNOWN",
+      "children": "TOXIC"
+    }
+  },
+  "fatsia_japonica": {
+    "cats": "rhs_fatsia: 'Pets: Fruit are ornamental - not to be eaten - see the HTA guide to potentially harmful plants'",
+    "dogs": "rhs_fatsia: 'Pets: Fruit are ornamental - not to be eaten - see the HTA guide to potentially harmful plants'",
+    "children": "rhs_fatsia (section 'Potentially harmful'): 'Fruit are ornamental - not to be eaten.'",
+    "disagreementNote": null,
+    "changeVsCurrent": "UNKNOWN -> TOXIC for cats, dogs and children: RHS says the fruit should not be eaten by people or pets. The current NC State page has no explicit non-toxic statement, so sourcesDisagree is false.",
+    "previous": {
+      "pets": "UNKNOWN",
+      "children": "UNKNOWN"
+    }
+  }
+}

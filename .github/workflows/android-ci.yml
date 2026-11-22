@@ -1,0 +1,94 @@
+name: Android CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-bundle:
+    name: Tests and release bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+
+      - name: Create non-production Firebase config
+        shell: bash
+        run: |
+          cat > app/google-services.json <<'JSON'
+          {
+            "project_info": {
+              "project_number": "123456789012",
+              "project_id": "flowers-ci-placeholder",
+              "storage_bucket": "flowers-ci-placeholder.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:123456789012:android:0123456789abcdef012345",
+                  "android_client_info": {
+                    "package_name": "com.savoj.flowers"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  {
+                    "current_key": "ci-placeholder-not-a-real-key"
+                  }
+                ],
+                "services": {
+                  "appinvite_service": {
+                    "other_platform_oauth_client": []
+                  }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          JSON
+          echo "Created ephemeral CI-only Firebase configuration."
+
+      - name: Run unit tests and build release bundle
+        run: ./gradlew --no-daemon --no-parallel --stacktrace testDebugUnitTest bundleRelease
+
+      - name: Verify release bundle safeguards
+        shell: bash
+        run: |
+          set -euo pipefail
+          AAB="app/build/outputs/bundle/release/app-release.aab"
+          test -s "$AAB"
+          mkdir -p build/ci-aab
+          unzip -q "$AAB" 'base/dex/classes*.dex' -d build/ci-aab
+          if grep -aR -q 'DebugAppCheckProviderFactory' build/ci-aab/base/dex; then
+            echo "Debug App Check provider found in release bundle." >&2
+            exit 1
+          fi
+          grep -aR -q 'PlayIntegrityAppCheckProviderFactory' build/ci-aab/base/dex
+          if git grep -nE 'AIza[0-9A-Za-z_-]{30,}'; then
+            echo "A Google API key pattern was found in tracked files." >&2
+            exit 1
+          fi
+

@@ -248,3 +248,11 @@
 - TASK-048 (PR #24): запис скарги завжди ставиться в чергу Firestore, офлайн/тайм-аут = Queued («Скаргу буде надіслано, щойно з'явиться зв'язок»), один ID документа на діалог; 139 тестів; QA Verified; встановлено на телефон (екран заблоковано, візуально не перевірено).
 - TASK-049 (PR #26): формат безпеки schema 2 (рівні NON_TOXIC/LOW/MODERATE/SEVERE/TOXIC/UNKNOWN окремо для cats/dogs/children, toxicParts, sourcesDisagree, explanation 4 мовами). Міграція 50 карток: 5 агентів Opus перечитали ≈ 110 сторінок; QA Opus (20 карток глибоко + 48 сторінок NC State скриптом) знайшла 3 помилки даних (syngonium діти, dracaena_marginata хибне джерело, ficus/zamioculcas діти) і прогалини валідатора; виправлено; повторно QA Verified. НЕ злито до затвердження (INBOX-012).
 - **Перенумерація (сесія 022):** ID `TASK-048` у `TASK_BOARD.md` мав дубль (пропозиція оновити PRD.md і завдання про скаргу, яке Власник призначив 2026-11-21). Пропозицію про PRD перенумеровано в `TASK-050`; зміст завдань не змінено. Власник підтвердив і дозволив надалі робити такі технічні перенумерації самостійно (дублі номерів без зміни змісту), фіксуючи тут, що й чому.
+
+## Сесія 024 (2026-11-22, Codex): bootstrap GitHub Actions CI
+- Власник обрав безпечну альтернативу merge без CI: налаштувати мінімальний GitHub Actions CI.
+- Прикріплені Власником `CONSTITUTION.uk.md`, `CONSTITUTION.en.md` і `PROJECT_PROFILE.template.md` побайтово збігаються з файлами в репозиторії; додаткових змін правил не потрібно.
+- Створено окрему гілку `codex/task-051-github-actions-ci` від `origin/main`, картку TASK-051 і workflow `.github/workflows/android-ci.yml`.
+- Офіційні action-релізи звірено 2026-11-22 і pinned на повні commit SHA: checkout v7.0.1, setup-java v6.2.0, gradle/actions v6.4.1.
+- Workflow не використовує реальний `google-services.json`: створює тимчасову CI-only конфігурацію, запускає unit-тести й release bundle, перевіряє App Check providers і відсутність API-ключів у tracked-файлах. CI AAB не публікується.
+- Наступний крок: локальна smoke-перевірка, PR, GitHub run і незалежна QA.

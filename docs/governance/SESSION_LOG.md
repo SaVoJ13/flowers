@@ -305,3 +305,9 @@
 - Annotation про застарілий Gradle 8.12.1 інформаційна; оновлення інструментарію не входить у TASK-051 і раніше відхилене Власником як ненавмисне.
 - Повторна незалежна QA іншою моделлю: `QA Verified`; permissions, SHA pinning, dummy Firebase config, quiet secret scan і safeguards підтверджено; секретів у PR diff немає.
 - Стан: TASK-051 виконано, PR #30 готовий до злиття після зеленого check фінального closeout-коміту. Після merge оновити PR #29 від `main` і дочекатися його CI.
+
+### Сесія 024, закриття TASK-051 і TASK-021-C
+- PR #30 пройшов фінальний зелений CI та незалежну QA, після чого злитий у `main`; merge commit `3683054`.
+- `origin/main` об'єднано в гілку PR #29. Append-only конфлікти в `CURRENT_STATE.md`, `TASK_BOARD.md` і `SESSION_LOG.md` розв'язано зі збереженням усіх записів сесій 023 і 024.
+- GitHub Actions run `45051612575` для PR #29: `SUCCESS`; job `Tests and release bundle` — 3m41s. Незалежна QA іншою моделлю: `QA Verified`, P1/P2 зауважень немає, секретів і маркерів конфлікту не виявлено.
+- PR #29 злитий у `main`; merge commit `9c5575b`. TASK-051 і TASK-021-C завершено. Реальні ключі, паролі, `keystore.properties`, upload-keystore і локальний підписаний AAB не додавалися до Git і не публікувалися.

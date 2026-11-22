@@ -11,7 +11,7 @@ plugins {
 val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = Properties().apply {
     if (keystorePropertiesFile.exists()) {
-        keystorePropertiesFile.inputStream().use(::load)
+        keystorePropertiesFile.reader(Charsets.UTF_8).use(::load)
     }
 }
 

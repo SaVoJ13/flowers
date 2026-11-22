@@ -493,7 +493,7 @@
     "safety": {
       "cats": "LOW",
       "dogs": "LOW",
-      "children": "LOW",
+      "children": "UNKNOWN",
       "toxicParts": [
         "FRUIT",
         "LEAVES",
@@ -501,10 +501,10 @@
       ],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "Токсична для котів, собак і людей у разі поїдання, тяжкість низька (NC State): подразнення рота й горла. Отруйні листя, плоди й сік.",
-        "en": "Toxic to cats, dogs and people if eaten, low severity (NC State): mouth and throat irritation. Leaves, fruit and sap are poisonous.",
-        "ru": "Токсична для кошек, собак и людей при поедании, тяжесть низкая (NC State): раздражение рта и горла. Ядовиты листья, плоды и сок.",
-        "pl": "Trująca dla kotów, psów i ludzi po zjedzeniu, niskie nasilenie (NC State): podrażnienie jamy ustnej i gardła. Trujące są liście, owoce i sok."
+        "uk": "За даними NC State, листя, плоди й сік мають низьку токсичність для котів і собак. Безпека для дітей у наведених джерелах не підтверджена.",
+        "en": "NC State rates the leaves, fruit and sap low-severity toxic to cats and dogs. The cited sources do not confirm safety for children.",
+        "ru": "По данным NC State, листья, плоды и сок слаботоксичны для кошек и собак. Безопасность для детей приведённые источники не подтверждают.",
+        "pl": "Według NC State liście, owoce i sok mają niską toksyczność dla kotów i psów. Przytoczone źródła nie potwierdzają bezpieczeństwa dla dzieci."
       },
       "sourceIds": [
         "ncsu_dracaena_reflexa"

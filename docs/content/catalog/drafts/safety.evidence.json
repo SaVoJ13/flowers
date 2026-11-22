@@ -4,7 +4,7 @@
     "dogs": "ncsu_zz: \"This plant has a medium toxicity to cats and dogs.\"; tag \"#problem for dogs\"",
     "children": "Рівень TOXIC за правилом для дітей: NC State не має тегу для людей; RHS «Harmful if eaten» без тяжкості (QA 2026-11-21). Раніше було MODERATE.",
     "disagreementNote": null,
-    "changeVsCurrent": "Без зміни напрямку (TOXIC залишається токсичним), уточнено тяжкість: MODERATE для котів, собак і дітей за NC State (Medium). Clemson і RHS підтверджують шкідливість без тяжкості.",
+    "changeVsCurrent": "Коти й собаки: TOXIC -> MODERATE за NC State (Medium). Діти лишаються TOXIC: RHS називає рослину шкідливою при поїданні без оцінки тяжкості.",
     "previous": {
       "pets": "TOXIC",
       "children": "TOXIC"
@@ -81,7 +81,7 @@
     "dogs": "ncsu_rubber: \"Problem for Dogs\"; clemson_rubber: sap \"may irritate skin or the stomach if eaten\"",
     "children": "Рівень TOXIC: clemson_rubber описує подразнення шкіри/шлунку соком і радить тримати подалі від дітей, тяжкість не названа (QA 2026-11-21). Раніше було LOW.",
     "disagreementNote": null,
-    "changeVsCurrent": "Тварини лишаються TOXIC; для дітей уточнено LOW (подразник, Clemson) замість загального TOXIC; отруйна частина SAP.",
+    "changeVsCurrent": "Коти й собаки лишаються TOXIC; діти лишаються TOXIC, бо Clemson описує шкоду без названої тяжкості. Отруйна частина — SAP.",
     "previous": {
       "pets": "TOXIC",
       "children": "TOXIC"
@@ -332,7 +332,7 @@
   "dracaena_reflexa": {
     "cats": "ncsu_dracaena_reflexa: Poison Severity: Low; \"This plant is toxic to cats and dogs if ingested.\"; tag #problem for cats",
     "dogs": "ncsu_dracaena_reflexa: Poison Severity: Low; \"This plant is toxic to cats and dogs if ingested.\"; tag #problem for dogs",
-    "children": "ncsu_dracaena_reflexa: речення про людей «If ingested, mouth and throat irritation…», Poison Severity: Low (QA 2026-11-21). Раніше було UNKNOWN.",
+    "children": null,
     "disagreementNote": null,
     "changeVsCurrent": "pets TOXIC -> cats/dogs LOW (severity refined from NC State 'Low'); children stays UNKNOWN (only a generic 'some types of dracaena' remark).",
     "previous": {

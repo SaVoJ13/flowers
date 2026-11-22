@@ -535,20 +535,18 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "cats": "NON_TOXIC",
-      "dogs": "NON_TOXIC",
+      "cats": "UNKNOWN",
+      "dogs": "UNKNOWN",
       "children": "UNKNOWN",
       "toxicParts": [],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "За даними NC State, хлорофітум нетоксичний для котів і собак. Безпека для дітей у наведених джерелах не підтверджена.",
-        "en": "NC State lists spider plant as non-toxic to cats and dogs. The cited sources do not confirm its safety for children.",
-        "ru": "По данным NC State, хлорофитум нетоксичен для кошек и собак. Безопасность для детей приведённые источники не подтверждают.",
-        "pl": "Według NC State zielistka nie jest trująca dla kotów ani psów. Przytoczone źródła nie potwierdzają bezpieczeństwa dla dzieci."
+        "uk": "Безпека для котів, собак і дітей не підтверджена наведеними джерелами.",
+        "en": "Safety for cats, dogs and children is not confirmed by the cited sources.",
+        "ru": "Безопасность для кошек, собак и детей не подтверждена приведёнными источниками.",
+        "pl": "Przytoczone źródła nie potwierdzają bezpieczeństwa dla kotów, psów ani dzieci."
       },
-      "sourceIds": [
-        "ncsu_spider"
-      ]
+      "sourceIds": []
     },
     "i18n": {
       "uk": {
@@ -1053,21 +1051,18 @@
       "soil": "LIGHT_AIRY"
     },
     "safety": {
-      "cats": "NON_TOXIC",
-      "dogs": "NON_TOXIC",
+      "cats": "UNKNOWN",
+      "dogs": "UNKNOWN",
       "children": "UNKNOWN",
       "toxicParts": [],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "Джерела позначають пеперомію як нетоксичну для котів і собак. Даних щодо безпеки для дітей у джерелах немає.",
-        "en": "Sources list peperomia as non-toxic to cats and dogs. They give no information about safety for children.",
-        "ru": "Источники отмечают пеперомию как нетоксичную для кошек и собак. Данных о безопасности для детей в источниках нет.",
-        "pl": "Źródła podają, że peperomia jest nietoksyczna dla kotów i psów. Brak danych o bezpieczeństwie dla dzieci."
+        "uk": "Безпека для котів, собак і дітей не підтверджена наведеними джерелами.",
+        "en": "Safety for cats, dogs and children is not confirmed by the cited sources.",
+        "ru": "Безопасность для кошек, собак и детей не подтверждена приведёнными источниками.",
+        "pl": "Przytoczone źródła nie potwierdzają bezpieczeństwa dla kotów, psów ani dzieci."
       },
-      "sourceIds": [
-        "ncsu_peperomia_obtusifolia",
-        "clemson_peperomia"
-      ]
+      "sourceIds": []
     },
     "i18n": {
       "uk": {
@@ -1775,10 +1770,10 @@
       ],
       "sourcesDisagree": true,
       "explanation": {
-        "uk": "Шефлера шкідлива для котів і собак: жування листя подразнює рот і горло, спричиняє слинотечу й блювання. Дані джерела NC State не збігаються (низька чи серйозна тяжкість); показано обережніший варіант.",
-        "en": "Schefflera is harmful to cats and dogs: chewing leaves irritates the mouth and throat, causing drooling and vomiting. The NC State data disagree (low vs serious severity); the cautious level is shown.",
-        "ru": "Шеффлера вредна для кошек и собак: жевание листьев раздражает рот и горло, вызывает слюнотечение и рвоту. Данные источника NC State расходятся (низкая или серьёзная тяжесть); показан более осторожный вариант.",
-        "pl": "Szeflera jest szkodliwa dla kotów i psów: żucie liści podrażnia jamę ustną i gardło, powoduje ślinotok i wymioty. Dane źródła NC State się różnią (niskie lub poważne nasilenie); pokazano ostrożniejszy wariant."
+        "uk": "Усі частини шефлери можуть серйозно зашкодити котам і собакам. Для людей NC State вказує низьку тяжкість: сік може подразнювати шкіру. Дані джерела розходяться щодо тяжкості для тварин, тому показано обережніший рівень.",
+        "en": "All parts of schefflera may seriously harm cats and dogs. For people, NC State gives a low severity and says the sap may irritate skin. The source disagrees with itself about severity for pets, so the cautious level is shown.",
+        "ru": "Все части шеффлеры могут серьёзно навредить кошкам и собакам. Для людей NC State указывает низкую тяжесть: сок может раздражать кожу. Данные источника расходятся по тяжести для животных, поэтому показан более осторожный уровень.",
+        "pl": "Wszystkie części szeflery mogą poważnie zaszkodzić kotom i psom. Dla ludzi NC State podaje niskie nasilenie: sok może podrażniać skórę. Dane źródła różnią się co do nasilenia u zwierząt, więc pokazano ostrożniejszy poziom."
       },
       "sourceIds": [
         "ncsu_schefflera_arboricola"
@@ -1866,20 +1861,18 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "cats": "NON_TOXIC",
-      "dogs": "NON_TOXIC",
+      "cats": "UNKNOWN",
+      "dogs": "UNKNOWN",
       "children": "UNKNOWN",
       "toxicParts": [],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "За даними NC State, калатея Макоя нетоксична для котів і собак. Безпека для дітей у наведених джерелах не підтверджена.",
-        "en": "NC State lists Goeppertia makoyana as non-toxic to cats and dogs. The cited sources do not confirm its safety for children.",
-        "ru": "По данным NC State, калатея Макоя нетоксична для кошек и собак. Безопасность для детей приведённые источники не подтверждают.",
-        "pl": "Według NC State kalatea Makoya nie jest trująca dla kotów ani psów. Przytoczone źródła nie potwierdzają bezpieczeństwa dla dzieci."
+        "uk": "Безпека для котів, собак і дітей не підтверджена наведеними джерелами.",
+        "en": "Safety for cats, dogs and children is not confirmed by the cited sources.",
+        "ru": "Безопасность для кошек, собак и детей не подтверждена приведёнными источниками.",
+        "pl": "Przytoczone źródła nie potwierdzają bezpieczeństwa dla kotów, psów ani dzieci."
       },
-      "sourceIds": [
-        "ncsu_goeppertia_makoyana"
-      ]
+      "sourceIds": []
     },
     "i18n": {
       "uk": {
@@ -2160,20 +2153,18 @@
       "soil": "ORCHID_BARK"
     },
     "safety": {
-      "cats": "NON_TOXIC",
-      "dogs": "NON_TOXIC",
+      "cats": "UNKNOWN",
+      "dogs": "UNKNOWN",
       "children": "UNKNOWN",
       "toxicParts": [],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "NC State описує фаленопсис як нетоксичний для котів і собак. Даних про безпеку для дітей у джерелах немає.",
-        "en": "NC State lists Phalaenopsis as non-toxic for cats and dogs. The sources give no data on safety for children.",
-        "ru": "NC State описывает фаленопсис как нетоксичный для кошек и собак. Данных о безопасности для детей в источниках нет.",
-        "pl": "NC State opisuje falenopsis jako nietoksyczny dla kotów i psów. Źródła nie podają danych o bezpieczeństwie dla dzieci."
+        "uk": "Безпека для котів, собак і дітей не підтверджена наведеними джерелами.",
+        "en": "Safety for cats, dogs and children is not confirmed by the cited sources.",
+        "ru": "Безопасность для кошек, собак и детей не подтверждена приведёнными источниками.",
+        "pl": "Przytoczone źródła nie potwierdzają bezpieczeństwa dla kotów, psów ani dzieci."
       },
-      "sourceIds": [
-        "ncsu_phalaenopsis"
-      ]
+      "sourceIds": []
     },
     "i18n": {
       "uk": {
@@ -2356,20 +2347,18 @@
       "soil": "AROID_MIX"
     },
     "safety": {
-      "cats": "NON_TOXIC",
-      "dogs": "NON_TOXIC",
+      "cats": "UNKNOWN",
+      "dogs": "UNKNOWN",
       "children": "UNKNOWN",
       "toxicParts": [],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "NC State описує хойю як нетоксичну для котів і собак. Даних про безпеку для дітей у джерелах немає.",
-        "en": "NC State lists Hoya carnosa as non-toxic for cats and dogs. The sources give no data on safety for children.",
-        "ru": "NC State описывает хойю как нетоксичную для кошек и собак. Данных о безопасности для детей в источниках нет.",
-        "pl": "NC State opisuje hoję jako nietoksyczną dla kotów i psów. Źródła nie podają danych o bezpieczeństwie dla dzieci."
+        "uk": "Безпека для котів, собак і дітей не підтверджена наведеними джерелами.",
+        "en": "Safety for cats, dogs and children is not confirmed by the cited sources.",
+        "ru": "Безопасность для кошек, собак и детей не подтверждена приведёнными источниками.",
+        "pl": "Przytoczone źródła nie potwierdzają bezpieczeństwa dla kotów, psów ani dzieci."
       },
-      "sourceIds": [
-        "ncsu_hoya"
-      ]
+      "sourceIds": []
     },
     "i18n": {
       "uk": {
@@ -2451,20 +2440,18 @@
       "soil": "MOISTURE_RETAINING"
     },
     "safety": {
-      "cats": "NON_TOXIC",
-      "dogs": "NON_TOXIC",
+      "cats": "UNKNOWN",
+      "dogs": "UNKNOWN",
       "children": "UNKNOWN",
       "toxicParts": [],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "NC State описує нефролепіс як нетоксичний для котів і собак. Даних про безпеку для дітей у джерелах немає.",
-        "en": "NC State lists Boston fern as non-toxic for cats and dogs. The sources give no data on safety for children.",
-        "ru": "NC State описывает нефролепис как нетоксичный для кошек и собак. Данных о безопасности для детей в источниках нет.",
-        "pl": "NC State opisuje nefrolepis jako nietoksyczny dla kotów i psów. Źródła nie podają danych o bezpieczeństwie dla dzieci."
+        "uk": "Безпека для котів, собак і дітей не підтверджена наведеними джерелами.",
+        "en": "Safety for cats, dogs and children is not confirmed by the cited sources.",
+        "ru": "Безопасность для кошек, собак и детей не подтверждена приведёнными источниками.",
+        "pl": "Przytoczone źródła nie potwierdzają bezpieczeństwa dla kotów, psów ani dzieci."
       },
-      "sourceIds": [
-        "ncsu_nephrolepis"
-      ]
+      "sourceIds": []
     },
     "i18n": {
       "uk": {

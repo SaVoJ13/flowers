@@ -982,20 +982,18 @@
       "soil": "CACTUS_MIX"
     },
     "safety": {
-      "cats": "NON_TOXIC",
-      "dogs": "NON_TOXIC",
+      "cats": "UNKNOWN",
+      "dogs": "UNKNOWN",
       "children": "UNKNOWN",
       "toxicParts": [],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "NC State описує рослину як нетоксичну для котів і собак. Дані щодо дітей у джерелах відсутні; краї листя можуть бути гострими.",
-        "en": "NC State lists this plant as non-toxic for cats and dogs. The sources give no data for children; leaf edges can be sharp.",
-        "ru": "NC State описывает растение как нетоксичное для кошек и собак. Данных о детях в источниках нет; края листьев могут быть острыми.",
-        "pl": "NC State opisuje roślinę jako nietoksyczną dla kotów i psów. Źródła nie podają danych dla dzieci; brzegi liści mogą być ostre."
+        "uk": "Безпека для котів, собак і дітей не підтверджена наведеними джерелами.",
+        "en": "Safety for cats, dogs and children is not confirmed by the cited sources.",
+        "ru": "Безопасность для кошек, собак и детей не подтверждена приведёнными источниками.",
+        "pl": "Przytoczone źródła nie potwierdzają bezpieczeństwa dla kotów, psów ani dzieci."
       },
-      "sourceIds": [
-        "ncsu_beaucarnea"
-      ]
+      "sourceIds": []
     },
     "i18n": {
       "uk": {
@@ -1079,20 +1077,18 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "cats": "NON_TOXIC",
-      "dogs": "NON_TOXIC",
+      "cats": "UNKNOWN",
+      "dogs": "UNKNOWN",
       "children": "UNKNOWN",
       "toxicParts": [],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "NC State описує аспідистру як нетоксичну для котів і собак. Дані щодо безпеки для дітей у джерелах відсутні.",
-        "en": "NC State lists aspidistra as non-toxic for cats and dogs. The sources give no safety data for children.",
-        "ru": "NC State описывает аспидистру как нетоксичную для кошек и собак. Данных о безопасности для детей в источниках нет.",
-        "pl": "NC State opisuje aspidistrę jako nietoksyczną dla kotów i psów. Źródła nie podają danych o bezpieczeństwie dla dzieci."
+        "uk": "Безпека для котів, собак і дітей не підтверджена наведеними джерелами.",
+        "en": "Safety for cats, dogs and children is not confirmed by the cited sources.",
+        "ru": "Безопасность для кошек, собак и детей не подтверждена приведёнными источниками.",
+        "pl": "Przytoczone źródła nie potwierdzają bezpieczeństwa dla kotów, psów ani dzieci."
       },
-      "sourceIds": [
-        "ncsu_aspidistra"
-      ]
+      "sourceIds": []
     },
     "i18n": {
       "uk": {
@@ -2076,20 +2072,18 @@
       "soil": "UNIVERSAL"
     },
     "safety": {
-      "cats": "NON_TOXIC",
-      "dogs": "NON_TOXIC",
+      "cats": "UNKNOWN",
+      "dogs": "UNKNOWN",
       "children": "UNKNOWN",
       "toxicParts": [],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "За даними NC State нетоксичний для котів і собак; даних щодо безпеки для дітей у джерелах немає.",
-        "en": "NC State lists it as non-toxic for cats and dogs; the sources give no safety data for children.",
-        "ru": "По данным NC State нетоксичен для кошек и собак; данных о безопасности для детей в источниках нет.",
-        "pl": "Według NC State nietoksyczny dla kotów i psów; źródła nie podają danych o bezpieczeństwie dla dzieci."
+        "uk": "Безпека для котів, собак і дітей не підтверджена наведеними джерелами.",
+        "en": "Safety for cats, dogs and children is not confirmed by the cited sources.",
+        "ru": "Безопасность для кошек, собак и детей не подтверждена приведёнными источниками.",
+        "pl": "Przytoczone źródła nie potwierdzają bezpieczeństwa dla kotów, psów ani dzieci."
       },
-      "sourceIds": [
-        "ncstate_cissus_alata"
-      ]
+      "sourceIds": []
     },
     "i18n": {
       "uk": {
@@ -2370,16 +2364,15 @@
       "toxicParts": [
         "FRUIT"
       ],
-      "sourcesDisagree": true,
+      "sourcesDisagree": false,
       "explanation": {
-        "uk": "Джерела розходяться: NC State вважає рослину нетоксичною для котів і собак, а RHS відносить її до потенційно шкідливих і застерігає людей та тварин від поїдання плодів.",
-        "en": "Sources disagree: NC State lists it as non-toxic for cats and dogs, while RHS rates it potentially harmful and says the fruit should not be eaten by people or pets.",
-        "ru": "Источники расходятся: NC State считает растение нетоксичным для кошек и собак, а RHS относит его к потенциально вредным, плоды нельзя есть людям и животным.",
-        "pl": "Źródła się różnią: NC State uznaje roślinę za nietoksyczną dla kotów i psów, a RHS za potencjalnie szkodliwą; owoców nie powinni jeść ludzie ani zwierzęta."
+        "uk": "За даними RHS, плоди фатсії можуть зашкодити людям, котам і собакам при поїданні; тяжкість не вказана.",
+        "en": "RHS warns that Fatsia fruit may harm people, cats and dogs if eaten; no severity is stated.",
+        "ru": "По данным RHS, плоды фатсии могут навредить людям, кошкам и собакам при поедании; степень тяжести не указана.",
+        "pl": "Według RHS owoce fatsji mogą zaszkodzić ludziom, kotom i psom po zjedzeniu; nasilenie nie jest podane."
       },
       "sourceIds": [
-        "rhs_fatsia",
-        "ncstate_fatsia"
+        "rhs_fatsia"
       ]
     },
     "i18n": {
@@ -2445,7 +2438,6 @@
         "ru": false,
         "pl": false
       }
-    },
-    "notes": "Теги NC State «non-toxic for cats/dogs» суперечать RHS («Potentially harmful»): взято обережніший рівень; докладно: drafts/safety.evidence.json."
+    }
   }
 ]

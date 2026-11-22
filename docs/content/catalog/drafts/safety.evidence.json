@@ -55,11 +55,11 @@
     }
   },
   "chlorophytum": {
-    "cats": "ncsu_spider: tag \"#non-toxic for cats\"",
-    "dogs": "ncsu_spider: tag \"#non-toxic for dogs\"",
+    "cats": null,
+    "dogs": null,
     "children": null,
     "disagreementNote": null,
-    "changeVsCurrent": "Без змін: коти/собаки NON_TOXIC (теги NC State), діти UNKNOWN. Clemson і Wisconsin про токсичність не пишуть, суперечності немає.",
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
     "previous": {
       "pets": "NON_TOXIC",
       "children": "UNKNOWN"
@@ -110,11 +110,11 @@
     }
   },
   "peperomia": {
-    "cats": "ncsu_peperomia_obtusifolia tag: \"#non-toxic for cats\"; clemson_peperomia: \"Most peperomia are considered safe for pets.\"",
-    "dogs": "ncsu_peperomia_obtusifolia tag: \"#non-toxic for dogs\"; clemson_peperomia: \"Most peperomia are considered safe for pets.\"",
+    "cats": null,
+    "dogs": null,
     "children": null,
     "disagreementNote": null,
-    "changeVsCurrent": "No change: pets NON_TOXIC (NC State tags now backed by a Clemson sentence), children stays UNKNOWN.",
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
     "previous": {
       "pets": "NON_TOXIC",
       "children": "UNKNOWN"
@@ -198,11 +198,11 @@
     }
   },
   "calathea": {
-    "cats": "ncsu_goeppertia_makoyana tag: \"#non-toxic for cats\"",
-    "dogs": "ncsu_goeppertia_makoyana tag: \"#non-toxic for dogs\"",
+    "cats": null,
+    "dogs": null,
     "children": null,
     "disagreementNote": null,
-    "changeVsCurrent": "No change: pets NON_TOXIC (NC State tags only; RHS silent), children UNKNOWN.",
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
     "previous": {
       "pets": "NON_TOXIC",
       "children": "UNKNOWN"
@@ -231,11 +231,11 @@
     }
   },
   "phalaenopsis_hybrid": {
-    "cats": "NC State tag \"#non-toxic for cats\"",
-    "dogs": "NC State tag \"#non-toxic for dogs\"",
+    "cats": null,
+    "dogs": null,
     "children": null,
     "disagreementNote": null,
-    "changeVsCurrent": "Без змін: pets NON_TOXIC (теги NC State), children UNKNOWN. Clemson про токсичність мовчить.",
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
     "previous": {
       "pets": "NON_TOXIC",
       "children": "UNKNOWN"
@@ -253,22 +253,22 @@
     }
   },
   "hoya_carnosa": {
-    "cats": "NC State tag \"#non-toxic for cats\"",
-    "dogs": "NC State tag \"#non-toxic for dogs\"",
+    "cats": null,
+    "dogs": null,
     "children": null,
     "disagreementNote": null,
-    "changeVsCurrent": "Без змін: pets NON_TOXIC (теги NC State), children UNKNOWN. Iowa State про токсичність мовчить.",
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
     "previous": {
       "pets": "NON_TOXIC",
       "children": "UNKNOWN"
     }
   },
   "nephrolepis_exaltata": {
-    "cats": "NC State tag \"non-toxic for cats\"",
-    "dogs": "NC State tag \"non-toxic for dogs\"",
+    "cats": null,
+    "dogs": null,
     "children": null,
     "disagreementNote": null,
-    "changeVsCurrent": "Без змін: pets NON_TOXIC (теги NC State), children UNKNOWN. Wisconsin про токсичність мовчить.",
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
     "previous": {
       "pets": "NON_TOXIC",
       "children": "UNKNOWN"
@@ -385,22 +385,22 @@
     }
   },
   "beaucarnea_recurvata": {
-    "cats": "ncsu_beaucarnea: tag #non-toxic for cats",
-    "dogs": "ncsu_beaucarnea: tag #non-toxic for dogs",
-    "children": "No human toxicity statement in ncsu_beaucarnea, wisc_ponytail or iastate_ponytail (wisc notes only that leaf edges can be sharp enough to cut skin).",
+    "cats": null,
+    "dogs": null,
+    "children": null,
     "disagreementNote": null,
-    "changeVsCurrent": "No change: pets NON_TOXIC (NC State tags), children UNKNOWN; other sources silent on toxicity.",
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
     "previous": {
       "pets": "NON_TOXIC",
       "children": "UNKNOWN"
     }
   },
   "aspidistra_elatior": {
-    "cats": "ncsu_aspidistra: tags #non-toxic for cats, #pet friendly",
-    "dogs": "ncsu_aspidistra: tags #non-toxic for dogs, #pet friendly",
-    "children": "No human toxicity statement in ncsu_aspidistra or rhs_aspidistra.",
+    "cats": null,
+    "dogs": null,
+    "children": null,
     "disagreementNote": null,
-    "changeVsCurrent": "No change: pets NON_TOXIC (NC State tags), children UNKNOWN; RHS silent on toxicity.",
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
     "previous": {
       "pets": "NON_TOXIC",
       "children": "UNKNOWN"
@@ -506,11 +506,11 @@
     }
   },
   "cissus_rhombifolia": {
-    "cats": "ncstate_cissus_alata: tag '#non-toxic for cats'",
-    "dogs": "ncstate_cissus_alata: tag '#non-toxic for dogs'",
+    "cats": null,
+    "dogs": null,
     "children": null,
     "disagreementNote": null,
-    "changeVsCurrent": "No change: pets NON_TOXIC (cats and dogs), children UNKNOWN.",
+    "changeVsCurrent": "Коти, собаки й діти: UNKNOWN. Актуальні наведені джерела не містять явного твердження про безпеку для цих груп; відсутність згадки не трактується як NON_TOXIC.",
     "previous": {
       "pets": "NON_TOXIC",
       "children": "UNKNOWN"
@@ -542,8 +542,8 @@
     "cats": "rhs_fatsia: 'Pets: Fruit are ornamental - not to be eaten - see the HTA guide to potentially harmful plants'",
     "dogs": "rhs_fatsia: 'Pets: Fruit are ornamental - not to be eaten - see the HTA guide to potentially harmful plants'",
     "children": "rhs_fatsia (section 'Potentially harmful'): 'Fruit are ornamental - not to be eaten.'",
-    "disagreementNote": "ncstate_fatsia tags the plant '#non-toxic for cats' and '#non-toxic for dogs', while rhs_fatsia lists it as 'Potentially harmful' with 'Pets: Fruit are ornamental - not to be eaten'. The more cautious level (TOXIC, severity unspecified) is used. clemson_fatsia has no toxicity statements.",
-    "changeVsCurrent": "UNKNOWN -> TOXIC for cats, dogs and children: the new format can record the NC State vs RHS conflict, so the cautious level is shown with disagreement=true instead of UNKNOWN.",
+    "disagreementNote": null,
+    "changeVsCurrent": "UNKNOWN -> TOXIC for cats, dogs and children: RHS says the fruit should not be eaten by people or pets. The current NC State page has no explicit non-toxic statement, so sourcesDisagree is false.",
     "previous": {
       "pets": "UNKNOWN",
       "children": "UNKNOWN"

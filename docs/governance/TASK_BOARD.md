@@ -93,3 +93,4 @@
 
 ## Оновлення сесії 024 — 2026-11-22 (append-only)
 - [ ] `TASK-051` [А] Мінімальний GitHub Actions CI: JDK 21, `testDebugUnitTest`, `bundleRelease`, release-запобіжники, без реальних секретів. Окрема гілка/PR; після зеленого CI розблоковує злиття PR #29.
+- [x] `TASK-051`: PR #30, GitHub run `45050316454` зелений, незалежна QA = `QA Verified`; готово до злиття після зеленого check фінального closeout-коміту.

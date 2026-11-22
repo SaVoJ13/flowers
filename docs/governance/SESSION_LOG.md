@@ -272,3 +272,10 @@
 - QA іншою моделлю: `Needs changes` (P2). Action SHA, permissions, dummy Firebase config, Gradle-команди й release safeguards підтверджено; знайдено ризик витоку: `git grep` без quiet mode надрукував би збіг API-ключа в Actions log.
 - Виправлено на `git grep -qE`: при виявленні ключа job падає, але значення не друкується. Локальні ignored/неtracked приватні файли явно не додаються до комітів.
 - Наступний крок: новий GitHub run і повторна QA.
+
+### Сесія 024, фінал TASK-051
+- Після `chmod +x` другий run був скасований concurrency новим QA-виправленням. У scan API-ключів використано quiet mode `git grep -qE`, щоб жоден знайдений секрет не друкувався в лог.
+- GitHub run `45050316454`: `SUCCESS`; job `Tests and release bundle` завершився за 4m22s, усі кроки зелені (wrapper validation, JDK 21, tests/bundle, release safeguards).
+- Annotation про застарілий Gradle 8.12.1 інформаційна; оновлення інструментарію не входить у TASK-051 і раніше відхилене Власником як ненавмисне.
+- Повторна незалежна QA іншою моделлю: `QA Verified`; permissions, SHA pinning, dummy Firebase config, quiet secret scan і safeguards підтверджено; секретів у PR diff немає.
+- Стан: TASK-051 виконано, PR #30 готовий до злиття після зеленого check фінального closeout-коміту. Після merge оновити PR #29 від `main` і дочекатися його CI.

@@ -262,3 +262,8 @@
 - Із тією самою фіктивною Firebase-конфігурацією, що у workflow, виконано JDK 21 `testDebugUnitTest bundleRelease`: `BUILD SUCCESSFUL`, 154 тести, 0 failures/errors/skipped.
 - AAB створено; debug App Check provider не знайдено, Play Integrity provider присутній; API-key pattern у tracked-файлах відсутній.
 - Наступний крок: створити PR TASK-051, дочекатися GitHub check і провести незалежну QA іншою моделлю.
+
+### Сесія 024, GitHub run 45049900198
+- PR #30 створено. Перший job впав за 7 секунд до запуску Gradle: `/home/runner/...sh: ./gradlew: Permission denied` (exit 126).
+- Причина: executable bit `gradlew` не переноситься з поточного Windows checkout. У workflow додано окремий крок `chmod +x gradlew`; послаблень тестів немає.
+- Наступний крок: повторний GitHub run після push виправлення.

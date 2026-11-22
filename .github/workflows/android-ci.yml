@@ -71,6 +71,9 @@ jobs:
           JSON
           echo "Created ephemeral CI-only Firebase configuration."
 
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
       - name: Run unit tests and build release bundle
         run: ./gradlew --no-daemon --no-parallel --stacktrace testDebugUnitTest bundleRelease
 

@@ -26,5 +26,6 @@
 - Створено окрему гілку `codex/task-051-github-actions-ci` від `origin/main`.
 - Локальна smoke-перевірка виконана в чистому `git archive` без реального `google-services.json`, лише з тимчасовою CI-only конфігурацією: `BUILD SUCCESSFUL`; 154/154 тести, 0 failures/errors/skipped; AAB створено.
 - Перевірки AAB: `DebugAppCheckProviderFactory` відсутній, `PlayIntegrityAppCheckProviderFactory` присутній; шаблон реального Google API-ключа у tracked-файлах не знайдено.
+- Перший GitHub run `45049900198` зупинився до Gradle з `./gradlew: Permission denied` (Windows checkout не зберіг executable bit). Додано явний `chmod +x gradlew`; тести застосунку в цьому run не запускались.
 - Наступний крок: PR, реальний GitHub Actions run і незалежна QA.
 

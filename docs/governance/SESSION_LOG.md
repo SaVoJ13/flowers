@@ -256,3 +256,9 @@
 - Офіційні action-релізи звірено 2026-11-22 і pinned на повні commit SHA: checkout v7.0.1, setup-java v6.2.0, gradle/actions v6.4.1.
 - Workflow не використовує реальний `google-services.json`: створює тимчасову CI-only конфігурацію, запускає unit-тести й release bundle, перевіряє App Check providers і відсутність API-ключів у tracked-файлах. CI AAB не публікується.
 - Наступний крок: локальна smoke-перевірка, PR, GitHub run і незалежна QA.
+
+### Сесія 024, локальна smoke-перевірка
+- Commit `5f5b2f9` експортовано через `git archive` у тимчасову папку; реальні локальні `google-services.json`, `keystore.properties` і upload-ключ не копіювалися.
+- Із тією самою фіктивною Firebase-конфігурацією, що у workflow, виконано JDK 21 `testDebugUnitTest bundleRelease`: `BUILD SUCCESSFUL`, 154 тести, 0 failures/errors/skipped.
+- AAB створено; debug App Check provider не знайдено, Play Integrity provider присутній; API-key pattern у tracked-файлах відсутній.
+- Наступний крок: створити PR TASK-051, дочекатися GitHub check і провести незалежну QA іншою моделлю.

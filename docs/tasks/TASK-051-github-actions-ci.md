@@ -24,5 +24,7 @@
 ## Журнал 2026-11-22
 
 - Створено окрему гілку `codex/task-051-github-actions-ci` від `origin/main`.
-- Наступний крок: локальна перевірка workflow, PR і незалежна QA.
+- Локальна smoke-перевірка виконана в чистому `git archive` без реального `google-services.json`, лише з тимчасовою CI-only конфігурацією: `BUILD SUCCESSFUL`; 154/154 тести, 0 failures/errors/skipped; AAB створено.
+- Перевірки AAB: `DebugAppCheckProviderFactory` відсутній, `PlayIntegrityAppCheckProviderFactory` присутній; шаблон реального Google API-ключа у tracked-файлах не знайдено.
+- Наступний крок: PR, реальний GitHub Actions run і незалежна QA.
 

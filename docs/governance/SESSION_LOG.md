@@ -267,3 +267,8 @@
 - PR #30 створено. Перший job впав за 7 секунд до запуску Gradle: `/home/runner/...sh: ./gradlew: Permission denied` (exit 126).
 - Причина: executable bit `gradlew` не переноситься з поточного Windows checkout. У workflow додано окремий крок `chmod +x gradlew`; послаблень тестів немає.
 - Наступний крок: повторний GitHub run після push виправлення.
+
+### Сесія 024, незалежна QA PR #30
+- QA іншою моделлю: `Needs changes` (P2). Action SHA, permissions, dummy Firebase config, Gradle-команди й release safeguards підтверджено; знайдено ризик витоку: `git grep` без quiet mode надрукував би збіг API-ключа в Actions log.
+- Виправлено на `git grep -qE`: при виявленні ключа job падає, але значення не друкується. Локальні ignored/неtracked приватні файли явно не додаються до комітів.
+- Наступний крок: новий GitHub run і повторна QA.

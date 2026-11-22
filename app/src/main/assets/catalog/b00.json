@@ -746,10 +746,10 @@
       ],
       "sourcesDisagree": false,
       "explanation": {
-        "uk": "Проблемний для котів і собак (тяжкість не вказана). Білий липкий сік може подразнювати шкіру або шлунок при поїданні, тому рослину тримають подалі від дітей і тварин.",
-        "en": "A problem for cats and dogs (severity not given). The sticky white sap may irritate skin or the stomach if eaten, so keep it away from children and pets.",
-        "ru": "Проблемен для кошек и собак (тяжесть не указана). Белый липкий сок может раздражать кожу или желудок при поедании, поэтому растение держат подальше от детей и животных.",
-        "pl": "Problem dla kotów i psów (nasilenie nie podane). Lepki biały sok może podrażniać skórę lub żołądek po zjedzeniu, więc roślinę trzyma się z dala od dzieci i zwierząt."
+        "uk": "За даними NC State, фікус може зашкодити котам і собакам; тяжкість не вказана. Clemson застерігає, що білий липкий сік може подразнювати шкіру або шлунок при поїданні, тому рослину слід тримати подалі від дітей і тварин.",
+        "en": "NC State warns that rubber plant may harm cats and dogs, without stating a severity. Clemson says the sticky white sap may irritate skin or the stomach if eaten and advises keeping the plant away from children and pets.",
+        "ru": "По данным NC State, фикус может навредить кошкам и собакам; степень тяжести не указана. Clemson предупреждает, что белый липкий сок может раздражать кожу или желудок при поедании, поэтому растение следует держать подальше от детей и животных.",
+        "pl": "Według NC State figowiec może zaszkodzić kotom i psom; nasilenie nie jest podane. Clemson ostrzega, że lepki biały sok może podrażniać skórę lub żołądek po zjedzeniu, dlatego roślinę należy trzymać z dala od dzieci i zwierząt."
       },
       "sourceIds": [
         "ncsu_rubber",

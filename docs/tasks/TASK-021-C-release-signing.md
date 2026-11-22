@@ -32,3 +32,11 @@
 
 - Офіційна інструкція Android вимагає однаковий пароль для сховища й ключа через відому проблему інструментів підпису. Інструкцію та `keystore.properties.example` виправлено: Власник обирає один пароль і записує його в обидва поля.
 - `keystore.properties` тепер читається через UTF-8 `Reader`, тому кириличний шлях не спотворюється. Інструкція вимагає прямі риски `/` у шляху та пояснює екранування `\` як `\\` у паролі.
+
+### Повторна незалежна QA 2026-11-22 — QA Verified
+
+- Інша модель (`gpt-6-luna`) перевірила diff після виправлень: проблем у Gradle signing config, UTF-8 читанні properties, захисті секретів та інструкції не знайдено.
+- Після припинення паралельних Gradle-процесів виконано чистий послідовний прогін на JDK 21: `clean :app:testDebugUnitTest :app:bundleRelease --no-parallel` — `BUILD SUCCESSFUL`; 154/154 тести, 0 failures/errors/skipped.
+- Технічний AAB без `keystore.properties` очікувано непідписаний (`jar is unsigned`). У чотирьох dex немає `DebugAppCheckProviderFactory`, є `PlayIntegrityAppCheckProviderFactory`; шаблон реального Google API-ключа у відстежуваних файлах не знайдено.
+- Зупинився на: потрібен локальний upload-ключ Власника і `keystore.properties` за `docs/release/UPLOAD_KEY_GUIDE.uk.md`.
+- Наступний крок: після повідомлення Власника «upload-ключ створено, `keystore.properties` заповнено» повторно зібрати AAB і підтвердити `jar verified`, не читаючи й не показуючи секрети.

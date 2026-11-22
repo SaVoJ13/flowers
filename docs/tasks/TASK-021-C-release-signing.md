@@ -49,3 +49,10 @@
 - AAB: `app/build/outputs/bundle/release/app-release.aab`, 17 461 972 bytes, SHA-256 `9D9EDD8B752747A5A04993B84CE4D6A1BB773FCC947EE882FEB1A804FAEC322D`.
 - `keystore.properties` підтверджено як ignored; AAB із каталогу Android Studio `app/release/` також виключено з Git. Ключ, паролі й `keystore.properties` не комітяться.
 - TASK-021-C технічно виконано; PR #29 не зливається, доки не вирішено долю незакомічених автоматичних оновлень Android Studio (AGP 8.7.3 → 8.13.2, Gradle 8.12.1 → 8.13, Foojay resolver і daemon JVM properties).
+
+### Фінальна збірка на затвердженому інструментарії 2026-11-22
+
+- Власник підтвердив, що оновлення Android Studio було ненавмисним. Три tracked-файли відновлено до стану гілки; згенерований `gradle/gradle-daemon-jvm.properties` видалено. Ключ, `keystore.properties` і AAB не чіпали.
+- На затверджених AGP 8.7.3 / Gradle 8.12.1 повторено `:app:bundleRelease --rerun-tasks --no-parallel`: `BUILD SUCCESSFUL`; `jarsigner -verify` = код 0, `jar verified`.
+- **Канонічний фінальний AAB:** `app/build/outputs/bundle/release/app-release.aab`, 17 510 432 bytes, SHA-256 `69A09BCAF6DB87608D1FEC9E7F900F940628AE025FAFF073C210BACDC56DC375`. Цей хеш замінює попередній, отриманий ненавмисно оновленим інструментарієм; попередній запис збережено як історію перевірки.
+- Конфігурація AGP/Gradle/settings повернута до HEAD; поза цими append-only доповненнями ненавмисних змін немає. TASK-021-C готове до повторної QA-звірки й злиття PR #29.

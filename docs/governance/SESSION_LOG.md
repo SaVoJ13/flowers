@@ -263,3 +263,9 @@
 - `keystore.properties` ignored. `app/release/` додано до `.gitignore`, щоб AAB із майстра Android Studio не потрапив у Git.
 - Під час перевірки виявлено незакомічені зміни, створені під час дій Власника в Android Studio: AGP 8.7.3 → 8.13.2, Gradle 8.12.1 → 8.13, Foojay resolver, `gradle-daemon-jvm.properties` і `app/release/app-release.aab`. Їх не змінено, не видалено й не додано до коміту; потрібне рішення Власника, чи оновлення інструментів було навмисним.
 - Стан: TASK-021-C технічно виконано, PR #29 не зливати до вирішення цього робочого дерева й фінальної звірки.
+
+### Сесія 023, фінал: відновлення інструментарію
+- Власник відповів, що оновлення AGP/Gradle було ненавмисним. Відновлено `gradle/libs.versions.toml`, `gradle/wrapper/gradle-wrapper.properties`, `settings.gradle.kts`; видалено лише згенерований незакомічений `gradle/gradle-daemon-jvm.properties`. Приватний ключ, `keystore.properties` і AAB не видалялися.
+- На стані гілки (AGP 8.7.3, Gradle 8.12.1) повторно виконано підписаний `bundleRelease`: `BUILD SUCCESSFUL`; `jarsigner` = код 0, `jar verified`.
+- Канонічний AAB: 17 510 432 bytes, SHA-256 `69A09BCAF6DB87608D1FEC9E7F900F940628AE025FAFF073C210BACDC56DC375`. Попередній хеш належав збірці з ненавмисно оновленим інструментарієм і не використовується для завантаження.
+- Конфігурація AGP/Gradle/settings після відновлення збігається з HEAD; незакоміченими лишаються лише append-only доповнення цієї сесії. Наступний крок: повторна незалежна звірка доказів і злиття PR #29 за умови відсутності нових зауважень.

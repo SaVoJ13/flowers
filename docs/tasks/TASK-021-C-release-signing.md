@@ -40,3 +40,12 @@
 - Технічний AAB без `keystore.properties` очікувано непідписаний (`jar is unsigned`). У чотирьох dex немає `DebugAppCheckProviderFactory`, є `PlayIntegrityAppCheckProviderFactory`; шаблон реального Google API-ключа у відстежуваних файлах не знайдено.
 - Зупинився на: потрібен локальний upload-ключ Власника і `keystore.properties` за `docs/release/UPLOAD_KEY_GUIDE.uk.md`.
 - Наступний крок: після повідомлення Власника «upload-ключ створено, `keystore.properties` заповнено» повторно зібрати AAB і підтвердити `jar verified`, не читаючи й не показуючи секрети.
+
+### Підписаний AAB 2026-11-22
+
+- Власник повідомив, що upload-ключ і локальний `keystore.properties` створено; агент не читав і не показував їхній вміст.
+- `:app:bundleRelease --rerun-tasks --no-parallel` на JDK 21 — `BUILD SUCCESSFUL`; `validateSigningRelease` і `signReleaseBundle` виконано.
+- `jarsigner -verify` завершився з кодом 0 і результатом `jar verified`.
+- AAB: `app/build/outputs/bundle/release/app-release.aab`, 17 461 972 bytes, SHA-256 `9D9EDD8B752747A5A04993B84CE4D6A1BB773FCC947EE882FEB1A804FAEC322D`.
+- `keystore.properties` підтверджено як ignored; AAB із каталогу Android Studio `app/release/` також виключено з Git. Ключ, паролі й `keystore.properties` не комітяться.
+- TASK-021-C технічно виконано; PR #29 не зливається, доки не вирішено долю незакомічених автоматичних оновлень Android Studio (AGP 8.7.3 → 8.13.2, Gradle 8.12.1 → 8.13, Foojay resolver і daemon JVM properties).

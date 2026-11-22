@@ -256,3 +256,10 @@
 - Технічний AAB без `keystore.properties` очікувано непідписаний. У release dex відсутній `DebugAppCheckProviderFactory`, присутній `PlayIntegrityAppCheckProviderFactory`; реальних Google API-ключів у tracked-файлах не знайдено.
 - Стан: гілка `codex/task-021-c-release-signing`, PR #29; підписаний AAB ще не створено, секретів агент не бачив.
 - Наступний крок: Власник створює upload-ключ і локальний `keystore.properties` за `docs/release/UPLOAD_KEY_GUIDE.uk.md`, потім агент повторно збирає й перевіряє `jar verified`.
+
+### Сесія 023, продовження: підписаний AAB
+- Власник повідомив про створення upload-ключа й локального `keystore.properties`; їхній вміст агент не читав і не показував.
+- На JDK 21 виконано `:app:bundleRelease --rerun-tasks --no-parallel`: `BUILD SUCCESSFUL`; `jarsigner -verify` = код 0, `jar verified`. AAB: 17 461 972 bytes, SHA-256 `9D9EDD8B752747A5A04993B84CE4D6A1BB773FCC947EE882FEB1A804FAEC322D`.
+- `keystore.properties` ignored. `app/release/` додано до `.gitignore`, щоб AAB із майстра Android Studio не потрапив у Git.
+- Під час перевірки виявлено незакомічені зміни, створені під час дій Власника в Android Studio: AGP 8.7.3 → 8.13.2, Gradle 8.12.1 → 8.13, Foojay resolver, `gradle-daemon-jvm.properties` і `app/release/app-release.aab`. Їх не змінено, не видалено й не додано до коміту; потрібне рішення Власника, чи оновлення інструментів було навмисним.
+- Стан: TASK-021-C технічно виконано, PR #29 не зливати до вирішення цього робочого дерева й фінальної звірки.

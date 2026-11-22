@@ -275,3 +275,33 @@
 - PR #29 має `mergeStateStatus=CLEAN`, але `statusCheckRollup=[]`: у GitHub немає налаштованих CI-checks.
 - Запит на merge з видаленням власної гілки не виконано: середовище виконання відхилило його як ризиковий через відсутність підтвердженого зеленого CI. Стан захисту гілки GitHub цим не перевірявся.
 - Стан: PR #29 відкритий. Наступний крок Власника: після повідомлення про ризик явно дозволити merge без CI або доручити окреме налаштування CI.
+## Сесія 024 (2026-11-22, Codex): bootstrap GitHub Actions CI
+- Власник обрав безпечну альтернативу merge без CI: налаштувати мінімальний GitHub Actions CI.
+- Прикріплені Власником `CONSTITUTION.uk.md`, `CONSTITUTION.en.md` і `PROJECT_PROFILE.template.md` побайтово збігаються з файлами в репозиторії; додаткових змін правил не потрібно.
+- Створено окрему гілку `codex/task-051-github-actions-ci` від `origin/main`, картку TASK-051 і workflow `.github/workflows/android-ci.yml`.
+- Офіційні action-релізи звірено 2026-11-22 і pinned на повні commit SHA: checkout v7.0.1, setup-java v6.2.0, gradle/actions v6.4.1.
+- Workflow не використовує реальний `google-services.json`: створює тимчасову CI-only конфігурацію, запускає unit-тести й release bundle, перевіряє App Check providers і відсутність API-ключів у tracked-файлах. CI AAB не публікується.
+- Наступний крок: локальна smoke-перевірка, PR, GitHub run і незалежна QA.
+
+### Сесія 024, локальна smoke-перевірка
+- Commit `5f5b2f9` експортовано через `git archive` у тимчасову папку; реальні локальні `google-services.json`, `keystore.properties` і upload-ключ не копіювалися.
+- Із тією самою фіктивною Firebase-конфігурацією, що у workflow, виконано JDK 21 `testDebugUnitTest bundleRelease`: `BUILD SUCCESSFUL`, 154 тести, 0 failures/errors/skipped.
+- AAB створено; debug App Check provider не знайдено, Play Integrity provider присутній; API-key pattern у tracked-файлах відсутній.
+- Наступний крок: створити PR TASK-051, дочекатися GitHub check і провести незалежну QA іншою моделлю.
+
+### Сесія 024, GitHub run 45049900198
+- PR #30 створено. Перший job впав за 7 секунд до запуску Gradle: `/home/runner/...sh: ./gradlew: Permission denied` (exit 126).
+- Причина: executable bit `gradlew` не переноситься з поточного Windows checkout. У workflow додано окремий крок `chmod +x gradlew`; послаблень тестів немає.
+- Наступний крок: повторний GitHub run після push виправлення.
+
+### Сесія 024, незалежна QA PR #30
+- QA іншою моделлю: `Needs changes` (P2). Action SHA, permissions, dummy Firebase config, Gradle-команди й release safeguards підтверджено; знайдено ризик витоку: `git grep` без quiet mode надрукував би збіг API-ключа в Actions log.
+- Виправлено на `git grep -qE`: при виявленні ключа job падає, але значення не друкується. Локальні ignored/неtracked приватні файли явно не додаються до комітів.
+- Наступний крок: новий GitHub run і повторна QA.
+
+### Сесія 024, фінал TASK-051
+- Після `chmod +x` другий run був скасований concurrency новим QA-виправленням. У scan API-ключів використано quiet mode `git grep -qE`, щоб жоден знайдений секрет не друкувався в лог.
+- GitHub run `45050316454`: `SUCCESS`; job `Tests and release bundle` завершився за 4m22s, усі кроки зелені (wrapper validation, JDK 21, tests/bundle, release safeguards).
+- Annotation про застарілий Gradle 8.12.1 інформаційна; оновлення інструментарію не входить у TASK-051 і раніше відхилене Власником як ненавмисне.
+- Повторна незалежна QA іншою моделлю: `QA Verified`; permissions, SHA pinning, dummy Firebase config, quiet secret scan і safeguards підтверджено; секретів у PR diff немає.
+- Стан: TASK-051 виконано, PR #30 готовий до злиття після зеленого check фінального closeout-коміту. Після merge оновити PR #29 від `main` і дочекатися його CI.

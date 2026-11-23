@@ -66,4 +66,6 @@ sealed class ImageProcessingException(message: String, cause: Throwable? = null)
     class OutOfMemory(message: String, cause: Throwable? = null) : ImageProcessingException(message, cause)
     class IoFailure(message: String, cause: Throwable? = null) : ImageProcessingException(message, cause)
     class SaveFailed(message: String, cause: Throwable? = null) : ImageProcessingException(message, cause)
+    class FileAlreadyExists(message: String) : ImageProcessingException(message)
+    class InvalidFileName(message: String) : ImageProcessingException(message)
 }

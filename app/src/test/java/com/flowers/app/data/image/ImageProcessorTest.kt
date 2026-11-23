@@ -1,9 +1,13 @@
 package com.flowers.app.data.image
 
 import androidx.exifinterface.media.ExifInterface
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -79,7 +83,6 @@ class ImageProcessorTest {
         assertEquals(576, data.processedDimensions.height)
         assertTrue(data.byteSize > 0)
 
-        // Verify aspect ratio preservation
         val originalAspect = 1920f / 1080f
         val processedAspect = data.processedDimensions.width.toFloat() / data.processedDimensions.height.toFloat()
         assertTrue("Aspect ratio preserved", abs(originalAspect - processedAspect) < 0.01)
@@ -131,7 +134,6 @@ class ImageProcessorTest {
         val originalFile = File(inputDir, "rotated_90.jpg")
         createTestJpeg(originalFile, 1920, 1080, orientation = 6) // Orientation 6 = 90° CW
 
-        // Verify source has orientation 6
         val srcExif = ExifInterface(originalFile.absolutePath)
         assertEquals(ExifInterface.ORIENTATION_ROTATE_90, srcExif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1))
 
@@ -139,7 +141,6 @@ class ImageProcessorTest {
         assertTrue(result.isSuccess)
 
         val data = result.getOrThrow()
-        // Visual image is portrait (1080x1920) -> downscaled to 576x1024
         assertEquals(576, data.processedDimensions.width)
         assertEquals(1024, data.processedDimensions.height)
     }
@@ -155,7 +156,6 @@ class ImageProcessorTest {
         val result = processor.processFile(originalFile, ImageProfile.SpeciesIdentification)
         assertTrue(result.isSuccess)
 
-        // Verify original file remained strictly byte-identical
         assertEquals("Original size must not change", initialSize, originalFile.length())
         assertEquals("Original MD5 hash must not change", initialMd5, calculateMd5(originalFile))
     }
@@ -165,23 +165,71 @@ class ImageProcessorTest {
         val originalFile = File(inputDir, "geotagged_photo.jpg")
         createTestJpeg(originalFile, 800, 600, hasGps = true)
 
-        // Verify source has GPS
         val checkSrcExif = ExifInterface(originalFile.absolutePath)
         assertNotNull(checkSrcExif.getAttribute(ExifInterface.TAG_GPS_LATITUDE))
 
-        // Process through ImageProcessor
         val result = processor.processFile(originalFile, ImageProfile.SpeciesIdentification)
         assertTrue(result.isSuccess)
 
         val outputFile = result.getOrThrow().file
         val outExif = ExifInterface(outputFile.absolutePath)
 
-        // Assert all GPS and camera metadata tags are null / stripped
         assertNull("GPS latitude must be stripped", outExif.getAttribute(ExifInterface.TAG_GPS_LATITUDE))
         assertNull("Camera make must be stripped", outExif.getAttribute(ExifInterface.TAG_MAKE))
         assertNull("Camera model must be stripped", outExif.getAttribute(ExifInterface.TAG_MODEL))
         val orientationTag = outExif.getAttribute(ExifInterface.TAG_ORIENTATION)
         assertTrue("EXIF orientation tag must be null or undefined (0)", orientationTag == null || orientationTag == "0")
+    }
+
+    @Test
+    fun `path traversal attempts are detected and rejected`() = runBlocking {
+        val originalFile = File(inputDir, "normal.jpg")
+        createTestJpeg(originalFile, 600, 400)
+
+        // Attempt 1: Relative navigation ../../evil.jpg
+        val res1 = processor.processFile(originalFile, customFileName = "../../evil.jpg")
+        assertTrue(res1.isFailure)
+        assertTrue(res1.exceptionOrNull() is ImageProcessingException.InvalidFileName)
+
+        // Attempt 2: Subdirectory slash
+        val res2 = processor.processFile(originalFile, customFileName = "subdir/photo.jpg")
+        assertTrue(res2.isFailure)
+        assertTrue(res2.exceptionOrNull() is ImageProcessingException.InvalidFileName)
+
+        // Attempt 3: Backslash
+        val res3 = processor.processFile(originalFile, customFileName = "test\\escape.jpg")
+        assertTrue(res3.isFailure)
+        assertTrue(res3.exceptionOrNull() is ImageProcessingException.InvalidFileName)
+    }
+
+    @Test
+    fun `forbids overwriting existing target file and preserves existing file untouched`() = runBlocking {
+        val originalFile = File(inputDir, "new_photo.jpg")
+        createTestJpeg(originalFile, 800, 600)
+
+        val existingFile = File(outputDir, "existing_card.jpg")
+        existingFile.writeText("PRE-EXISTING PHOTO CONTENT THAT MUST NOT BE DELETED")
+        val existingSize = existingFile.length()
+
+        val result = processor.processFile(originalFile, customFileName = "existing_card.jpg")
+        assertTrue("Must fail when target file already exists", result.isFailure)
+        assertTrue(result.exceptionOrNull() is ImageProcessingException.FileAlreadyExists)
+
+        // Assert existing file was NOT modified or deleted
+        assertTrue(existingFile.exists())
+        assertEquals("Existing file size must not change", existingSize, existingFile.length())
+        assertEquals("PRE-EXISTING PHOTO CONTENT THAT MUST NOT BE DELETED", existingFile.readText())
+    }
+
+    @Test
+    fun `forbids processing when source and target point to the same file`() = runBlocking {
+        val sameFile = File(outputDir, "same_file.jpg")
+        createTestJpeg(sameFile, 800, 600)
+
+        // Pass sameFile as both source and target in outputDir
+        val result = processor.processFile(sameFile, customFileName = "same_file.jpg")
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull() is ImageProcessingException.InvalidImage)
     }
 
     @Test
@@ -193,17 +241,19 @@ class ImageProcessorTest {
         assertTrue("Must fail gracefully for corrupt files", result.isFailure)
         assertTrue(result.exceptionOrNull() is ImageProcessingException)
 
-        // Verify no leftover files in output directory
         val leftoverFiles = outputDir.listFiles() ?: emptyArray()
         assertEquals("Output directory must be empty after failed processing", 0, leftoverFiles.size)
     }
 
     @Test
-    fun `failed compression cleans up temporary files atomically`() = runBlocking {
+    fun `failed compression cleans up only temporary files and leaves output directory intact`() = runBlocking {
         val validFile = File(inputDir, "valid_for_failing_engine.jpg")
         createTestJpeg(validFile, 600, 400)
 
-        // Mock engine that fails during compression
+        // Create an existing photo in output directory to ensure it is not touched
+        val existingPreciousPhoto = File(outputDir, "precious_plant.jpg")
+        existingPreciousPhoto.writeText("UNTOUCHED PLANT PHOTO")
+
         val failingEngine = object : ImageDecoderEngine by engine {
             override fun compressToFile(
                 bitmapHolder: DecodedBitmapHolder,
@@ -211,18 +261,39 @@ class ImageProcessorTest {
                 quality: Int,
                 destinationFile: File
             ): Boolean {
-                // Simulate partial write followed by failure
                 destinationFile.writeText("partial garbage")
                 return false
             }
         }
 
         val failingProcessor = ImageProcessor(outputDirectory = outputDir, engine = failingEngine)
-        val result = failingProcessor.processFile(validFile, ImageProfile.SpeciesIdentification)
+        val result = failingProcessor.processFile(validFile, ImageProfile.SpeciesIdentification, customFileName = "failed_task.jpg")
 
         assertTrue(result.isFailure)
-        val files = outputDir.listFiles() ?: emptyArray()
-        // Guarantee no incomplete/corrupt or .tmp files remain
-        assertEquals("No temporary or partial files should be left behind", 0, files.size)
+
+        // Assert only the existing photo remains; temporary file is cleaned up, failed target is not created
+        val files = outputDir.listFiles()?.map { it.name } ?: emptyList()
+        assertEquals(listOf("precious_plant.jpg"), files)
+        assertEquals("UNTOUCHED PLANT PHOTO", existingPreciousPhoto.readText())
+    }
+
+    @Test
+    fun `coroutine cancellation propagates without being swallowed`() = runBlocking {
+        val originalFile = File(inputDir, "cancel_test.jpg")
+        createTestJpeg(originalFile, 1200, 800)
+
+        var cancelledCaught = false
+        val job = launch {
+            try {
+                // Cancel current scope before/during execution
+                cancel("User left the screen")
+                processor.processFile(originalFile)
+            } catch (e: CancellationException) {
+                cancelledCaught = true
+                throw e
+            }
+        }
+        job.join()
+        assertTrue("CancellationException must be rethrown and propagate", cancelledCaught)
     }
 }

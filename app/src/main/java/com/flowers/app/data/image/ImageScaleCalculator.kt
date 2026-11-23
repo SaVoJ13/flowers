@@ -18,6 +18,30 @@ data class ExifTransform(
 )
 
 /**
+ * Деталізована оцінка використання оперативної пам'яті під час обробки.
+ * Відокремлює теоретичний обсяг сирого растру від фактичного пікового сліду з урахуванням
+ * проміжних Bitmap, матричних перетворень та буферів стиснення.
+ *
+ * @property theoreticalRawBytes Теоретичний розмір растру повного оригіналу (w * h * 4).
+ * @property sampledBitmapBytes Розмір первинного субсемпльованого растру після BitmapFactory.
+ * @property intermediateTransformedBytes Розмір другого проміжного растру під час трансформації Matrix (createBitmap).
+ * @property compressionBufferBytes Орієнтовний обсяг системного буфера потоку кодування (1–2 МБ).
+ * @property estimatedPeakBytes Оцінка пікового споживання пам'яті в момент одночасного існування двох растрових копій.
+ */
+data class MemoryEstimate(
+    val theoreticalRawBytes: Long,
+    val sampledBitmapBytes: Long,
+    val intermediateTransformedBytes: Long,
+    val compressionBufferBytes: Long,
+    val estimatedPeakBytes: Long
+) {
+    val estimatedSavingsPercentage: Double
+        get() = if (theoreticalRawBytes > 0) {
+            ((theoreticalRawBytes - estimatedPeakBytes).coerceAtLeast(0).toDouble() / theoreticalRawBytes.toDouble()) * 100.0
+        } else 0.0
+}
+
+/**
  * Калькулятор масштабування, пам'яті та EXIF-геометрії (TASK-052).
  * Чисті детерміновані функції без прив'язки до Android framework для надійного тестування.
  */
@@ -89,9 +113,54 @@ object ImageScaleCalculator {
     }
 
     /**
-     * Оцінює обсяг оперативної пам'яті (у байтах), необхідний для зберігання пікселів у форматі ARGB_8888 (4 байти на піксель).
+     * Розраховує повну аналітичну оцінку споживання пам'яті під час конвеєра обробки.
+     * Враховує:
+     * 1. Первинний семпльований Bitmap.
+     * 2. Другий проміжний Bitmap, який виділяється методом Bitmap.createBitmap під час застосування Matrix.
+     * 3. Буфер стиснення потоку виведення (~1.5 МБ).
      */
-    fun estimateMemoryUsageBytes(width: Int, height: Int, inSampleSize: Int = 1, bytesPerPixel: Int = 4): Long {
+    fun estimateMemoryFootprint(
+        rawWidth: Int,
+        rawHeight: Int,
+        targetMaxDimension: Int,
+        orientation: Int = 1,
+        bytesPerPixel: Int = 4
+    ): MemoryEstimate {
+        val theoreticalRaw = rawWidth.toLong() * rawHeight.toLong() * bytesPerPixel.toLong()
+        val inSampleSize = calculateInSampleSize(rawWidth, rawHeight, targetMaxDimension)
+        val sampledW = (rawWidth / inSampleSize).coerceAtLeast(1).toLong()
+        val sampledH = (rawHeight / inSampleSize).coerceAtLeast(1).toLong()
+        val sampledBytes = sampledW * sampledH * bytesPerPixel.toLong()
+
+        val targetDims = calculateTargetDimensions(rawWidth, rawHeight, targetMaxDimension, orientation)
+        val transform = getExifTransform(orientation)
+        val needsTransform = transform.rotationDegrees != 0f ||
+            transform.flipHorizontal ||
+            transform.flipVertical ||
+            maxOf(sampledW, sampledH) > targetMaxDimension
+
+        val intermediateBytes = if (needsTransform) {
+            targetDims.width.toLong() * targetDims.height.toLong() * bytesPerPixel.toLong()
+        } else {
+            0L
+        }
+
+        val compressionBufferBytes = 1_500_000L // ~1.5 МБ для буферів потоку кодера
+        val peakBytes = sampledBytes + intermediateBytes + compressionBufferBytes
+
+        return MemoryEstimate(
+            theoreticalRawBytes = theoreticalRaw,
+            sampledBitmapBytes = sampledBytes,
+            intermediateTransformedBytes = intermediateBytes,
+            compressionBufferBytes = compressionBufferBytes,
+            estimatedPeakBytes = peakBytes
+        )
+    }
+
+    /**
+     * Оцінює теоретичний обсяг пам'яті (у байтах) для зберігання растру в форматі ARGB_8888.
+     */
+    fun estimateRawMemoryBytes(width: Int, height: Int, inSampleSize: Int = 1, bytesPerPixel: Int = 4): Long {
         if (width <= 0 || height <= 0 || inSampleSize <= 0) return 0L
         val sampledWidth = (width / inSampleSize).coerceAtLeast(1).toLong()
         val sampledHeight = (height / inSampleSize).coerceAtLeast(1).toLong()

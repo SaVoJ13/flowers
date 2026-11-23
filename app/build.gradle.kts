@@ -71,10 +71,6 @@ android {
         compose = true
         buildConfig = true
     }
-
-    testOptions {
-        unitTests.isReturnDefaultValues = true
-    }
 }
 
 dependencies {
@@ -116,6 +112,11 @@ dependencies {
     // Тест міграції Room на JVM (TASK-025): реальна SQLite без пристрою; лише test scope.
     testImplementation("org.xerial:sqlite-jdbc:3.46.1.3")
     testImplementation(libs.kotlinx.coroutines.test)
+
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

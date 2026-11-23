@@ -39,29 +39,27 @@ class ImageScaleCalculatorTest {
     }
 
     @Test
-    fun `memory estimation proves dramatic RAM reduction avoiding OOM`() {
-        // 200 MP raw uncompressed: 16384 * 12288 * 4 bytes = 805,306,368 bytes (~805 MB RAM!)
-        val raw200Bytes = ImageScaleCalculator.estimateMemoryUsageBytes(16384, 12288, inSampleSize = 1)
-        assertTrue(raw200Bytes > 800_000_000L)
+    fun `memory footprint estimation accounts for intermediate bitmaps and stream buffers`() {
+        // 200 MP: theoretical raw ~805 MB
+        val footprint200 = ImageScaleCalculator.estimateMemoryFootprint(16384, 12288, 1024, orientation = 1)
+        assertTrue("Theoretical raw should be ~805 MB", footprint200.theoreticalRawBytes > 800_000_000L)
+        // With inSampleSize=16, primary sampled is 1024x768 = ~3.15 MB
+        assertEquals(1024L * 768L * 4L, footprint200.sampledBitmapBytes)
+        // Peak footprint including secondary matrix bitmap and 1.5 MB stream buffer remains < 10 MB
+        assertTrue("Peak memory must remain under 10 MB", footprint200.estimatedPeakBytes < 10_000_000L)
+        assertTrue("Memory savings must exceed 98%", footprint200.estimatedSavingsPercentage > 98.0)
 
-        // 200 MP with inSampleSize=16: 1024 * 768 * 4 bytes = 3,145,728 bytes (~3.1 MB RAM!)
-        val sampled200Bytes = ImageScaleCalculator.estimateMemoryUsageBytes(16384, 12288, inSampleSize = 16)
-        assertEquals(1024L * 768L * 4L, sampled200Bytes)
-        assertTrue("RAM savings should exceed 99%", (raw200Bytes - sampled200Bytes).toDouble() / raw200Bytes > 0.99)
+        // 50 MP: theoretical raw ~201 MB
+        val footprint50 = ImageScaleCalculator.estimateMemoryFootprint(8192, 6144, 1024, orientation = 1)
+        assertTrue("Theoretical raw should be ~201 MB", footprint50.theoreticalRawBytes > 200_000_000L)
+        assertTrue("Peak memory must remain under 10 MB", footprint50.estimatedPeakBytes < 10_000_000L)
+        assertTrue("Memory savings must exceed 95%", footprint50.estimatedSavingsPercentage > 95.0)
 
-        // 50 MP raw: ~201 MB RAM. With inSampleSize=8: ~3.1 MB RAM (>98% savings)
-        val raw50Bytes = ImageScaleCalculator.estimateMemoryUsageBytes(8192, 6144, inSampleSize = 1)
-        val sampled50Bytes = ImageScaleCalculator.estimateMemoryUsageBytes(8192, 6144, inSampleSize = 8)
-        assertTrue(raw50Bytes > 200_000_000L)
-        assertEquals(1024L * 768L * 4L, sampled50Bytes)
-        assertTrue("RAM savings should exceed 98%", (raw50Bytes - sampled50Bytes).toDouble() / raw50Bytes > 0.98)
-
-        // 12 MP raw: ~48 MB RAM. With inSampleSize=2: ~12 MB RAM (75% savings)
-        val raw12Bytes = ImageScaleCalculator.estimateMemoryUsageBytes(4000, 3000, inSampleSize = 1)
-        val sampled12Bytes = ImageScaleCalculator.estimateMemoryUsageBytes(4000, 3000, inSampleSize = 2)
-        assertEquals(4000L * 3000L * 4L, raw12Bytes)
-        assertEquals(2000L * 1500L * 4L, sampled12Bytes)
-        assertEquals(0.75, (raw12Bytes - sampled12Bytes).toDouble() / raw12Bytes, 0.001)
+        // 12 MP: theoretical raw ~48 MB
+        val footprint12 = ImageScaleCalculator.estimateMemoryFootprint(4000, 3000, 1024, orientation = 1)
+        assertEquals(4000L * 3000L * 4L, footprint12.theoreticalRawBytes)
+        assertTrue("Peak memory must remain under 20 MB", footprint12.estimatedPeakBytes < 20_000_000L)
+        assertTrue("Memory savings must exceed 60%", footprint12.estimatedSavingsPercentage > 60.0)
     }
 
     @Test
@@ -161,13 +159,10 @@ class ImageScaleCalculatorTest {
 
     @Test
     fun `calculateTargetDimensions accounts for EXIF orientation dimension swapping`() {
-        // Landscape photo stored as 4000x3000, but with EXIF 6 (90° CW)
-        // Visual image is portrait: width=3000, height=4000
         val dims90 = ImageScaleCalculator.calculateTargetDimensions(4000, 3000, 1024, orientation = 6)
         assertEquals(768, dims90.width)
         assertEquals(1024, dims90.height)
 
-        // Transpose (orientation 5)
         val dimsTranspose = ImageScaleCalculator.calculateTargetDimensions(4000, 3000, 1024, orientation = 5)
         assertEquals(768, dimsTranspose.width)
         assertEquals(1024, dimsTranspose.height)

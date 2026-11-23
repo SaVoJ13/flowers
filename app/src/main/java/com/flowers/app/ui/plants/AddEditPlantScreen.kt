@@ -239,6 +239,7 @@ private fun AddPlantPhotoFlowContent(
                 is AddPlantUiState.Confirmation -> {
                     PlantConfirmationForm(
                         state = state,
+                        viewModel = viewModel,
                         onSave = { name, species, botanical, room, light, interval, advice, soil, toxicity, confidence, isAi ->
                             viewModel.savePlant(
                                 plantId = null,
@@ -501,6 +502,7 @@ private fun ErrorStateView(
 @Composable
 private fun PlantConfirmationForm(
     state: AddPlantUiState.Confirmation,
+    viewModel: PlantsViewModel,
     onSave: (
         customName: String,
         speciesName: String,
@@ -516,6 +518,9 @@ private fun PlantConfirmationForm(
     ) -> Unit,
     onCancel: () -> Unit
 ) {
+    val isSaving by viewModel.isSaving.collectAsState()
+    var hasSwitchedToAlternative by remember { mutableStateOf(false) }
+
     var customName by remember {
         mutableStateOf(
             state.identification.nameUk.ifBlank { "Мій вазон" }
@@ -558,8 +563,9 @@ private fun PlantConfirmationForm(
 
         // 2. Бейдж впевненості ШІ
         ConfidenceBadge(
-            confidence = state.identification.confidence,
-            isOffline = state.isOfflineFallback
+            confidence = if (hasSwitchedToAlternative) "LOW" else state.identification.confidence,
+            isOffline = state.isOfflineFallback,
+            isAlternative = hasSwitchedToAlternative
         )
 
         // 3. Альтернативні варіанти виду (якщо є)
@@ -580,13 +586,47 @@ private fun PlantConfirmationForm(
                         FilterChip(
                             selected = speciesName == alt,
                             onClick = {
-                                speciesName = alt
-                                if (customName == state.identification.nameUk || customName == "Мій вазон") {
-                                    customName = alt
+                                if (speciesName != alt) {
+                                    speciesName = alt
+                                    if (customName == state.identification.nameUk || customName == "Мій вазон") {
+                                        customName = alt
+                                    }
+                                    // Безпека: при виборі іншого виду скидаємо залежні рекомендації попереднього виду
+                                    botanicalName = ""
+                                    wateringAdvice = ""
+                                    soilType = ""
+                                    toxicityInfo = "UNKNOWN"
+                                    hasSwitchedToAlternative = true
                                 }
                             },
                             label = { Text(alt) }
                         )
+                    }
+                }
+
+                if (hasSwitchedToAlternative) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Info,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Text(
+                                text = "Обрано альтернативний вид: рекомендації попереднього виду скинуто для безпеки. Будь ласка, вкажіть або перевірте умови догляду.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
                     }
                 }
             }
@@ -735,10 +775,10 @@ private fun PlantConfirmationForm(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        // 10. Кнопки збереження та скасування
+        // 10. Кнопки збереження та скасування (із захистом від повторних натискань)
         Button(
             onClick = {
-                if (customName.isNotBlank()) {
+                if (customName.isNotBlank() && !isSaving) {
                     onSave(
                         customName.trim(),
                         speciesName.trim(),
@@ -749,22 +789,26 @@ private fun PlantConfirmationForm(
                         wateringAdvice.trim(),
                         soilType.trim(),
                         toxicityInfo.trim(),
-                        state.identification.confidence,
-                        !state.isOfflineFallback
+                        if (hasSwitchedToAlternative) "LOW" else state.identification.confidence,
+                        !state.isOfflineFallback && !hasSwitchedToAlternative
                     )
                 }
             },
-            enabled = customName.isNotBlank(),
+            enabled = customName.isNotBlank() && !isSaving,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
             shape = RoundedCornerShape(14.dp)
         ) {
-            Text("Зберегти в мої рослини", style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = if (isSaving) "Збереження..." else "Зберегти в мої рослини",
+                style = MaterialTheme.typography.titleMedium
+            )
         }
 
         OutlinedButton(
             onClick = onCancel,
+            enabled = !isSaving,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -780,9 +824,16 @@ private fun PlantConfirmationForm(
 @Composable
 private fun ConfidenceBadge(
     confidence: String,
-    isOffline: Boolean
+    isOffline: Boolean,
+    isAlternative: Boolean = false
 ) {
     val (text, containerColor, contentColor, icon) = when {
+        isAlternative -> Quadruple(
+            "Ручний вибір (альтернативний вид)",
+            MaterialTheme.colorScheme.secondaryContainer,
+            MaterialTheme.colorScheme.onSecondaryContainer,
+            Icons.Default.Info
+        )
         isOffline -> Quadruple(
             "Ручне введення (офлайн)",
             MaterialTheme.colorScheme.surfaceVariant,
@@ -847,6 +898,7 @@ private fun EditPlantContent(
     onNavigateBack: () -> Unit
 ) {
     val catalogPlants by repository.getAllCatalogPlants().collectAsState(initial = emptyList())
+    val isSaving by viewModel.isSaving.collectAsState()
 
     var customName by remember { mutableStateOf("") }
     var selectedSpecies by remember { mutableStateOf<CatalogPlantEntity?>(null) }
@@ -1015,7 +1067,7 @@ private fun EditPlantContent(
 
             Button(
                 onClick = {
-                    if (customName.isNotBlank()) {
+                    if (customName.isNotBlank() && !isSaving) {
                         viewModel.savePlant(
                             plantId = plantId,
                             customName = customName.trim(),
@@ -1028,13 +1080,16 @@ private fun EditPlantContent(
                         )
                     }
                 },
-                enabled = customName.isNotBlank(),
+                enabled = customName.isNotBlank() && !isSaving,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
                 shape = RoundedCornerShape(14.dp)
             ) {
-                Text("Зберегти зміни", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = if (isSaving) "Збереження..." else "Зберегти зміни",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
         }
     }

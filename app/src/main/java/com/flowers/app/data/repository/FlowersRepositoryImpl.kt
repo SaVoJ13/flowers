@@ -31,11 +31,11 @@ class FlowersRepositoryImpl(
     private val careEventDao: CareEventDao,
     private val catalogDao: CatalogDao,
     private val carePodDao: CarePodDao,
-    private val context: Context
+    private val context: Context,
+    private val geminiPlantService: GeminiPlantService = GeminiPlantService(catalogDao, carePodDao, AndroidNetworkChecker(context))
 ) : FlowersRepository {
 
     override val userPreferences: UserPreferences = UserPreferences(context)
-    private val geminiPlantService = GeminiPlantService(catalogDao, carePodDao, AndroidNetworkChecker(context))
     private var cachedSymptomTree: SymptomTreeRoot? = null
 
     init {

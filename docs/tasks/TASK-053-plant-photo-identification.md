@@ -51,3 +51,13 @@
   - `assembleDebug`: BUILD SUCCESSFUL.
   - `bundleRelease`: BUILD SUCCESSFUL.
 
+- **Крок 6: Усунення блокувальних зауважень архітектурного аудиту:**
+  - 1. **Скасування та очищення тимчасових фото:** `activeAnalysisJob?.cancel()`, відстеження `pendingPhotoFile`, гарантоване видалення залишкових файлів при виклику `resetAddPlantFlow(discardPhoto = true)` та захист від запізнілих результатів ШІ.
+  - 2. **Правдива історія поливу:** вилучено створення штучної події `WATER` при створенні картки рослини; `lastWateredDate` для нових рослин залишається `null`; `ReminderCalculator.calculateInitialCheckDate(now)` призначає перевірку ґрунту на день додавання.
+  - 3. **Безпека альтернативних видів:** при виборі чіпа альтернативного виду скидаються залежні поля (`botanicalName`, `wateringAdvice`, `soilType`), токсичність переводиться в `UNKNOWN`, рівень впевненості — в `LOW`, користувач отримує попереджувальний банер.
+  - 4. **Захист від дублювання збереження:** блокування повторних натискань кнопки «Зберегти» через `_isSaving` у `PlantsViewModel` та `AddEditPlantScreen`.
+  - 5. **Android Instrumented тест міграції Room v2 → v3 (`RoomMigrationV2ToV3Test`):** створення реальної бази даних SQLite v2 на ізольованому емуляторі `emulator-5554`, виконання `MIGRATION_2_3`, відкриття через Room v3, верифікація збереження 100% рослин і подій догляду та підтримки нових колонок v3. Результат: 1/1 PASSED.
+  - 6. **Наскрізний інструментальний тест користувацького сценарію (`AddPlantUserScenarioTest`):** прогін повного шляху (фото $\rightarrow$ `ImageProcessor` $\rightarrow$ ШІ $\rightarrow$ екран підтвердження $\rightarrow$ збереження в Room v3 $\rightarrow$ повторне відкриття), скасування з очищенням фото, офлайн-фолбек. Результат: 3/3 PASSED.
+  - 7. **EXIF та растр (`AndroidImageProcessorTest`):** верифікація 8 EXIF-орієнтацій на рівні пікселів на `emulator-5554`. Результат: 5/5 PASSED.
+
+

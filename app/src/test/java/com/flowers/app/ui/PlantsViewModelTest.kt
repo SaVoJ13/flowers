@@ -1,12 +1,6 @@
 package com.flowers.app.ui
 
 import android.net.Uri
-import com.flowers.app.data.image.ImageDimensions
-import com.flowers.app.data.image.ImageFormat
-import com.flowers.app.data.image.ImageProcessResult
-import com.flowers.app.data.image.ImageProcessor
-import com.flowers.app.data.image.ImageProfile
-import com.flowers.app.data.image.TestImageDecoderEngine
 import com.flowers.app.data.local.entity.CareEventEntity
 import com.flowers.app.data.local.entity.CarePodEntity
 import com.flowers.app.data.local.entity.CatalogPlantEntity
@@ -17,12 +11,13 @@ import com.flowers.app.data.remote.GeneratePlantResult
 import com.flowers.app.data.remote.IdentifyPlantResult
 import com.flowers.app.data.remote.PlantIdentificationResponse
 import com.flowers.app.data.repository.FlowersRepository
+import com.flowers.app.domain.ReminderCalculator
 import com.flowers.app.ui.plants.AddPlantUiState
 import com.flowers.app.ui.plants.PlantsViewModel
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -33,6 +28,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -70,7 +66,8 @@ class PlantsViewModelTest {
                 toxicityInfo = "UNKNOWN",
                 alternativeSpecies = listOf("Філодендрон")
             )
-        )
+        ),
+        val onIdentifyDeferred: CompletableDeferred<Unit>? = null
     ) : FlowersRepository {
         val insertedPlants = mutableListOf<PlantEntity>()
         val updatedPlants = mutableListOf<PlantEntity>()
@@ -121,7 +118,10 @@ class PlantsViewModelTest {
         override suspend fun skipPlant(plant: PlantEntity) {}
         override suspend fun generatePlantWithAi(plantQuery: String): GeneratePlantResult = throw UnsupportedOperationException()
 
-        override suspend fun identifyPlantFromPhoto(imageFile: File): IdentifyPlantResult = identifyResult
+        override suspend fun identifyPlantFromPhoto(imageFile: File): IdentifyPlantResult {
+            onIdentifyDeferred?.await()
+            return identifyResult
+        }
     }
 
     @Test
@@ -160,7 +160,24 @@ class PlantsViewModelTest {
     }
 
     @Test
-    fun `savePlant inserts PlantEntity with Flowers 2_0 fields and logs care event`() = runTest {
+    fun `resetAddPlantFlow during AnalyzingWithAi deletes active photo and stays Idle`() = runTest {
+        val deferred = CompletableDeferred<Unit>()
+        val repo = FakeRepository(onIdentifyDeferred = deferred)
+        val viewModel = PlantsViewModel(repo)
+
+        val tempPhoto = File(tempDir, "analyzing_photo.jpg").apply { writeText("image data") }
+        assertTrue(tempPhoto.exists())
+
+        // Симулюємо перебування у стані AnalyzingWithAi
+        viewModel.onManualEntryRequested(photoFile = tempPhoto)
+        viewModel.resetAddPlantFlow(discardPhoto = true)
+
+        assertEquals(AddPlantUiState.Idle, viewModel.addPlantUiState.value)
+        assertFalse("Файл фото мав бути видалений при скасуванні", tempPhoto.exists())
+    }
+
+    @Test
+    fun `savePlant inserts PlantEntity with Flowers 2_0 fields and DOES NOT record false WATER event`() = runTest {
         val repo = FakeRepository()
         val viewModel = PlantsViewModel(repo)
 
@@ -200,8 +217,10 @@ class PlantsViewModelTest {
         assertEquals(8, plant.checkIntervalDays)
         assertEquals("/data/plants/species_monstera.jpg", plant.photoUri)
 
-        assertEquals(1, repo.careEvents.size)
-        assertEquals("WATER", repo.careEvents.first().eventType)
+        // Правдива історія: створення картки НЕ є поливом!
+        assertNull("lastWateredDate має бути null без підтвердження поливу", plant.lastWateredDate)
+        assertEquals("Жодних штучних подій WATER не повинно бути записано", 0, repo.careEvents.size)
+        assertTrue("Рослина має потребувати огляду ґрунту сьогодні", ReminderCalculator.isDue(plant.nextCheckDate))
     }
 
     @Test
@@ -242,5 +261,31 @@ class PlantsViewModelTest {
         assertEquals("Кабінет", updated.roomLocation)
         assertEquals("INDIRECT", updated.lightLevel)
         assertEquals(7, updated.checkIntervalDays)
+    }
+
+    @Test
+    fun `duplicate savePlant calls while saving are ignored`() = runTest {
+        val repo = FakeRepository()
+        val viewModel = PlantsViewModel(repo)
+
+        var saveCount = 0
+        // Перший виклик
+        viewModel.savePlant(
+            plantId = null,
+            customName = "Рослина 1",
+            onSaved = { saveCount++ }
+        )
+        // Негайний повторний виклик до завершення першого
+        viewModel.savePlant(
+            plantId = null,
+            customName = "Рослина дублікат",
+            onSaved = { saveCount++ }
+        )
+
+        advanceUntilIdle()
+
+        assertEquals("Має бути створено рівно одну рослину без дублікатів", 1, repo.insertedPlants.size)
+        assertEquals("onSaved має викликатися один раз", 1, saveCount)
+        assertFalse("isSaving має скинутися після завершення", viewModel.isSaving.value)
     }
 }

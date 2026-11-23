@@ -17,6 +17,17 @@ object ReminderCalculator {
     }
 
     /**
+     * Calculates the initial check date for a newly added plant.
+     * Marked due for soil check immediately (start of today) so the user
+     * can inspect soil moisture before watering.
+     */
+    fun calculateInitialCheckDate(
+        fromTimestamp: Long = System.currentTimeMillis()
+    ): Long {
+        return normalizeToStartOfDay(fromTimestamp)
+    }
+
+    /**
      * Calculates the postponed check date when user clicks "Snooze / Відкласти" (1 to 3 days).
      */
     fun calculateSnoozeDate(

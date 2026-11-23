@@ -71,6 +71,10 @@ android {
         compose = true
         buildConfig = true
     }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -96,6 +100,7 @@ dependencies {
 
     // Coil & Gson
     implementation(libs.coil.compose)
+    implementation(libs.androidx.exifinterface)
     implementation(libs.gson)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)

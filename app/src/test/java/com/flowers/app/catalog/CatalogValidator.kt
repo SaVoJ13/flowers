@@ -14,7 +14,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 /**
- * Валідатор каталогу `schema: 1` (TASK-038). Чиста функція над текстами JSON, без Android: працює в JVM-тестах
+ * Валідатор каталогу `schema: 2` (TASK-038; безпека за ADR-020: рівні для котів/собак/дітей, отруйні частини, суперечності, пояснення 4 мовами). Чиста функція над текстами JSON, без Android: працює в JVM-тестах
  * на `app/src/main/assets/catalog` і на навмисно зламаних прикладах. Повертає список помилок (порожній = валідно).
  * Правила описані в `docs/content/catalog/FORMAT.md`; змінюючи тут, змінювати й там.
  */
@@ -32,7 +32,28 @@ object CatalogValidator {
     val LIGHT = listOf("LOW", "MEDIUM", "HIGH", "DIRECT") // порядок = зростання
     val HUMIDITY = listOf("LOW", "MEDIUM", "HIGH")
     val SOIL = listOf("UNIVERSAL", "AROID_MIX", "CACTUS_MIX", "ORCHID_BARK", "MOISTURE_RETAINING", "LIGHT_AIRY")
-    val SAFETY = listOf("TOXIC", "NON_TOXIC", "UNKNOWN")
+    /** Рівні токсичності: NON_TOXIC лише з явного твердження джерела; TOXIC = токсична без вказаної тяжкості; UNKNOWN = явних даних немає. */
+    val LEVELS = listOf("NON_TOXIC", "LOW", "MODERATE", "SEVERE", "TOXIC", "UNKNOWN")
+    private val TOXIC_LEVELS = setOf("LOW", "MODERATE", "SEVERE", "TOXIC")
+    val PARTS = listOf("LEAVES", "STEMS", "SAP", "ROOTS", "BULBS", "FLOWERS", "FRUIT", "BERRIES", "SEEDS", "ALL_PARTS", "UNSPECIFIED")
+    /** Вузькі маркери «джерела розходяться» (без хибних збігів на «Different parts», «różni się zależnie od części»). */
+    private val DISAGREE_MARKERS = mapOf(
+        "uk" to Regex("(джерел\\p{L}*|дані|даних)[^.]{0,40}(розходят|не збігаються)|розходят", RegexOption.IGNORE_CASE),
+        "ru" to Regex("(источник\\p{L}*|данные)[^.]{0,40}(расходят|не совпадают)|расходят", RegexOption.IGNORE_CASE),
+        "pl" to Regex("(źródł\\p{L}*|dane|danych)[^.]{0,40}(różni|rozbieżn|sprzeczn)", RegexOption.IGNORE_CASE),
+        "en" to Regex("(sources?|data)\\s+(disagree|differ|conflict)|conflicting (sources|data)", RegexOption.IGNORE_CASE)
+    )
+    /** Нейтральний текст для картки, де всі рівні UNKNOWN. */
+    private val UNKNOWN_MARKERS = mapOf(
+        "uk" to Regex("не підтверджен", RegexOption.IGNORE_CASE),
+        "ru" to Regex("не подтвержд", RegexOption.IGNORE_CASE),
+        "pl" to Regex("nie jest potwierdz|nie potwierdz|niepotwierdz", RegexOption.IGNORE_CASE),
+        "en" to Regex("not confirmed", RegexOption.IGNORE_CASE)
+    )
+    private val UK_FORBIDDEN = Regex("[ыэёъ]")
+    private val RU_FORBIDDEN = Regex("[іїєґ]")
+    private val EXPLANATION_LEN = 15..250
+    const val SCHEMA = 2
     val SOURCE_KINDS = listOf("extension", "botanical", "society", "other")
 
     const val ASPCA_PREFIX = "https://www.aspca.org/"
@@ -65,7 +86,8 @@ object CatalogValidator {
     private val CARD_KEYS = setOf("id", "latin", "family", "retired", "replacedBy", "care", "safety", "i18n", "sourceIds", "review", "notes")
     private val CARD_REQUIRED = CARD_KEYS - setOf("notes", "replacedBy")
     private val CARE_KEYS = setOf("difficulty", "lightMin", "lightMax", "checkIntervalDays", "humidity", "soil")
-    private val SAFETY_KEYS = setOf("pets", "children", "sourceIds", "aspcaUrl")
+    private val SAFETY_KEYS = setOf("cats", "dogs", "children", "toxicParts", "sourcesDisagree", "explanation", "sourceIds", "aspcaUrl")
+    private val SAFETY_REQUIRED = SAFETY_KEYS - "aspcaUrl"
     private val TEXT_KEYS = setOf("name", "aliases", "summary", "watering", "light", "soil", "tip")
     private val REVIEW_KEYS = setOf("authoredBy", "factChecked", "ownerSampled", "nativeReviewed")
     private val SOURCE_DEF_KEYS = setOf("title", "publisher", "url", "kind")
@@ -97,7 +119,7 @@ object CatalogValidator {
             val keys = setOf("contentVersion", "schema", "batches")
             checkKeys(man, keys, keys, "manifest", errors)
             contentVersion = man.int("contentVersion", "manifest.contentVersion", errors, 0..100000) ?: 0
-            man.int("schema", "manifest.schema", errors, 1..1)
+            man.int("schema", "manifest.schema", errors, SCHEMA..SCHEMA)
             val arr = man.get("batches")
             if (arr != null) {
                 if (arr !is JsonArray) errors += "manifest.batches має бути масивом" else arr.forEach { e ->
@@ -116,6 +138,7 @@ object CatalogValidator {
         presentBatchFiles.filter { it !in batchNames }.forEach { errors += "файл $it.json лежить у каталозі, але не вказаний у manifest.batches" }
 
         val seenIds = HashMap<String, String>()
+        val nameOwners = HashMap<String, String>()
         val replacements = ArrayList<Triple<String, String, String>>()
         for (b in batchNames) {
             val text = batches[b] ?: continue
@@ -137,6 +160,7 @@ object CatalogValidator {
                 }
                 val id = validateCard(el, where, sourceIds, errors)
                 if (id != null) {
+                    collectNames(el, id, nameOwners, errors)
                     seenIds.put(id, where)?.let { errors += "$where: id '$id' дублює $it" }
                     val rb = el.get("replacedBy")
                     if (rb != null && rb.isJsonPrimitive && rb.asJsonPrimitive.isString) replacements += Triple(where, id, rb.asString)
@@ -160,6 +184,81 @@ object CatalogValidator {
             }
         }
         return errors
+    }
+
+    /**
+     * Назва чи псевдонім у ОДНІЙ мові не може повторюватися в двох різних картках (напр. «Грошове дерево» і в пахіри, і в красули).
+     * Порівняння без регістру й зайвих пробілів; назва й псевдонім однієї картки можуть збігатися.
+     */
+    private fun collectNames(card: JsonObject, id: String, owners: MutableMap<String, String>, errors: MutableList<String>) {
+        val i18n = card.get("i18n") as? JsonObject ?: return
+        for (lang in LANGS) {
+            val t = i18n.get(lang) as? JsonObject ?: continue
+            val values = ArrayList<String>()
+            (t.get("name") as? com.google.gson.JsonPrimitive)?.takeIf { it.isString }?.let { values += it.asString }
+            (t.get("aliases") as? JsonArray)?.forEach { a -> if (a.isJsonPrimitive && a.asJsonPrimitive.isString) values += a.asString }
+            for (v in values) {
+                val key = lang + "|" + v.trim().lowercase().replace(Regex("\\s+"), " ")
+                val prev = owners.putIfAbsent(key, id)
+                if (prev != null && prev != id) errors += "$id.i18n.$lang: назва/псевдонім '$v' уже вжито в картці $prev"
+            }
+        }
+    }
+
+    private fun validateSafety(s: JsonObject, w: String, sourceIds: Set<String>, errors: MutableList<String>) {
+        val sw = "$w.safety"
+        checkKeys(s, SAFETY_KEYS, SAFETY_REQUIRED, sw, errors)
+        val cats = s.enum("cats", LEVELS, "$sw.cats", errors)
+        val dogs = s.enum("dogs", LEVELS, "$sw.dogs", errors)
+        val kids = s.enum("children", LEVELS, "$sw.children", errors)
+        val levels = listOfNotNull(cats, dogs, kids)
+        val anyToxic = levels.any { it in TOXIC_LEVELS }
+        val anyClaim = levels.any { it != "UNKNOWN" }
+
+        val parts = s.strList("toxicParts", "$sw.toxicParts", errors)
+        if (parts != null) {
+            parts.filter { it !in PARTS }.forEach { errors += "$sw.toxicParts: '$it' не з $PARTS" }
+            if (parts.toSet().size != parts.size) errors += "$sw.toxicParts: дублі"
+            if (("ALL_PARTS" in parts || "UNSPECIFIED" in parts) && parts.size > 1) errors += "$sw.toxicParts: ALL_PARTS/UNSPECIFIED не поєднуються з іншими значеннями"
+            if (anyToxic && parts.isEmpty()) errors += "$sw.toxicParts: для токсичного рівня потрібна отруйна частина (або UNSPECIFIED)"
+            if (!anyToxic && levels.size == 3 && parts.isNotEmpty()) errors += "$sw.toxicParts: має бути порожнім, якщо жоден рівень не токсичний"
+        }
+        val disagree = s.get("sourcesDisagree")
+        val disagrees = if (disagree != null && disagree.isJsonPrimitive && disagree.asJsonPrimitive.isBoolean) disagree.asBoolean
+            else { if (s.has("sourcesDisagree")) errors += "$sw.sourcesDisagree має бути boolean"; false }
+
+        val sids = s.strList("sourceIds", "$sw.sourceIds", errors)
+        if (sids != null) {
+            if (sids.toSet().size != sids.size) errors += "$sw.sourceIds: дублі"
+            sids.filter { it !in sourceIds }.forEach { errors += "$sw.sourceIds: невідоме джерело '$it'" }
+            if (anyClaim && sids.isEmpty()) errors += "$sw: рівень ≠ UNKNOWN потребує safety.sourceIds (безпека лише з джерела)"
+        }
+        if (disagrees && !anyClaim) errors += "$sw: sourcesDisagree=true без жодного рівня ≠ UNKNOWN"
+
+        s.obj("explanation", sw, errors)?.let { ex ->
+            val keys = ex.keySet()
+            (LANGS - keys).forEach { errors += "$sw.explanation: немає мови $it" }
+            (keys - LANGS.toSet()).forEach { errors += "$sw.explanation: зайва мова $it" }
+            for (lang in LANGS) {
+                val t = ex.str(lang, "$sw.explanation.$lang", errors, EXPLANATION_LEN) ?: continue
+                val cyr = CYRILLIC.containsMatchIn(t)
+                if ((lang == "uk" || lang == "ru") && (!cyr || t.count { CYRILLIC.matches(it.toString()) } * 2 <= t.count { it.isLetter() })) {
+                    errors += "$sw.explanation.$lang: очікується переважно кирилиця"
+                }
+                if (lang == "uk" && UK_FORBIDDEN.containsMatchIn(t.lowercase())) errors += "$sw.explanation.$lang: російські літери (ы э ё ъ) в українському тексті"
+                if (lang == "ru" && RU_FORBIDDEN.containsMatchIn(t.lowercase())) errors += "$sw.explanation.$lang: українські літери (і ї є ґ) у російському тексті"
+                if ((lang == "en" || lang == "pl") && NON_LATIN.containsMatchIn(t)) errors += "$sw.explanation.$lang: кирилиця або грецькі літери"
+                val saysDisagree = DISAGREE_MARKERS.getValue(lang).containsMatchIn(t)
+                if (disagrees && !saysDisagree) errors += "$sw.explanation.$lang: при sourcesDisagree=true пояснення має прямо сказати, що джерела розходяться"
+                if (!disagrees && saysDisagree) errors += "$sw.explanation.$lang: пояснення згадує розбіжність джерел, але sourcesDisagree=false"
+                if (!anyClaim && !UNKNOWN_MARKERS.getValue(lang).containsMatchIn(t)) errors += "$sw.explanation.$lang: для всіх UNKNOWN потрібен нейтральний текст «не підтверджено джерелами»"
+            }
+        }
+        s.get("aspcaUrl")?.let { u ->
+            val ok = u.isJsonPrimitive && u.asJsonPrimitive.isString && u.asString.startsWith(ASPCA_PREFIX) &&
+                u.asString.length <= 300 && !CONTROL.containsMatchIn(u.asString) && u.asString.none { it.isWhitespace() }
+            if (!ok) errors += "$sw.aspcaUrl: має починатися з $ASPCA_PREFIX"
+        }
     }
 
     private fun validateSources(src: JsonObject, ids: MutableSet<String>, errors: MutableList<String>) {
@@ -216,21 +315,7 @@ object CatalogValidator {
             care.enum("soil", SOIL, "$w.care.soil", errors)
         }
 
-        c.obj("safety", w, errors)?.let { s ->
-            checkKeys(s, SAFETY_KEYS, setOf("pets", "children", "sourceIds"), "$w.safety", errors)
-            val pets = s.enum("pets", SAFETY, "$w.safety.pets", errors)
-            val kids = s.enum("children", SAFETY, "$w.safety.children", errors)
-            val sids = s.strList("sourceIds", "$w.safety.sourceIds", errors)
-            if (sids != null && sids.toSet().size != sids.size) errors += "$w.safety.sourceIds: дублі"
-            sids?.filter { it !in sourceIds }?.forEach { errors += "$w.safety.sourceIds: невідоме джерело '$it'" }
-            val claims = (pets != null && pets != "UNKNOWN") || (kids != null && kids != "UNKNOWN")
-            if (claims && sids.isNullOrEmpty()) errors += "$w.safety: прапорець ≠ UNKNOWN потребує safety.sourceIds (безпека лише з джерелом)"
-            s.get("aspcaUrl")?.let { u ->
-                val ok = u.isJsonPrimitive && u.asJsonPrimitive.isString && u.asString.startsWith(ASPCA_PREFIX) &&
-                    u.asString.length <= 300 && !CONTROL.containsMatchIn(u.asString) && u.asString.none { it.isWhitespace() }
-                if (!ok) errors += "$w.safety.aspcaUrl: має починатися з $ASPCA_PREFIX"
-            }
-        }
+        c.obj("safety", w, errors)?.let { s -> validateSafety(s, w, sourceIds, errors) }
 
         c.strList("sourceIds", "$w.sourceIds", errors)?.let { care ->
             if (care.toSet().size < MIN_CARE_SOURCES) errors += "$w.sourceIds: потрібно ≥ $MIN_CARE_SOURCES різних джерел догляду"

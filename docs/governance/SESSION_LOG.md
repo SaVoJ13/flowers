@@ -242,3 +242,72 @@
 - Політика на GitHub Pages (Pages увімкнено через gh, джерело main:/docs; internal docs виключено через docs/_config.yml). QA знайшла, що щорічне видалення «старше 12 місяців» давало б до 24 місяців: механізм змінено на «усі скарги, створені до дати чистки».
 - TASK-047 (PR #21): картку Premium прибрано, версія з BuildConfig, білий список бекапу; встановлено на телефон (екран згас, візуально не перевірено); НЕ злито.
 - B0 ч.2 + B1: 6 збирачів фактів + 6 авторів текстів (Sonnet), валідатор спіймав 2 збіги оригінальності; QA Opus відкрила 67 джерел як сирий HTML і знайшла 5 хибних прапорців безпеки (hedera pets, rhaphidophora, mentha pets TOXIC; fatsia NON_TOXIC → UNKNOWN) + факти/мови; виправлено; повторно QA Verified; PR #22 злито.
+
+## Сесія 022 (2026-11-21, Розробник)
+- Рішення Власника: PR #21 злито; «Грошове дерево» лише Crassula (pachira: uk «Пахіра водна», ru «Пахира водная», en Money tree, pl Pachira wodna); вичитка uk/ru (редактор Opus, 89 правок) + QA; валідатор: унікальність назв/aliases в мові.
+- TASK-048 (PR #24): запис скарги завжди ставиться в чергу Firestore, офлайн/тайм-аут = Queued («Скаргу буде надіслано, щойно з'явиться зв'язок»), один ID документа на діалог; 139 тестів; QA Verified; встановлено на телефон (екран заблоковано, візуально не перевірено).
+- TASK-049 (PR #26): формат безпеки schema 2 (рівні NON_TOXIC/LOW/MODERATE/SEVERE/TOXIC/UNKNOWN окремо для cats/dogs/children, toxicParts, sourcesDisagree, explanation 4 мовами). Міграція 50 карток: 5 агентів Opus перечитали ≈ 110 сторінок; QA Opus (20 карток глибоко + 48 сторінок NC State скриптом) знайшла 3 помилки даних (syngonium діти, dracaena_marginata хибне джерело, ficus/zamioculcas діти) і прогалини валідатора; виправлено; повторно QA Verified. НЕ злито до затвердження (INBOX-012).
+- **Перенумерація (сесія 022):** ID `TASK-048` у `TASK_BOARD.md` мав дубль (пропозиція оновити PRD.md і завдання про скаргу, яке Власник призначив 2026-11-21). Пропозицію про PRD перенумеровано в `TASK-050`; зміст завдань не змінено. Власник підтвердив і дозволив надалі робити такі технічні перенумерації самостійно (дублі номерів без зміни змісту), фіксуючи тут, що й чому.
+
+## Сесія 023 (2026-11-22, Codex): TASK-021-C
+- Прочитано обов'язкові документи; `git fetch` і відкриті PR перевірено. `origin/main` = merge PR #26; відкриті PR #24 і #29.
+- Продовжено PR #29: після першої незалежної QA виправлено однаковий пароль upload-ключа, UTF-8 читання `keystore.properties`, правила Windows-шляхів і екранування. Повторна незалежна QA економною іншою моделлю (`gpt-6-luna`) — `QA Verified` (статичний огляд).
+- Паралельний Gradle-прогін спершу впав через одночасну роботу двох процесів у спільному `build/`; процес QA зупинено, daemon зупинено, після чого один чистий послідовний прогін на JDK 21 завершився успішно: 154 тести, 0 failures/errors/skipped, `bundleRelease` зелений.
+- Технічний AAB без `keystore.properties` очікувано непідписаний. У release dex відсутній `DebugAppCheckProviderFactory`, присутній `PlayIntegrityAppCheckProviderFactory`; реальних Google API-ключів у tracked-файлах не знайдено.
+- Стан: гілка `codex/task-021-c-release-signing`, PR #29; підписаний AAB ще не створено, секретів агент не бачив.
+- Наступний крок: Власник створює upload-ключ і локальний `keystore.properties` за `docs/release/UPLOAD_KEY_GUIDE.uk.md`, потім агент повторно збирає й перевіряє `jar verified`.
+
+### Сесія 023, продовження: підписаний AAB
+- Власник повідомив про створення upload-ключа й локального `keystore.properties`; їхній вміст агент не читав і не показував.
+- На JDK 21 виконано `:app:bundleRelease --rerun-tasks --no-parallel`: `BUILD SUCCESSFUL`; `jarsigner -verify` = код 0, `jar verified`. AAB: 17 461 972 bytes, SHA-256 `9D9EDD8B752747A5A04993B84CE4D6A1BB773FCC947EE882FEB1A804FAEC322D`.
+- `keystore.properties` ignored. `app/release/` додано до `.gitignore`, щоб AAB із майстра Android Studio не потрапив у Git.
+- Під час перевірки виявлено незакомічені зміни, створені під час дій Власника в Android Studio: AGP 8.7.3 → 8.13.2, Gradle 8.12.1 → 8.13, Foojay resolver, `gradle-daemon-jvm.properties` і `app/release/app-release.aab`. Їх не змінено, не видалено й не додано до коміту; потрібне рішення Власника, чи оновлення інструментів було навмисним.
+- Стан: TASK-021-C технічно виконано, PR #29 не зливати до вирішення цього робочого дерева й фінальної звірки.
+
+### Сесія 023, фінал: відновлення інструментарію
+- Власник відповів, що оновлення AGP/Gradle було ненавмисним. Відновлено `gradle/libs.versions.toml`, `gradle/wrapper/gradle-wrapper.properties`, `settings.gradle.kts`; видалено лише згенерований незакомічений `gradle/gradle-daemon-jvm.properties`. Приватний ключ, `keystore.properties` і AAB не видалялися.
+- На стані гілки (AGP 8.7.3, Gradle 8.12.1) повторно виконано підписаний `bundleRelease`: `BUILD SUCCESSFUL`; `jarsigner` = код 0, `jar verified`.
+- Канонічний AAB: 17 510 432 bytes, SHA-256 `69A09BCAF6DB87608D1FEC9E7F900F940628AE025FAFF073C210BACDC56DC375`. Попередній хеш належав збірці з ненавмисно оновленим інструментарієм і не використовується для завантаження.
+- Конфігурація AGP/Gradle/settings після відновлення збігається з HEAD; незакоміченими лишаються лише append-only доповнення цієї сесії. Наступний крок: повторна незалежна звірка доказів і злиття PR #29 за умови відсутності нових зауважень.
+
+### Сесія 023, блокер merge PR #29
+- Повторна незалежна QA після виправлення формулювань: `QA Verified`; AAB, підпис, розмір і канонічний SHA-256 звірено ще раз.
+- PR #29 має `mergeStateStatus=CLEAN`, але `statusCheckRollup=[]`: у GitHub немає налаштованих CI-checks.
+- Запит на merge з видаленням власної гілки не виконано: середовище виконання відхилило його як ризиковий через відсутність підтвердженого зеленого CI. Стан захисту гілки GitHub цим не перевірявся.
+- Стан: PR #29 відкритий. Наступний крок Власника: після повідомлення про ризик явно дозволити merge без CI або доручити окреме налаштування CI.
+## Сесія 024 (2026-11-22, Codex): bootstrap GitHub Actions CI
+- Власник обрав безпечну альтернативу merge без CI: налаштувати мінімальний GitHub Actions CI.
+- Прикріплені Власником `CONSTITUTION.uk.md`, `CONSTITUTION.en.md` і `PROJECT_PROFILE.template.md` побайтово збігаються з файлами в репозиторії; додаткових змін правил не потрібно.
+- Створено окрему гілку `codex/task-051-github-actions-ci` від `origin/main`, картку TASK-051 і workflow `.github/workflows/android-ci.yml`.
+- Офіційні action-релізи звірено 2026-11-22 і pinned на повні commit SHA: checkout v7.0.1, setup-java v6.2.0, gradle/actions v6.4.1.
+- Workflow не використовує реальний `google-services.json`: створює тимчасову CI-only конфігурацію, запускає unit-тести й release bundle, перевіряє App Check providers і відсутність API-ключів у tracked-файлах. CI AAB не публікується.
+- Наступний крок: локальна smoke-перевірка, PR, GitHub run і незалежна QA.
+
+### Сесія 024, локальна smoke-перевірка
+- Commit `5f5b2f9` експортовано через `git archive` у тимчасову папку; реальні локальні `google-services.json`, `keystore.properties` і upload-ключ не копіювалися.
+- Із тією самою фіктивною Firebase-конфігурацією, що у workflow, виконано JDK 21 `testDebugUnitTest bundleRelease`: `BUILD SUCCESSFUL`, 154 тести, 0 failures/errors/skipped.
+- AAB створено; debug App Check provider не знайдено, Play Integrity provider присутній; API-key pattern у tracked-файлах відсутній.
+- Наступний крок: створити PR TASK-051, дочекатися GitHub check і провести незалежну QA іншою моделлю.
+
+### Сесія 024, GitHub run 45049900198
+- PR #30 створено. Перший job впав за 7 секунд до запуску Gradle: `/home/runner/...sh: ./gradlew: Permission denied` (exit 126).
+- Причина: executable bit `gradlew` не переноситься з поточного Windows checkout. У workflow додано окремий крок `chmod +x gradlew`; послаблень тестів немає.
+- Наступний крок: повторний GitHub run після push виправлення.
+
+### Сесія 024, незалежна QA PR #30
+- QA іншою моделлю: `Needs changes` (P2). Action SHA, permissions, dummy Firebase config, Gradle-команди й release safeguards підтверджено; знайдено ризик витоку: `git grep` без quiet mode надрукував би збіг API-ключа в Actions log.
+- Виправлено на `git grep -qE`: при виявленні ключа job падає, але значення не друкується. Локальні ignored/неtracked приватні файли явно не додаються до комітів.
+- Наступний крок: новий GitHub run і повторна QA.
+
+### Сесія 024, фінал TASK-051
+- Після `chmod +x` другий run був скасований concurrency новим QA-виправленням. У scan API-ключів використано quiet mode `git grep -qE`, щоб жоден знайдений секрет не друкувався в лог.
+- GitHub run `45050316454`: `SUCCESS`; job `Tests and release bundle` завершився за 4m22s, усі кроки зелені (wrapper validation, JDK 21, tests/bundle, release safeguards).
+- Annotation про застарілий Gradle 8.12.1 інформаційна; оновлення інструментарію не входить у TASK-051 і раніше відхилене Власником як ненавмисне.
+- Повторна незалежна QA іншою моделлю: `QA Verified`; permissions, SHA pinning, dummy Firebase config, quiet secret scan і safeguards підтверджено; секретів у PR diff немає.
+- Стан: TASK-051 виконано, PR #30 готовий до злиття після зеленого check фінального closeout-коміту. Після merge оновити PR #29 від `main` і дочекатися його CI.
+
+### Сесія 024, закриття TASK-051 і TASK-021-C
+- PR #30 пройшов фінальний зелений CI та незалежну QA, після чого злитий у `main`; merge commit `3683054`.
+- `origin/main` об'єднано в гілку PR #29. Append-only конфлікти в `CURRENT_STATE.md`, `TASK_BOARD.md` і `SESSION_LOG.md` розв'язано зі збереженням усіх записів сесій 023 і 024.
+- GitHub Actions run `45051612575` для PR #29: `SUCCESS`; job `Tests and release bundle` — 3m41s. Незалежна QA іншою моделлю: `QA Verified`, P1/P2 зауважень немає, секретів і маркерів конфлікту не виявлено.
+- PR #29 злитий у `main`; merge commit `9c5575b`. TASK-051 і TASK-021-C завершено. Реальні ключі, паролі, `keystore.properties`, upload-keystore і локальний підписаний AAB не додавалися до Git і не публікувалися.

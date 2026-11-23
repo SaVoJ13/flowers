@@ -1,6 +1,6 @@
 {
-  "contentVersion": 2,
-  "schema": 1,
+  "contentVersion": 3,
+  "schema": 2,
   "batches": [
     "b00",
     "b01"

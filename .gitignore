@@ -1,7 +1,9 @@
 *.iml
 .gradle
+.kotlin/
 /build
 /app/build
+/app/release/
 !gradle/wrapper/gradle-wrapper.jar
 !gradle/wrapper/gradle-wrapper.properties
 .idea
@@ -14,3 +16,8 @@ local.properties
 # Google Services / Firebase (TASK-019)
 google-services.json
 app/google-services.json
+
+# Release signing (TASK-021-C): local secrets only
+keystore.properties
+*.jks
+*.keystore

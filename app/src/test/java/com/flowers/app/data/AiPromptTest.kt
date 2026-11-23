@@ -21,4 +21,25 @@ class AiPromptTest {
         listOf("name_uk", "name_latin", "popular_name", "difficulty", "light", "default_check_interval_days", "soil_type", "care_tip")
             .forEach { assertTrue("missing $it", prompt.contains("\"$it\"")) }
     }
+
+    @Test
+    fun `photo identification prompt contains required multimodal fields`() {
+        val photoPrompt = AiPrompt.identifyPlantFromPhotoPrompt()
+        listOf(
+            "is_plant",
+            "name_uk",
+            "name_latin",
+            "confidence",
+            "description",
+            "light_level",
+            "light",
+            "default_check_interval_days",
+            "watering_advice",
+            "soil_type",
+            "toxicity_info",
+            "alternative_species"
+        ).forEach { field ->
+            assertTrue("missing field: $field", photoPrompt.contains("\"$field\""))
+        }
+    }
 }

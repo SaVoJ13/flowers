@@ -7,7 +7,9 @@ import com.flowers.app.data.local.entity.PlantEntity
 import com.flowers.app.data.model.SymptomTreeRoot
 import com.flowers.app.data.preferences.UserPreferences
 import com.flowers.app.data.remote.GeneratePlantResult
+import com.flowers.app.data.remote.IdentifyPlantResult
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 interface FlowersRepository {
     val userPreferences: UserPreferences
@@ -37,4 +39,5 @@ interface FlowersRepository {
     suspend fun skipPlant(plant: PlantEntity)
 
     suspend fun generatePlantWithAi(plantQuery: String): GeneratePlantResult
+    suspend fun identifyPlantFromPhoto(imageFile: File): IdentifyPlantResult
 }

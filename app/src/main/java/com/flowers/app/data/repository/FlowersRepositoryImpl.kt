@@ -14,6 +14,7 @@ import com.flowers.app.data.preferences.UserPreferences
 import com.flowers.app.data.remote.AndroidNetworkChecker
 import com.flowers.app.data.remote.GeminiPlantService
 import com.flowers.app.data.remote.GeneratePlantResult
+import com.flowers.app.data.remote.IdentifyPlantResult
 import com.flowers.app.domain.ReminderCalculator
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class FlowersRepositoryImpl(
     private val plantDao: PlantDao,
@@ -170,5 +172,9 @@ class FlowersRepositoryImpl(
         return geminiPlantService.generatePlantCareCard(
             plantQuery = plantQuery
         )
+    }
+
+    override suspend fun identifyPlantFromPhoto(imageFile: File): IdentifyPlantResult {
+        return geminiPlantService.identifyPlantFromPhoto(imageFile)
     }
 }

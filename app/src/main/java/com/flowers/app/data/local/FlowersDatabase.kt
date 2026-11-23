@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
         CatalogPlantEntity::class,
         CarePodEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 abstract class FlowersDatabase : RoomDatabase() {
@@ -47,7 +47,10 @@ abstract class FlowersDatabase : RoomDatabase() {
                     FlowersDatabase::class.java,
                     "flowers_database.db"
                 )
-                    .addMigrations(Migrations.MIGRATION_1_2)
+                    .addMigrations(
+                        Migrations.MIGRATION_1_2,
+                        Migrations.MIGRATION_2_3
+                    )
                     .addCallback(PrepopulateCallback(context.applicationContext))
                     .build()
                 INSTANCE = instance

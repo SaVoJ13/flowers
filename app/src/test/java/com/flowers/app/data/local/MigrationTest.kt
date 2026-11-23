@@ -3,6 +3,7 @@ package com.flowers.app.data.local
 import com.google.gson.JsonParser
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -140,5 +141,67 @@ class MigrationTest {
     fun `migration is registered for 1 to 2`() {
         assertEquals(1, Migrations.MIGRATION_1_2.startVersion)
         assertEquals(2, Migrations.MIGRATION_1_2.endVersion)
+    }
+
+    private fun migrateV2ToV3() {
+        conn.createStatement().use { st -> Migrations.MIGRATION_2_3_SQL.forEach { st.execute(it) } }
+    }
+
+    @Test
+    fun `migration 2 to 3 preserves all existing user plants and adds flowers 2_0 columns with default values`() {
+        migrate() // 1 -> 2
+        migrateV2ToV3() // 2 -> 3
+
+        assertEquals(3, count("SELECT COUNT(*) FROM plants"))
+        assertEquals(3, count("SELECT COUNT(*) FROM care_events"))
+
+        // Existing plants must have new columns with default NULL and isAiGenerated=0
+        conn.createStatement().use { st ->
+            st.executeQuery("SELECT id, customName, speciesName, botanicalName, description, wateringAdvice, soilType, toxicityInfo, aiConfidence, isAiGenerated FROM plants WHERE id=1").use { rs ->
+                assertTrue(rs.next())
+                assertEquals(1L, rs.getLong("id"))
+                assertEquals("Моя Монстера", rs.getString("customName"))
+                assertNull(rs.getString("speciesName"))
+                assertNull(rs.getString("botanicalName"))
+                assertNull(rs.getString("description"))
+                assertNull(rs.getString("wateringAdvice"))
+                assertNull(rs.getString("soilType"))
+                assertNull(rs.getString("toxicityInfo"))
+                assertNull(rs.getString("aiConfidence"))
+                assertEquals(0, rs.getInt("isAiGenerated"))
+            }
+        }
+
+        // Inserting a new Flowers 2.0 plant with new fields works seamlessly
+        conn.createStatement().use { st ->
+            st.execute("INSERT INTO plants VALUES (4,'Спатифілум','spathi_1','Спальня','INDIRECT',5,NULL,1700900000000,'path/to/img.jpg',0,1700800000000,'Спатифілум Шопен','Spathiphyllum','Красива квітка','Поливати помірно','Пухкий ґрунт','Безпечно для людей','HIGH',1)")
+        }
+
+        assertEquals(4, count("SELECT COUNT(*) FROM plants"))
+        conn.createStatement().use { st ->
+            st.executeQuery("SELECT speciesName, botanicalName, aiConfidence, isAiGenerated FROM plants WHERE id=4").use { rs ->
+                assertTrue(rs.next())
+                assertEquals("Спатифілум Шопен", rs.getString("speciesName"))
+                assertEquals("Spathiphyllum", rs.getString("botanicalName"))
+                assertEquals("HIGH", rs.getString("aiConfidence"))
+                assertEquals(1, rs.getInt("isAiGenerated"))
+            }
+        }
+    }
+
+    @Test
+    fun `migration 2 to 3 contains no destructive statements`() {
+        Migrations.MIGRATION_2_3_SQL.forEach {
+            val up = it.uppercase()
+            assertTrue("no DROP: $it", !up.contains("DROP"))
+            assertTrue("no DELETE: $it", !up.contains("DELETE"))
+            assertTrue("must only be ALTER TABLE ADD COLUMN: $it", up.startsWith("ALTER TABLE") && up.contains("ADD COLUMN"))
+        }
+    }
+
+    @Test
+    fun `migration 2 to 3 is registered for 2 to 3`() {
+        assertEquals(2, Migrations.MIGRATION_2_3.startVersion)
+        assertEquals(3, Migrations.MIGRATION_2_3.endVersion)
     }
 }

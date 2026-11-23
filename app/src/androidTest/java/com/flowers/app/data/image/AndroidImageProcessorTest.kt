@@ -260,4 +260,23 @@ class AndroidImageProcessorTest {
         assertEquals("Original MD5 must not change", initialMd5, calculateMd5(srcFile))
         srcBitmap.recycle()
     }
+
+    @Test
+    fun real_android_existing_file_is_never_overwritten() = runBlocking {
+        val srcBitmap = createAsymmetricBitmap(300, 300)
+        val srcFile = File(inputDir, "source_protection.jpg")
+        saveBitmapAsJpeg(srcBitmap, srcFile)
+
+        val targetName = "existing_protected_plant.jpg"
+        val existingFile = File(outputDir, targetName)
+        val initialContent = "DO_NOT_OVERWRITE_ANDROID_PICTURE"
+        existingFile.writeText(initialContent)
+
+        val result = processor.processFile(srcFile, customFileName = targetName)
+        assertTrue("Operation must fail if target exists", result.isFailure)
+        assertTrue(result.exceptionOrNull() is ImageProcessingException.FileAlreadyExists)
+
+        assertEquals("File content must remain completely identical", initialContent, existingFile.readText())
+        srcBitmap.recycle()
+    }
 }

@@ -2,6 +2,8 @@ package com.flowers.app.data.image
 
 import androidx.exifinterface.media.ExifInterface
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -295,5 +297,85 @@ class ImageProcessorTest {
         }
         job.join()
         assertTrue("CancellationException must be rethrown and propagate", cancelledCaught)
+    }
+
+    @Test
+    fun `concurrent parallel saves to same custom file name guarantee zero overwrites and exactly one winner`() = runBlocking {
+        val originalFile = File(inputDir, "parallel_source.jpg")
+        createTestJpeg(originalFile, 800, 600)
+
+        val concurrentCount = 20
+        val targetName = "parallel_target.jpg"
+
+        // Launch concurrent attempts on Dispatchers.IO
+        val deferreds = (1..concurrentCount).map { index ->
+            async(Dispatchers.IO) {
+                processor.processFile(originalFile, customFileName = targetName)
+            }
+        }
+
+        val results = deferreds.map { it.await() }
+        val successes = results.filter { it.isSuccess }
+        val failures = results.filter { it.isFailure }
+
+        assertEquals("Exactly one concurrent operation must succeed", 1, successes.size)
+        assertEquals("All other concurrent operations must fail", concurrentCount - 1, failures.size)
+
+        failures.forEach { failure ->
+            val ex = failure.exceptionOrNull()
+            assertTrue(
+                "Failure must be FileAlreadyExists but was $ex",
+                ex is ImageProcessingException.FileAlreadyExists
+            )
+        }
+
+        val targetFile = File(outputDir, targetName)
+        assertTrue("Target file must exist", targetFile.exists())
+        assertTrue("Target file must not be empty", targetFile.length() > 0)
+
+        // Verify no leftover .tmp files
+        val tmpFiles = outputDir.listFiles()?.filter { it.name.contains(".tmp") } ?: emptyList()
+        assertEquals("No temporary files should be left over", 0, tmpFiles.size)
+    }
+
+    @Test
+    fun `existing photo is never overwritten when save attempted with duplicate custom name`() = runBlocking {
+        val originalFile = File(inputDir, "source_plant.jpg")
+        createTestJpeg(originalFile, 500, 500)
+
+        val existingTarget = File(outputDir, "untouchable_plant.jpg")
+        val originalContent = "CRITICAL_ORIGINAL_PHOTO_BYTES_NEVER_OVERWRITE"
+        existingTarget.writeText(originalContent)
+        val originalLastModified = existingTarget.lastModified()
+
+        val result = processor.processFile(originalFile, customFileName = "untouchable_plant.jpg")
+
+        assertTrue("Must fail when target already exists", result.isFailure)
+        assertTrue(result.exceptionOrNull() is ImageProcessingException.FileAlreadyExists)
+
+        // Verify the original file content and integrity remain 100% untouched
+        assertEquals(originalContent, existingTarget.readText())
+        assertEquals(originalLastModified, existingTarget.lastModified())
+    }
+
+    @Test
+    fun `concurrent auto-generated names never collide and all succeed`() = runBlocking {
+        val originalFile = File(inputDir, "auto_source.jpg")
+        createTestJpeg(originalFile, 600, 400)
+
+        val count = 15
+        val deferreds = (1..count).map {
+            async(Dispatchers.IO) {
+                processor.processFile(originalFile, customFileName = null)
+            }
+        }
+
+        val results = deferreds.map { it.await() }
+        val successes = results.filter { it.isSuccess }
+
+        assertEquals("All auto-generated saves must succeed", count, successes.size)
+
+        val uniqueFiles = successes.map { it.getOrThrow().file.name }.toSet()
+        assertEquals("Each save must produce a distinct unique file", count, uniqueFiles.size)
     }
 }

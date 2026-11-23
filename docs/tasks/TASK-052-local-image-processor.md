@@ -22,12 +22,14 @@
    - Збереження пропорцій (aspect ratio); відсутність штучного збільшення малих фото.
 4. **Видалення GPS та приватних метаданих:**
    - Нове кодування растру через `compress` створює чистий JPEG без вихідних блоків EXIF APP1 (GPS-координати, серійні номери, модель пристрою повністю вилучено).
-5. **Захист фотографій та атомарне збереження:**
+5. **Захист фотографій та безпечне збереження:**
    - Оригінал у галереї використовується виключно в режимі читання вхідного потоку і ніколи не модифікується.
    - Сувора заборона видалення або перезаписування існуючих цільових файлів (`FileAlreadyExists`).
    - Повний захист від Path Traversal: метод `sanitizeAndValidateFileName` блокує `..`, `/`, `\`, null-байти та дозволяє лише безпечні символи `[a-zA-Z0-9._-]`.
    - Заборона колізії джерела та цілі (`source == target`).
-   - Атомарне переміщення через `Files.move` із прапорцем `StandardCopyOption.ATOMIC_MOVE` без `REPLACE_EXISTING`.
+   - Внутрішньопроцесна синхронізація через `ConcurrentHashMap<String, Mutex>` гарантує атомарну перевірку та збереження між конкурентними корутинами.
+   - `StandardCopyOption.ATOMIC_MOVE` свідомо вилучено: на POSIX/Linux (зокрема Android bionic) він безумовно замінює цільовий файл через `rename(2)` навіть без `REPLACE_EXISTING`.
+   - Переміщення файлу виконується через `Files.move` без прапорця `REPLACE_EXISTING`, що за стандартом Java NIO гарантує викидання `FileAlreadyExistsException`.
    - При збоях видаляється виключно власний тимчасовий `.tmp` файл; цільовий файл ніколи не видаляється.
 6. **Надійність і корутини:**
    - `CancellationException` ніколи не поглинається і завжди ретранслюється вгору.
@@ -41,8 +43,13 @@
 ## Результати тестів
 
 - `ImageScaleCalculatorTest`: 6 тестів (степені двійки для 12/50/200 МП, оцінка пікової RAM з урахуванням проміжних Bitmap, збереження пропорцій, 8 орієнтацій).
-- `ImageProcessorTest`: 12 тестів (Species profile, Disease profile, subsampling 12/50/200 МП, поворот 90°, незмінність оригіналу, видалення GPS, Path Traversal захист, захист від перезапису існуючих файлів, захист source == target, очищення тимчасових файлів, поширення CancellationException).
-- `AndroidImageProcessorTest`: інструментальні тести реального Android-рушія (`AndroidImageDecoderEngine`, декодування JPEG, піксельна перевірка всіх 8 орієнтацій, очищення GPS, незмінність оригіналу).
-- Усі 175 юніт-тестів проєкту зелені (`testDebugUnitTest` PASS).
+- `ImageProcessorTest`: 15 тестів (Species profile, Disease profile, subsampling 12/50/200 МП, поворот 90°, незмінність оригіналу, видалення GPS, Path Traversal захист, захист від перезапису існуючих файлів, захист source == target, очищення тимчасових файлів, поширення CancellationException, конкурентні паралельні записи з єдиним переможцем, захист від дублювання імен, конкурентні автозгенеровані імена).
+- `AndroidImageProcessorTest`: 5 інструментальних тестів виконано на ізольованому емуляторі `small_phone` (AVD API 36, Android 16.0 x86_64, `emulator-5554`) — 5/5 PASSED:
+   1. `real_android_decoding_and_scaling_preserves_aspect_ratio`: passed (5.441s)
+   2. `real_android_exif_orientations_verified_by_actual_pixel_coordinates`: passed (3.680s, усі 8 EXIF-орієнтацій)
+   3. `real_android_existing_file_is_never_overwritten`: passed (1.298s, перевірка захисту на реальній ФС Android)
+   4. `real_android_gps_metadata_completely_stripped`: passed (1.668s)
+   5. `real_android_original_file_strictly_unchanged`: passed (0.391s)
+- Усі 178 юніт-тестів проєкту зелені (`testDebugUnitTest` PASS).
 - `assembleDebugAndroidTest` збирає тестовий APK успішно.
-- `bundleRelease` на JDK 21 збирається успішно (`BUILD SUCCESSFUL`).
+- `bundleRelease` на Adoptium JDK 21 збирається успішно (`BUILD SUCCESSFUL`).

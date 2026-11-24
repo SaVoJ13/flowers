@@ -60,4 +60,15 @@
   - 6. **Наскрізний інструментальний тест користувацького сценарію (`AddPlantUserScenarioTest`):** прогін повного шляху (фото $\rightarrow$ `ImageProcessor` $\rightarrow$ ШІ $\rightarrow$ екран підтвердження $\rightarrow$ збереження в Room v3 $\rightarrow$ повторне відкриття), скасування з очищенням фото, офлайн-фолбек. Результат: 3/3 PASSED.
   - 7. **EXIF та растр (`AndroidImageProcessorTest`):** верифікація 8 EXIF-орієнтацій на рівні пікселів на `emulator-5554`. Результат: 5/5 PASSED.
 
+- **Крок 7: Фінальні блокувальні виправлення:**
+  - 1. **Захист фотографій у тестах Android:** у `AddPlantUserScenarioTest.kt` вилучено рекурсивне видалення загальних каталогів `filesDir/plants` та `cacheDir/camera`. Використано ізольовані унікальні директорії для кожного тесту. Додано автоматичний інструментальний тест `testPreExistingUserPhotosInPlantsDirectoryAreNeverTouched`, що доводить повну безпеку та недоторканність наявних користувацьких фото.
+  - 2. **Ручне створення без фото:** у станах `AddPlantUiState.Confirmation`, `NotAPlantError`, `ErrorFallback` поле `photoFile` зроблено nullable (`File? = null`). У `savePlant` реалізовано санітизацію `sanitizedPhotoUri` (порожні рядки або неіснуючі шляхи трансформуються в `null`). У Room v3 рослина без фото зберігається з `photoUri = null`. Додано тести `testManualPlantCreationWithoutPhotoSavesPhotoUriAsNull` на JVM та емуляторі.
+  - 3. **Скасування під час активного аналізу ШІ:** протестовано сценарій із затримкою відповіді ШІ (`CompletableDeferred`). Скасування гарантує повернення стану `Idle`, видалення тимчасового файлу та повне ігнорування запізнілої відповіді ШІ. Додано тести у `PlantsViewModelTest` та `AddPlantUserScenarioTest`.
+  - 4. **Автоматичні тести інтерфейсу Compose (`AddEditPlantComposeUiTest`):** реалізовано 4 інструментальні тести Compose на чистому семантичному дереві (`runComposeUiTest` на `emulator-5554`). Перевірено кнопки камери, галереї, ручного введення, перехід до форми підтвердження, редагування полів, скасування та збереження в Room v3. Espresso оновлено до 3.7.0 для повної сумісності з Android 16 (API 36). Результат: 4/4 PASSED.
+  - 5. **Підсумкова верифікація:**
+    - 197/197 JVM unit-тестів пройшли успішно.
+    - 15/15 Android instrumented тестів на `emulator-5554` пройшли успішно (5 `AndroidImageProcessorTest` + 1 `RoomMigrationV2ToV3Test` + 4 `AddEditPlantComposeUiTest` + 5 `AddPlantUserScenarioTest`).
+    - Емулятор `emulator-5554` коректно зупинено (`emu kill`), пристрій Samsung S24 Ultra (`RZCX326349A`) не зачіпався.
+    - `bundleRelease`: BUILD SUCCESSFUL.
+
 

@@ -248,7 +248,7 @@ private fun AddPlantPhotoFlowContent(
                                 roomLocation = room,
                                 lightLevel = light,
                                 checkIntervalDays = interval,
-                                photoUri = state.photoFile.takeIf { it.exists() && it.length() > 0 }?.absolutePath,
+                                photoUri = state.photoFile?.takeIf { it.exists() && it.isFile && it.length() > 0 }?.absolutePath,
                                 speciesName = species,
                                 botanicalName = botanical,
                                 description = state.identification.description,
@@ -548,8 +548,8 @@ private fun PlantConfirmationForm(
     ) {
         Spacer(modifier = Modifier.height(4.dp))
 
-        // 1. Попередній перегляд фото
-        if (state.photoFile.exists() && state.photoFile.length() > 0) {
+        // 1. Попередній перегляд фото (якщо фото є)
+        if (state.photoFile != null && state.photoFile.exists() && state.photoFile.isFile && state.photoFile.length() > 0) {
             AsyncImage(
                 model = state.photoFile,
                 contentDescription = "Фото рослини",

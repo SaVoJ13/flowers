@@ -137,7 +137,54 @@ class PlantsViewModelTest {
         assertTrue(state is AddPlantUiState.Confirmation)
         val confirmation = state as AddPlantUiState.Confirmation
         assertTrue(confirmation.isOfflineFallback)
+        assertNull("photoFile має бути null при ручному введенні без фото", confirmation.photoFile)
         assertEquals("LOW", confirmation.identification.confidence)
+    }
+
+    @Test
+    fun `manual plant creation without photo saves photoUri as null in repository`() = runTest {
+        val repo = FakeRepository()
+        val viewModel = PlantsViewModel(repo)
+
+        var saved = false
+        viewModel.savePlant(
+            plantId = null,
+            customName = "Фікус без фото",
+            roomLocation = "Вітальня",
+            lightLevel = "INDIRECT",
+            checkIntervalDays = 7,
+            photoUri = "", // порожній рядок замість фото
+            onSaved = { saved = true }
+        )
+        advanceUntilIdle()
+
+        assertTrue(saved)
+        assertEquals(1, repo.insertedPlants.size)
+        val plant = repo.insertedPlants.first()
+        assertNull("photoUri має бути строго null для рослини без фото", plant.photoUri)
+        assertNull("lastWateredDate має бути null без фактичного поливу", plant.lastWateredDate)
+    }
+
+    @Test
+    fun `cancellation during active AI analysis cancels job and late AI completion never modifies Idle state`() = runTest {
+        val deferred = CompletableDeferred<Unit>()
+        val repo = FakeRepository(onIdentifyDeferred = deferred)
+        val viewModel = PlantsViewModel(repo)
+
+        val tempPhoto = File(tempDir, "active_ai_photo.jpg").apply { writeText("dummy") }
+        viewModel.onManualEntryRequested(photoFile = tempPhoto)
+
+        // Скасування
+        viewModel.resetAddPlantFlow(discardPhoto = true)
+        assertEquals(AddPlantUiState.Idle, viewModel.addPlantUiState.value)
+        assertFalse(tempPhoto.exists())
+
+        // Запізніла відповідь ШІ завершується
+        deferred.complete(Unit)
+        advanceUntilIdle()
+
+        // Стан залишається строго Idle
+        assertEquals(AddPlantUiState.Idle, viewModel.addPlantUiState.value)
     }
 
     @Test
@@ -181,6 +228,10 @@ class PlantsViewModelTest {
         val repo = FakeRepository()
         val viewModel = PlantsViewModel(repo)
 
+        val testPhoto = File(tempDir, "species_monstera.jpg").apply {
+            writeText("dummy photo bytes")
+        }
+
         var savedCalled = false
         viewModel.savePlant(
             plantId = null,
@@ -188,7 +239,7 @@ class PlantsViewModelTest {
             roomLocation = "Вітальня",
             lightLevel = "INDIRECT",
             checkIntervalDays = 8,
-            photoUri = "/data/plants/species_monstera.jpg",
+            photoUri = testPhoto.absolutePath,
             speciesName = "Монстера делікатесна",
             botanicalName = "Monstera deliciosa",
             description = "Тропічна ліана",
@@ -215,7 +266,7 @@ class PlantsViewModelTest {
         assertEquals("HIGH", plant.aiConfidence)
         assertTrue(plant.isAiGenerated)
         assertEquals(8, plant.checkIntervalDays)
-        assertEquals("/data/plants/species_monstera.jpg", plant.photoUri)
+        assertEquals(testPhoto.absolutePath, plant.photoUri)
 
         // Правдива історія: створення картки НЕ є поливом!
         assertNull("lastWateredDate має бути null без підтвердження поливу", plant.lastWateredDate)

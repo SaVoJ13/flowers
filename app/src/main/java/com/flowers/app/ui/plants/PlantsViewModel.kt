@@ -50,12 +50,12 @@ sealed class AddPlantUiState {
     object ProcessingPhoto : AddPlantUiState()
     data class AnalyzingWithAi(val photoFile: File) : AddPlantUiState()
     data class Confirmation(
-        val photoFile: File,
+        val photoFile: File?,
         val identification: PlantIdentificationResponse,
         val isOfflineFallback: Boolean = false
     ) : AddPlantUiState()
     data class NotAPlantError(
-        val photoFile: File,
+        val photoFile: File?,
         val message: String
     ) : AddPlantUiState()
     data class ErrorFallback(
@@ -208,7 +208,7 @@ class PlantsViewModel(
         }
 
         _addPlantUiState.value = AddPlantUiState.Confirmation(
-            photoFile = photoFile ?: File(""),
+            photoFile = photoFile,
             identification = PlantIdentificationResponse(
                 isPlant = true,
                 nameUk = "",
@@ -273,6 +273,15 @@ class PlantsViewModel(
         viewModelScope.launch {
             try {
                 val now = System.currentTimeMillis()
+                val sanitizedPhotoUri = photoUri?.takeIf { path ->
+                    if (path.isBlank()) return@takeIf false
+                    if (path.startsWith("content://")) true
+                    else {
+                        val f = File(path)
+                        f.exists() && f.isFile && f.length() > 0
+                    }
+                }
+
                 if (plantId == null || plantId == 0L) {
                     // Правдива історія: створення картки не є фактом поливу.
                     // lastWateredDate = null; nextCheckDate = сьогодні для перевірки стану ґрунту.
@@ -285,7 +294,7 @@ class PlantsViewModel(
                         checkIntervalDays = checkIntervalDays,
                         lastWateredDate = null,
                         nextCheckDate = initialCheck,
-                        photoUri = photoUri,
+                        photoUri = sanitizedPhotoUri,
                         speciesName = speciesName,
                         botanicalName = botanicalName,
                         description = description,
@@ -306,7 +315,7 @@ class PlantsViewModel(
                             roomLocation = roomLocation.ifBlank { "Вітальня" },
                             lightLevel = lightLevel,
                             checkIntervalDays = checkIntervalDays,
-                            photoUri = photoUri ?: existing.photoUri,
+                            photoUri = sanitizedPhotoUri ?: existing.photoUri,
                             speciesName = speciesName ?: existing.speciesName,
                             botanicalName = botanicalName ?: existing.botanicalName,
                             description = description ?: existing.description,

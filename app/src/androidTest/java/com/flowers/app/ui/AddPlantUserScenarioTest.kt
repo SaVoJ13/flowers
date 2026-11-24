@@ -38,7 +38,7 @@ import java.io.FileOutputStream
  * 1. Зображення -> ImageProcessor (1024px, без GPS, унікальна тестова папка).
  * 2. ШІ-розпізнавання -> екран підтвердження.
  * 3. Збереження в Room v3 -> правдива історія (lastWateredDate == null, без штучних WATER подій).
- * 4. Захист фотографій користувача: сторонні фото у filesDir/plants гарантовано НЕ видаляються.
+ * 4. Захист фотографій користувача: контрольні наявні фото в директорії зберігаються побайтово незмінними.
  * 5. Ручне додавання без фото: photoUri = null.
  * 6. Скасування під час активного аналізу ШІ (контрольована затримка, перевірка Idle, очищення тимчасового фото).
  * 7. Офлайн-фолбек.
@@ -206,52 +206,46 @@ class AddPlantUserScenarioTest {
 
     @Test
     fun testPreExistingUserPhotosInPlantsDirectoryAreNeverTouched() = runBlocking {
-        // Створюємо "користувацьку" фотографію в реальному каталозі filesDir/plants
-        val plantsDir = File(context.filesDir, "plants").apply { mkdirs() }
-        val realUserPhoto = File(plantsDir, "existing_user_photo_do_not_delete.jpg")
-        val content = "USER_SECRET_PHOTO_PAYLOAD_${System.currentTimeMillis()}"
-        realUserPhoto.writeText(content)
-        val initialTimestamp = realUserPhoto.lastModified()
-        assertTrue("Фото користувача має існувати до тесту", realUserPhoto.exists())
+        // Створюємо імітацію наявної фотографії виключно в ізольованій тестовій директорії (жодних дій у filesDir/plants)
+        val preExistingPhoto = File(testOutputDir, "pre_existing_plant_photo.jpg")
+        val originalBytes = "USER_SECRET_PHOTO_BYTE_PAYLOAD_${System.currentTimeMillis()}".toByteArray(Charsets.UTF_8)
+        preExistingPhoto.writeBytes(originalBytes)
+        val initialTimestamp = preExistingPhoto.lastModified()
+        assertTrue("Контрольна фотографія має існувати до початку тесту", preExistingPhoto.exists())
 
-        try {
-            // Виконуємо повний сценарій тесту в окремій директорії testOutputDir
-            val processor = ImageProcessor(context, outputDirectory = testOutputDir)
-            val sourceFile = createTestBitmapFile("flow_photo.jpg", 800, 600)
+        // Виконуємо повний сценарій обробки нового фото в тій самій ізольованій директорії testOutputDir
+        val processor = ImageProcessor(context, outputDirectory = testOutputDir)
+        val sourceFile = createTestBitmapFile("flow_photo.jpg", 800, 600)
 
-            val repository = FlowersRepositoryImpl(
-                plantDao = db.plantDao(),
-                careEventDao = db.careEventDao(),
+        val repository = FlowersRepositoryImpl(
+            plantDao = db.plantDao(),
+            careEventDao = db.careEventDao(),
+            catalogDao = db.catalogDao(),
+            carePodDao = db.carePodDao(),
+            context = context,
+            geminiPlantService = GeminiPlantService(
                 catalogDao = db.catalogDao(),
                 carePodDao = db.carePodDao(),
-                context = context,
-                geminiPlantService = GeminiPlantService(
-                    catalogDao = db.catalogDao(),
-                    carePodDao = db.carePodDao(),
-                    networkChecker = NetworkChecker { true },
-                    generateMultimodal = { _, _ -> """{"is_plant": true, "name_uk": "Тест", "name_latin": "Test", "confidence": "HIGH", "default_check_interval_days": 7}""" }
-                )
+                networkChecker = NetworkChecker { true },
+                generateMultimodal = { _, _ -> """{"is_plant": true, "name_uk": "Тест", "name_latin": "Test", "confidence": "HIGH", "default_check_interval_days": 7}""" }
             )
-            val viewModel = PlantsViewModel(repository, imageProcessorProvider = { processor })
+        )
+        val viewModel = PlantsViewModel(repository, imageProcessorProvider = { processor })
 
-            viewModel.onPhotoSelected(Uri.fromFile(sourceFile), context)
-            val confirmation = viewModel.addPlantUiState.first { it is AddPlantUiState.Confirmation } as AddPlantUiState.Confirmation
-            assertTrue(confirmation.photoFile!!.exists())
+        viewModel.onPhotoSelected(Uri.fromFile(sourceFile), context)
+        val confirmation = viewModel.addPlantUiState.first { it is AddPlantUiState.Confirmation } as AddPlantUiState.Confirmation
+        assertTrue("Нове фото мало бути створене в testOutputDir", confirmation.photoFile!!.exists())
+        assertFalse("Нове фото не повинно перезаписувати контрольний файл", confirmation.photoFile!!.absolutePath == preExistingPhoto.absolutePath)
 
-            // Скасовуємо з очищенням
-            viewModel.resetAddPlantFlow(discardPhoto = true)
-            assertEquals(AddPlantUiState.Idle, viewModel.addPlantUiState.value)
+        // Скасовуємо з очищенням
+        viewModel.resetAddPlantFlow(discardPhoto = true)
+        assertEquals(AddPlantUiState.Idle, viewModel.addPlantUiState.value)
+        assertFalse("Тимчасове фото скасованої операції має бути видалене", confirmation.photoFile!!.exists())
 
-            // Перевіряємо, що стороннє фото користувача в filesDir/plants НЕ постраждало
-            assertTrue("Стороннє фото користувача НЕ повинно бути видалене!", realUserPhoto.exists())
-            assertEquals("Вміст стороннього фото не повинен бути модифікований!", content, realUserPhoto.readText())
-            assertEquals("Дата модифікації стороннього фото не повинна змінитися!", initialTimestamp, realUserPhoto.lastModified())
-        } finally {
-            // Очищуємо ТІЛЬКИ свій створений тестовий маркер
-            if (realUserPhoto.exists()) {
-                realUserPhoto.delete()
-            }
-        }
+        // Перевіряємо, що наявна контрольна фотографія в ізольованій директорії залишилася побайтово незмінною
+        assertTrue("Контрольна фотографія НЕ повинна бути видалена!", preExistingPhoto.exists())
+        assertTrue("Вміст контрольної фотографії має залишатися побайтово незмінним!", preExistingPhoto.readBytes().contentEquals(originalBytes))
+        assertEquals("Дата модифікації контрольної фотографії не повинна змінитися!", initialTimestamp, preExistingPhoto.lastModified())
     }
 
     @Test

@@ -17,7 +17,7 @@ import com.flowers.app.ui.navigation.Screen
 
 sealed class BottomNavItem(val screen: Screen, val title: String, val icon: ImageVector) {
     object Today : BottomNavItem(Screen.Today, "Сьогодні", Icons.Default.CalendarToday)
-    object Plants : BottomNavItem(Screen.Plants, "Рослини", Icons.Default.Park)
+    object Plants : BottomNavItem(Screen.Plants, "Мої рослини", Icons.Default.Park)
     object Catalog : BottomNavItem(Screen.Catalog, "Довідник", Icons.Default.MenuBook)
     object Settings : BottomNavItem(Screen.Settings, "Опції", Icons.Default.Settings)
 }
@@ -27,7 +27,6 @@ fun BottomNavBar(navController: NavController) {
     val items = listOf(
         BottomNavItem.Today,
         BottomNavItem.Plants,
-        BottomNavItem.Catalog,
         BottomNavItem.Settings
     )
 

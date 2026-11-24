@@ -37,7 +37,6 @@ fun FlowersApp(application: FlowersApplication) {
     val showBottomBar = currentRoute in listOf(
         Screen.Today.route,
         Screen.Plants.route,
-        Screen.Catalog.route,
         Screen.Settings.route
     )
 

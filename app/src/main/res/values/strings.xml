@@ -4,5 +4,5 @@
     <string name="nav_today">Сьогодні</string>
     <string name="nav_plants">Мої рослини</string>
     <string name="nav_catalog">Довідник</string>
-    <string name="nav_settings">Налаштування</string>
+    <string name="nav_settings">Опції</string>
 </resources>

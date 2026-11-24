@@ -135,7 +135,7 @@ class FlowersRepositoryImpl(
                 plantId = plant.id,
                 eventType = "WATER",
                 timestamp = now,
-                notes = notes
+                notes = notes ?: "Ґрунт перевірено, полив виконано"
             )
         )
     }

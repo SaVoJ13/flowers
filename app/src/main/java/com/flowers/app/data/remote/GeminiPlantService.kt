@@ -1,5 +1,7 @@
 package com.flowers.app.data.remote
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.flowers.app.data.local.dao.CarePodDao
 import com.flowers.app.data.local.dao.CatalogDao
 import com.flowers.app.data.local.entity.CarePodEntity
@@ -7,11 +9,13 @@ import com.flowers.app.data.local.entity.CatalogPlantEntity
 import com.google.firebase.Firebase
 import com.google.firebase.ai.type.GenerativeBackend
 import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.content
 import com.google.firebase.ai.type.generationConfig
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 
 data class GeneratedPlantResponse(
     @SerializedName("name_uk")
@@ -44,12 +48,74 @@ sealed class GeneratePlantResult {
     data class Error(val message: String) : GeneratePlantResult()
 }
 
+/**
+ * Відповідь моделі на мультимодальне розпізнавання рослини за фото (TASK-053).
+ */
+data class PlantIdentificationResponse(
+    @SerializedName("is_plant")
+    val isPlant: Boolean = true,
+
+    @SerializedName("name_uk")
+    val nameUk: String = "",
+
+    @SerializedName("name_latin")
+    val nameLatin: String = "",
+
+    @SerializedName("confidence")
+    val confidence: String = "MEDIUM",
+
+    @SerializedName("description")
+    val description: String? = null,
+
+    @SerializedName("light_level")
+    val lightLevel: String = "INDIRECT",
+
+    @SerializedName("light")
+    val light: String? = null,
+
+    @SerializedName("default_check_interval_days")
+    val defaultCheckIntervalDays: Int = 7,
+
+    @SerializedName("watering_advice")
+    val wateringAdvice: String? = null,
+
+    @SerializedName("soil_type")
+    val soilType: String? = null,
+
+    @SerializedName("toxicity_info")
+    val toxicityInfo: String? = null,
+
+    @SerializedName("alternative_species")
+    val alternativeSpecies: List<String> = emptyList()
+)
+
+sealed class IdentifyPlantResult {
+    data class Success(val response: PlantIdentificationResponse) : IdentifyPlantResult()
+    data class NotAPlant(
+        val message: String = "На фото не виявлено рослину. Спробуйте сфотографувати рослину ближче при кращому освітленні."
+    ) : IdentifyPlantResult()
+    data class Error(
+        val message: String,
+        val isOffline: Boolean = false
+    ) : IdentifyPlantResult()
+}
+
 class GeminiPlantService(
     private val catalogDao: CatalogDao,
     private val carePodDao: CarePodDao,
     private val networkChecker: NetworkChecker,
     /** Виклик моделі; за замовчуванням Firebase AI Logic. Підміняється в тестах. */
-    private val generateText: suspend (String) -> String? = { prompt -> defaultModel.generateContent(prompt).text }
+    private val generateText: suspend (String) -> String? = { prompt -> defaultModel.generateContent(prompt).text },
+    /** Мультимодальний виклик моделі з передачею зображення та промпту (TASK-053). */
+    private val generateMultimodal: suspend (Bitmap?, String) -> String? = { bitmap, prompt ->
+        val inputContent = content {
+            if (bitmap != null) {
+                image(bitmap)
+            }
+            text(prompt)
+        }
+        defaultModel.generateContent(inputContent).text
+    }
 ) {
     private val gson = Gson()
 
@@ -154,6 +220,116 @@ class GeminiPlantService(
             }
 
             gson.fromJson(cleaned, GeneratedPlantResponse::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    /**
+     * Мультимодальне розпізнавання рослини за Bitmap (TASK-053).
+     */
+    suspend fun identifyPlantFromPhoto(
+        bitmap: Bitmap?
+    ): IdentifyPlantResult = withContext(Dispatchers.IO) {
+        if (!networkChecker.isOnline()) {
+            return@withContext IdentifyPlantResult.Error(AiErrorMapper.MSG_NO_INTERNET, isOffline = true)
+        }
+
+        val prompt = AiPrompt.identifyPlantFromPhotoPrompt()
+
+        try {
+            val responseText = generateMultimodal(bitmap, prompt) ?: ""
+            val identified = parseIdentificationResponse(responseText)
+
+            if (identified != null) {
+                if (!identified.isPlant) {
+                    return@withContext IdentifyPlantResult.NotAPlant()
+                }
+                return@withContext IdentifyPlantResult.Success(identified)
+            } else {
+                return@withContext IdentifyPlantResult.Error("Не вдалося розпізнати рослину за фотографією. Спробуйте інший ракурс або введіть дані вручну.")
+            }
+        } catch (e: Exception) {
+            val errorMsg = AiErrorMapper.map(e)
+            val isOffline = !networkChecker.isOnline()
+            return@withContext IdentifyPlantResult.Error(errorMsg, isOffline = isOffline)
+        }
+    }
+
+    /**
+     * Мультимодальне розпізнавання рослини за файлом фотографії (TASK-053).
+     * Декодує файл у Bitmap, виконує запит та негайно звільняє нативну пам'ять (recycle).
+     */
+    suspend fun identifyPlantFromPhoto(
+        imageFile: File,
+        decoder: (File) -> Bitmap? = { file -> BitmapFactory.decodeFile(file.absolutePath) }
+    ): IdentifyPlantResult = withContext(Dispatchers.IO) {
+        if (!imageFile.exists() || imageFile.length() == 0L) {
+            return@withContext IdentifyPlantResult.Error("Файл фотографії не знайдено або він порожній.")
+        }
+
+        val bitmap = try {
+            decoder(imageFile)
+        } catch (e: OutOfMemoryError) {
+            return@withContext IdentifyPlantResult.Error("Недостатньо оперативної пам'яті для обробки фотографії.")
+        } catch (e: Exception) {
+            return@withContext IdentifyPlantResult.Error("Не вдалося прочитати файл фотографії: ${e.message}")
+        } ?: return@withContext IdentifyPlantResult.Error("Не вдалося декодувати зображення для аналізу.")
+
+        try {
+            identifyPlantFromPhoto(bitmap)
+        } finally {
+            try {
+                bitmap.recycle()
+            } catch (_: Throwable) {}
+        }
+    }
+
+    fun parseIdentificationResponse(rawText: String): PlantIdentificationResponse? {
+        return try {
+            val cleaned = rawText
+                .trim()
+                .removePrefix("```json")
+                .removePrefix("```")
+                .removeSuffix("```")
+                .trim()
+
+            val candidateText = if (cleaned.startsWith("{") && cleaned.contains("\"candidates\"")) {
+                val root = gson.fromJson(cleaned, Map::class.java)
+                val candidates = root["candidates"] as? List<*>
+                val firstCandidate = candidates?.firstOrNull() as? Map<*, *>
+                val content = firstCandidate?.get("content") as? Map<*, *>
+                val parts = content?.get("parts") as? List<*>
+                val firstPart = parts?.firstOrNull() as? Map<*, *>
+                val text = firstPart?.get("text") as? String
+                text?.trim()?.removePrefix("```json")?.removePrefix("```")?.removeSuffix("```")?.trim() ?: cleaned
+            } else {
+                cleaned
+            }
+
+            val parsed = gson.fromJson(candidateText, PlantIdentificationResponse::class.java) ?: return null
+
+            val sanitizedConfidence = when (parsed.confidence.uppercase()) {
+                "HIGH" -> "HIGH"
+                "LOW" -> "LOW"
+                else -> "MEDIUM"
+            }
+
+            val sanitizedLightLevel = when (parsed.lightLevel.uppercase()) {
+                "SHADE" -> "SHADE"
+                "DIRECT" -> "DIRECT"
+                else -> "INDIRECT"
+            }
+
+            val sanitizedInterval = parsed.defaultCheckIntervalDays.coerceIn(3, 21)
+
+            parsed.copy(
+                confidence = sanitizedConfidence,
+                lightLevel = sanitizedLightLevel,
+                defaultCheckIntervalDays = sanitizedInterval,
+                toxicityInfo = parsed.toxicityInfo?.takeIf { it.isNotBlank() } ?: "UNKNOWN"
+            )
         } catch (e: Exception) {
             e.printStackTrace()
             null

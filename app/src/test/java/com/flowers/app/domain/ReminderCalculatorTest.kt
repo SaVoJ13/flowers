@@ -26,6 +26,23 @@ class ReminderCalculatorTest {
     }
 
     @Test
+    fun calculateInitialCheckDate_normalizesToStartOfToday() {
+        val baseTime = 1700000000000L
+        val result = ReminderCalculator.calculateInitialCheckDate(baseTime)
+
+        val calExpected = Calendar.getInstance().apply {
+            timeInMillis = baseTime
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        assertEquals(calExpected.timeInMillis, result)
+        assertTrue(ReminderCalculator.isDue(result, baseTime))
+    }
+
+    @Test
     fun calculateSnoozeDate_addsAccuratePostponeDays() {
         val baseTime = 1700000000000L
         val snoozeDays = 2

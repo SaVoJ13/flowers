@@ -15,5 +15,14 @@ data class PlantEntity(
     val nextCheckDate: Long = System.currentTimeMillis() + 7 * 86400000L,
     val photoUri: String? = null,
     val isArchived: Boolean = false,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    // Поля персональної картки Flowers 2.0 (Room v3)
+    val speciesName: String? = null,
+    val botanicalName: String? = null,
+    val description: String? = null,
+    val wateringAdvice: String? = null,
+    val soilType: String? = null,
+    val toxicityInfo: String? = null,
+    val aiConfidence: String? = null, // "HIGH", "MEDIUM", "LOW"
+    val isAiGenerated: Boolean = false
 )

@@ -25,10 +25,12 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Park
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +39,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -48,10 +51,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.flowers.app.data.local.entity.PlantEntity
+import com.flowers.app.domain.SoilCheckAdvisor
 import com.flowers.app.ui.components.CarePodCard
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -65,6 +76,14 @@ fun TodayScreen(
     onNavigateToDiagnosis: (Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current
+    androidx.compose.runtime.DisposableEffect(lifecycleOwner, viewModel) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) viewModel.onScreenResumed()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
     val todayDateFormatted = remember {
         SimpleDateFormat("EEEE, d MMMM", Locale("uk")).format(Date())
     }
@@ -100,7 +119,7 @@ fun TodayScreen(
             // Section 1: Due Today
             item {
                 Text(
-                    text = "Потребують перевірки (${uiState.duePlants.size})",
+                    text = "Потребують перевірки ґрунту (${uiState.duePlants.size})",
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
@@ -116,10 +135,13 @@ fun TodayScreen(
                 }
             } else {
                 items(uiState.duePlants, key = { it.id }) { plant ->
+                    val isProcessing = uiState.processingPlantIds.contains(plant.id)
                     DuePlantCard(
                         plant = plant,
+                        isProcessing = isProcessing,
                         onWaterClicked = { viewModel.onWaterClicked(plant) },
-                        onSnoozeClicked = { days -> viewModel.onSnoozeClicked(plant, days) },
+                        onSnoozeTwoDaysClicked = { viewModel.onSnoozeTwoDaysClicked(plant) },
+                        onSnoozeCustomClicked = { days -> viewModel.onSnoozeClicked(plant, days) },
                         onSkipClicked = { viewModel.onSkipClicked(plant) },
                         onDiagnosisClicked = { onNavigateToDiagnosis(plant.id) },
                         onCardClicked = { onNavigateToPlantDetail(plant.id) }
@@ -152,7 +174,7 @@ fun TodayScreen(
                 item {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Найближчі дні (${uiState.upcomingPlants.size})",
+                        text = "Найближчі перевірки (${uiState.upcomingPlants.size})",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.SemiBold
@@ -168,19 +190,60 @@ fun TodayScreen(
             }
         }
     }
+
+    // Explicit confirmation dialog for actual watering
+    if (uiState.plantToConfirmWatering != null) {
+        val plant = uiState.plantToConfirmWatering!!
+        AlertDialog(
+            onDismissRequest = { viewModel.onWaterConfirmationDismissed() },
+            title = {
+                Text(
+                    text = "Підтвердження поливу",
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    text = "Ґрунт сухий і рослину «${plant.customName}» дійсно щойно полито?\n\nФіксуйте подію лише після фактичного фізичного поливу."
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { viewModel.onWaterConfirmed() },
+                    modifier = Modifier.testTag("confirm_water_button")
+                ) {
+                    Text("Полито")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { viewModel.onWaterConfirmationDismissed() },
+                    modifier = Modifier.testTag("cancel_water_button")
+                ) {
+                    Text("Скасувати")
+                }
+            }
+        )
+    }
 }
 
 @Composable
 fun DuePlantCard(
     plant: PlantEntity,
+    isProcessing: Boolean,
     onWaterClicked: () -> Unit,
-    onSnoozeClicked: (Int) -> Unit,
+    onSnoozeTwoDaysClicked: () -> Unit,
+    onSnoozeCustomClicked: (Int) -> Unit,
     onSkipClicked: () -> Unit,
     onDiagnosisClicked: () -> Unit,
     onCardClicked: () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var showSnoozeMenu by remember { mutableStateOf(false) }
+
+    val adaptiveAdvice = remember(plant) {
+        SoilCheckAdvisor.getSoilCheckAdvice(plant)
+    }
 
     Card(
         modifier = Modifier
@@ -197,18 +260,31 @@ fun DuePlantCard(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Park,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
+                // Photo or Park Icon
+                val photoFile = plant.photoUri?.let { File(it) }
+                if (photoFile != null && photoFile.exists() && photoFile.isFile && photoFile.length() > 0) {
+                    AsyncImage(
+                        model = photoFile,
+                        contentDescription = plant.customName,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(52.dp)
+                            .clip(RoundedCornerShape(12.dp))
                     )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(52.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Park,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(12.dp))
@@ -219,102 +295,151 @@ fun DuePlantCard(
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
+                    val speciesOrRoom = buildString {
+                        append(plant.roomLocation)
+                        val species = plant.speciesName ?: plant.botanicalName
+                        if (!species.isNullOrBlank()) {
+                            append(" • ")
+                            append(species)
+                        }
+                    }
                     Text(
-                        text = "${plant.roomLocation} • Перевірка ґрунту",
+                        text = speciesOrRoom,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 
-                Box {
-                    IconButton(onClick = { showMenu = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Опції")
-                    }
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("Пропустити цей цикл") },
-                            onClick = {
-                                showMenu = false
-                                onSkipClicked()
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Є проблема / Діагностика") },
-                            onClick = {
-                                showMenu = false
-                                onDiagnosisClicked()
-                            }
-                        )
+                if (isProcessing) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "Опції")
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Пропустити цей цикл") },
+                                onClick = {
+                                    showMenu = false
+                                    onSkipClicked()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Відкласти на 1 день") },
+                                onClick = {
+                                    showMenu = false
+                                    onSnoozeCustomClicked(1)
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Відкласти на 3 дні") },
+                                onClick = {
+                                    showMenu = false
+                                    onSnoozeCustomClicked(3)
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Є проблема / Діагностика") },
+                                onClick = {
+                                    showMenu = false
+                                    onDiagnosisClicked()
+                                }
+                            )
+                        }
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(
-                text = "💡 Занурте палець на 2 см: поливайте тільки якщо ґрунт сухий!",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Medium
-            )
+            // Adaptive Advice Box
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("advice_box_${plant.id}")
+            ) {
+                Row(
+                    modifier = Modifier.padding(10.dp),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Text(
+                        text = "💡",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = adaptiveAdvice,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.testTag("advice_text_${plant.id}")
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Action Buttons
+            // Action Buttons: WATER vs DELAY
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Button(
                     onClick = onWaterClicked,
-                    modifier = Modifier.weight(1.2f),
+                    enabled = !isProcessing,
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("water_button_${plant.id}")
+                        .semantics { contentDescription = "Ґрунт перевірено — Полито" },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Виконано")
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Полито",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
 
-                Box(modifier = Modifier.weight(1f)) {
-                    OutlinedButton(
-                        onClick = { showSnoozeMenu = true },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Icon(Icons.Default.Schedule, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Відкласти")
-                    }
-                    DropdownMenu(
-                        expanded = showSnoozeMenu,
-                        onDismissRequest = { showSnoozeMenu = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("На 1 день (ґрунт сирий)") },
-                            onClick = {
-                                showSnoozeMenu = false
-                                onSnoozeClicked(1)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("На 2 дні") },
-                            onClick = {
-                                showSnoozeMenu = false
-                                onSnoozeClicked(2)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("На 3 дні") },
-                            onClick = {
-                                showSnoozeMenu = false
-                                onSnoozeClicked(3)
-                            }
-                        )
-                    }
+                OutlinedButton(
+                    onClick = onSnoozeTwoDaysClicked,
+                    enabled = !isProcessing,
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("snooze_button_${plant.id}")
+                        .semantics { contentDescription = "Ще вологий — Відкласти на 2 дні" },
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Schedule,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Ще вологий (на 2 дні)",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
         }
@@ -402,9 +527,9 @@ fun EmptyTodayCard(
             Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = if (hasAnyPlants)
-                    "Чудова робота! Жодної прострочки. Наступна перевірка запланована найближчими днями."
+                    "Чудова робота! Жодної простроченої перевірки. Наступні перевірки заплановані на найближчі дні."
                 else
-                    "Додайте першу рослину, щоб отримати поди-підказки та захистити її від переливу.",
+                    "Додайте першу рослину, щоб налаштувати перевірку ґрунту та захистити її від переливу.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center

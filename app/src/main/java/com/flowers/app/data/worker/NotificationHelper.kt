@@ -12,14 +12,14 @@ import com.flowers.app.MainActivity
 object NotificationHelper {
 
     const val CHANNEL_ID = "flowers_care_reminders"
-    const val CHANNEL_NAME = "Нагадування про перевірку рослин"
+    const val CHANNEL_NAME = "Нагадування про перевірку ґрунту"
     const val NOTIFICATION_ID = 1001
 
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance).apply {
-                description = "Локальні нагадування оглянути ґрунт і стан кімнатних рослин"
+                description = "Локальні нагадування перевірити вологість ґрунту кімнатних рослин"
             }
             val notificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

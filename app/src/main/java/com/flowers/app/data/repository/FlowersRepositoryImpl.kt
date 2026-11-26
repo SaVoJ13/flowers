@@ -123,51 +123,16 @@ class FlowersRepositoryImpl(
     }
 
     override suspend fun performWatering(plant: PlantEntity, notes: String?) {
-        val now = System.currentTimeMillis()
-        val nextCheck = ReminderCalculator.calculateNextCheckAfterWatering(plant.checkIntervalDays, now)
-        val updatedPlant = plant.copy(
-            lastWateredDate = now,
-            nextCheckDate = nextCheck
-        )
-        plantDao.updatePlant(updatedPlant)
-        careEventDao.insertEvent(
-            CareEventEntity(
-                plantId = plant.id,
-                eventType = "WATER",
-                timestamp = now,
-                notes = notes
-            )
-        )
+        plantDao.applyWatering(plant.id, System.currentTimeMillis(), notes ?: "Ґрунт перевірено, полив виконано")
     }
 
     override suspend fun snoozePlant(plant: PlantEntity, days: Int) {
-        val now = System.currentTimeMillis()
-        val nextCheck = ReminderCalculator.calculateSnoozeDate(days, now)
-        val updatedPlant = plant.copy(nextCheckDate = nextCheck)
-        plantDao.updatePlant(updatedPlant)
-        careEventDao.insertEvent(
-            CareEventEntity(
-                plantId = plant.id,
-                eventType = "DELAY",
-                timestamp = now,
-                daysDelayed = days,
-                notes = "Відкладено на $days дн. (ґрунт ще вологий)"
-            )
-        )
+        plantDao.applySnooze(plant.id, days, System.currentTimeMillis(), "Відкладено на $days дн. (ґрунт ще вологий)")
     }
 
     override suspend fun skipPlant(plant: PlantEntity) {
-        val now = System.currentTimeMillis()
-        careEventDao.insertEvent(
-            CareEventEntity(
-                plantId = plant.id,
-                eventType = "SKIP",
-                timestamp = now,
-                notes = "Пропущено в цьому циклі"
-            )
-        )
+        plantDao.applySkip(plant.id, System.currentTimeMillis(), "Пропущено в цьому циклі")
     }
-
     override suspend fun generatePlantWithAi(plantQuery: String): GeneratePlantResult {
         return geminiPlantService.generatePlantCareCard(
             plantQuery = plantQuery

@@ -27,10 +27,13 @@ import com.flowers.app.ui.diagnosis.DiagnosisViewModel
 import com.flowers.app.ui.diagnosis.PlantDiagnosisScreen
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import com.flowers.app.ui.diagnosis.CameraCaptureManager
 import org.junit.After
+import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -47,12 +50,14 @@ class PhotoDiagnosisComposeTest {
     private val dbName = "photo_diagnosis_test_db_${System.currentTimeMillis()}.db"
     private lateinit var testOutputDir: File
     private lateinit var testTempDir: File
+    private lateinit var testCameraDir: File
 
     @Before
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
         testOutputDir = File(context.cacheDir, "diag_output_${System.currentTimeMillis()}").apply { mkdirs() }
         testTempDir = File(context.cacheDir, "diag_temp_${System.currentTimeMillis()}").apply { mkdirs() }
+        testCameraDir = File(context.cacheDir, "diag_cam_${System.currentTimeMillis()}_${java.util.UUID.randomUUID().toString().take(6)}").apply { mkdirs() }
 
         db = Room.databaseBuilder(context, FlowersDatabase::class.java, dbName)
             .addMigrations(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3)
@@ -67,10 +72,16 @@ class PhotoDiagnosisComposeTest {
         context.deleteDatabase(dbName)
         testOutputDir.deleteRecursively()
         testTempDir.deleteRecursively()
+        testCameraDir.deleteRecursively()
     }
 
     private fun createSampleBitmapFile(dir: File, name: String): File {
         val file = File(dir, name)
+        return writeSampleBitmap(file)
+    }
+
+    private fun writeSampleBitmap(file: File): File {
+        file.parentFile?.mkdirs()
         val bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
         FileOutputStream(file).use { out ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
@@ -294,20 +305,29 @@ class PhotoDiagnosisComposeTest {
 
     @Test
     fun testCameraTempFileLifecycle_cleanedUpAfterProcessing_andOnCancel() {
-        val cameraDir = File(context.cacheDir, "camera").apply { mkdirs() }
-        val cameraFile = createSampleBitmapFile(cameraDir, "camera_test_lifecycle.jpg")
-        assertTrue(cameraFile.exists())
-
-        // Імітуємо скасування зйомки (користувач закрив камеру)
-        // Логіка екрана видаляє конкретний створений файл
-        if (cameraFile.exists() && cameraFile.isFile) {
-            cameraFile.delete()
+        // Використовуємо окрему унікальну тестову директорію testCameraDir, не чіпаючи cacheDir/camera
+        val foreignFile = File(testCameraDir, "unrelated_user_photo_${java.util.UUID.randomUUID().toString().take(6)}.jpg").apply {
+            writeBytes(byteArrayOf(0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x77))
         }
-        assertFalse("Файл камери повинен бути видалений при скасуванні", cameraFile.exists())
+        val foreignBytesBefore = foreignFile.readBytes()
 
-        // Тепер імітуємо успішну зйомку та обробку
-        val cameraFile2 = createSampleBitmapFile(cameraDir, "camera_test_lifecycle2.jpg")
+        val captureManager = CameraCaptureManager()
+
+        // 1. Імітуємо скасування зйомки системною камерою
+        val session1 = captureManager.prepareCapture(testCameraDir)
+        val cameraFile1 = writeSampleBitmap(session1.file)
+        assertTrue(cameraFile1.exists())
+        assertEquals(session1, captureManager.activeSession)
+
+        captureManager.cleanUpSession(session1)
+        assertFalse("Файл камери повинен бути видалений при скасуванні", cameraFile1.exists())
+        assertNull(captureManager.activeSession)
+
+        // 2. Тепер імітуємо успішну зйомку та обробку
+        val session2 = captureManager.prepareCapture(testCameraDir)
+        val cameraFile2 = writeSampleBitmap(session2.file)
         assertTrue(cameraFile2.exists())
+        assertEquals(session2, captureManager.activeSession)
 
         val plantId = 1000L
         val repository = FlowersRepositoryImpl(
@@ -332,9 +352,7 @@ class PhotoDiagnosisComposeTest {
             uri = Uri.fromFile(cameraFile2),
             context = context,
             onProcessed = {
-                if (cameraFile2.exists() && cameraFile2.isFile) {
-                    cameraFile2.delete()
-                }
+                captureManager.cleanUpSession(session2)
             }
         )
 
@@ -349,10 +367,84 @@ class PhotoDiagnosisComposeTest {
         assertTrue(step is com.flowers.app.ui.diagnosis.PhotoDiagnosisStep.PreviewAndConfirm)
         val processedFile = (step as com.flowers.app.ui.diagnosis.PhotoDiagnosisStep.PreviewAndConfirm).photoFile
 
-        // Тимчасовий файл камери очищено
+        // Тимчасовий файл камери очищено саме через captureManager
         assertFalse("Тимчасовий файл камери має бути очищений після копіювання", cameraFile2.exists())
+        assertNull("Активна сесія має бути скинута після очищення сесії 2", captureManager.activeSession)
         // Оброблений файл у підконтрольній директорії існує
         assertTrue(processedFile.exists())
+
+        // Сторонній файл залишається побайтово незмінним
+        assertTrue("Сторонній файл повинен існувати", foreignFile.exists())
+        assertArrayEquals("Сторонній файл повинен залишатися побайтово незмінним", foreignBytesBefore, foreignFile.readBytes())
+    }
+
+    @Test
+    fun testDelayedCameraCallback_doesNotDeleteOrAffectNewSessionPhoto() {
+        val foreignFile = File(testCameraDir, "foreign_isolation_${java.util.UUID.randomUUID().toString().take(6)}.jpg").apply {
+            writeBytes(byteArrayOf(0x10, 0x20, 0x30, 0x40, 0x50))
+        }
+        val foreignBytes = foreignFile.readBytes()
+
+        val captureManager = CameraCaptureManager()
+
+        // 1. Почалася обробка фото A
+        val sessionA = captureManager.prepareCapture(testCameraDir)
+        val fileA = writeSampleBitmap(sessionA.file)
+        assertTrue(fileA.exists())
+        assertEquals(sessionA, captureManager.activeSession)
+
+        val plantId = 1001L
+        val repository = FlowersRepositoryImpl(
+            plantDao = db.plantDao(),
+            careEventDao = db.careEventDao(),
+            catalogDao = db.catalogDao(),
+            carePodDao = db.carePodDao(),
+            context = context
+        )
+        val imageProcessor = ImageProcessor(
+            context = context,
+            outputDirectory = testOutputDir,
+            engine = AndroidImageDecoderEngine()
+        )
+        val viewModel = DiagnosisViewModel(
+            plantId = plantId,
+            repository = repository,
+            imageProcessorProvider = { imageProcessor }
+        )
+
+        // Запуск обробки фото A (callback буде змодельовано пізніше)
+        viewModel.onPhotoSelected(
+            uri = Uri.fromFile(fileA),
+            context = context,
+            onProcessed = {
+                // Запізнілий callback не викликається тут одразу
+            }
+        )
+
+        // 2. Користувач скасував активну операцію
+        viewModel.cancelActivePhotoOperation()
+
+        // 3. Створено нове фото B
+        val sessionB = captureManager.prepareCapture(testCameraDir)
+        val fileB = sessionB.file
+        val photoBContent = byteArrayOf(0xAA.toByte(), 0xBB.toByte(), 0xCC.toByte(), 0xDD.toByte(), 0xEE.toByte())
+        fileB.writeBytes(photoBContent)
+        assertTrue(fileB.exists())
+        assertEquals(sessionB, captureManager.activeSession)
+
+        // 4. Запізнілий callback від зйомки A завершується і намагається виконати очищення
+        captureManager.cleanUpSession(sessionA)
+
+        // 5. Перевірки:
+        // - Файл A очищено
+        assertFalse("Файл A попередньої зйомки має бути видалений", fileA.exists())
+        // - Фото B залишається незмінним і доступним
+        assertTrue("Фото B має залишатися доступним", fileB.exists())
+        assertArrayEquals("Фото B має залишатися побайтово незмінним", photoBContent, fileB.readBytes())
+        assertEquals("Активна сесія менеджера має залишатися sessionB", sessionB, captureManager.activeSession)
+        // - Сторонній файл не змінений
+        assertTrue(foreignFile.exists())
+        assertArrayEquals(foreignBytes, foreignFile.readBytes())
     }
 
     @Test

@@ -72,35 +72,23 @@ import java.io.File
 @Composable
 fun PlantDiagnosisScreen(
     viewModel: DiagnosisViewModel,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    captureManager: CameraCaptureManager = remember { CameraCaptureManager() }
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    // Контрольований життєвий цикл тимчасового файлу зйомки системною камерою
-    var cameraTempFile by remember { mutableStateOf<File?>(null) }
-
-    fun cleanUpCameraTemp() {
-        try {
-            cameraTempFile?.let { file ->
-                if (file.exists() && file.isFile) {
-                    file.delete()
-                }
-            }
-        } catch (_: Throwable) {}
-        cameraTempFile = null
-    }
-
     DisposableEffect(Unit) {
         onDispose {
-            cleanUpCameraTemp()
+            captureManager.cleanUpActiveSession()
         }
     }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
-        val file = cameraTempFile
+        val session = captureManager.activeSession
+        val file = session?.file
         if (success && file != null && file.exists()) {
             val uri = try {
                 FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
@@ -108,12 +96,19 @@ fun PlantDiagnosisScreen(
                 null
             }
             if (uri != null) {
-                viewModel.onPhotoSelected(uri, context, onProcessed = { cleanUpCameraTemp() })
+                // Фіксуємо конкретну сесію для callback'а, щоб запізнілий виклик
+                // очистив тільки власний файл і не зачіпав нову сесію
+                val sessionToClean = session
+                viewModel.onPhotoSelected(
+                    uri = uri,
+                    context = context,
+                    onProcessed = { captureManager.cleanUpSession(sessionToClean) }
+                )
             } else {
-                cleanUpCameraTemp()
+                captureManager.cleanUpSession(session)
             }
         } else {
-            cleanUpCameraTemp()
+            captureManager.cleanUpSession(session)
         }
     }
 
@@ -312,18 +307,17 @@ fun PlantDiagnosisScreen(
                                     ) {
                                         Button(
                                             onClick = {
-                                                cleanUpCameraTemp()
-                                                val newFile = File(context.cacheDir, "camera/diagnosis_cam_${System.currentTimeMillis()}.jpg").apply {
-                                                    parentFile?.mkdirs()
-                                                }
-                                                cameraTempFile = newFile
+                                                val cameraDir = File(context.cacheDir, "camera")
+                                                val session = captureManager.prepareCapture(cameraDir)
                                                 val uri = try {
-                                                    FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", newFile)
+                                                    FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", session.file)
                                                 } catch (_: Exception) {
                                                     null
                                                 }
                                                 if (uri != null) {
                                                     cameraLauncher.launch(uri)
+                                                } else {
+                                                    captureManager.cleanUpSession(session)
                                                 }
                                             },
                                             enabled = !uiState.isSaving,

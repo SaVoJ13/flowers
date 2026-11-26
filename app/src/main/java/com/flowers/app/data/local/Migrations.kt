@@ -44,4 +44,30 @@ object Migrations {
             MIGRATION_2_3_SQL.forEach { db.execSQL(it) }
         }
     }
+
+    /**
+     * Міграція Room 3 → 4 (TASK-056, крок 1): таблиця історії персонального чату рослини.
+     * Суто адитивна: лише CREATE TABLE / CREATE INDEX. Таблиці `plants`, `care_events`,
+     * `catalog_plants`, `care_pods` не змінюються (жодних DROP/DELETE/ALTER), тож рослини,
+     * шляхи фото та історія догляду зберігаються 100%.
+     */
+    val MIGRATION_3_4_SQL: List<String> = listOf(
+        "CREATE TABLE IF NOT EXISTS `chat_messages` (" +
+            "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+            "`plantId` INTEGER NOT NULL, " +
+            "`role` TEXT NOT NULL, " +
+            "`content` TEXT NOT NULL, " +
+            "`status` TEXT NOT NULL, " +
+            "`errorMessage` TEXT, " +
+            "`timestamp` INTEGER NOT NULL, " +
+            "FOREIGN KEY(`plantId`) REFERENCES `plants`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "CREATE INDEX IF NOT EXISTS `index_chat_messages_plantId_timestamp` " +
+            "ON `chat_messages` (`plantId`, `timestamp`)"
+    )
+
+    val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            MIGRATION_3_4_SQL.forEach { db.execSQL(it) }
+        }
+    }
 }

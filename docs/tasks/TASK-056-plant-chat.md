@@ -261,3 +261,35 @@ CREATE INDEX IF NOT EXISTS `index_chat_messages_plantId_timestamp` ON `chat_mess
    - Підтвердження розміру слайдинг-вікна: максимум 6 повідомлень діалогу + до 10 останніх записів догляду (~650 токенів на запит, $0 витрат на тарифі Spark).
 3. **Розташування точки входу в UI:**
    - Розміщення кнопки «Запитати про рослину» в `PlantDetailScreen` поруч із кнопками «Полив» та «Діагностика».
+
+
+---
+
+## Журнал виконання: Крок 1 (Room v4) — 2026-11-26
+
+**Статус кроку 1:** реалізовано, PR відкрито, очікує QA та окремого дозволу Власника на злиття. Gemini-чат, ContextBuilder, ChatViewModel, UI і навігація НЕ створювались.
+
+### Реалізовано
+- `ChatMessageEntity` (+ `MessageRole` USER/MODEL, `MessageStatus` SENDING/SENT/ERROR), FK `plantId → plants.id ON DELETE CASCADE`.
+- `ChatConverters`: enum зберігаються рядками `name` (стійко до зміни порядку констант).
+- `ChatMessageDao`: `observeMessages`/`getMessages` (повна історія, `ORDER BY timestamp ASC, id ASC`), `getLastMessages(plantId, N)` (останні N у хронологічному порядку), `insertMessage` (**ABORT**, не REPLACE), `updateStatus`, `beginRetry` (ERROR→SENDING за тим самим id, ідемпотентно), `markInterruptedSendingAsError` (відновлення після перезапуску), `deleteAllForPlant`.
+- Room v4, `MIGRATION_3_4`, `exportSchema = true`, експортовано `schemas/.../4.json`. Один індекс `(plantId, timestamp)` замість двох (префікс plantId покриває FK; дублів немає).
+
+### SQL міграції 3 → 4 (лише CREATE)
+```sql
+CREATE TABLE IF NOT EXISTS `chat_messages` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plantId` INTEGER NOT NULL, `role` TEXT NOT NULL, `content` TEXT NOT NULL, `status` TEXT NOT NULL, `errorMessage` TEXT, `timestamp` INTEGER NOT NULL, FOREIGN KEY(`plantId`) REFERENCES `plants`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE );
+CREATE INDEX IF NOT EXISTS `index_chat_messages_plantId_timestamp` ON `chat_messages` (`plantId`, `timestamp`);
+```
+Збігається з експортованою `4.json`; DROP/ALTER/DELETE/UPDATE відсутні (перевіряється тестом `migrationSql_isPurelyAdditive`).
+
+### ⚠ ВИЯВЛЕНИЙ РИЗИК: `PlantDao.insertPlant` + `OnConflictStrategy.REPLACE`
+SQLite виконує REPLACE як DELETE + INSERT; Room вмикає foreign keys, тому повторна вставка рослини з **наявним id** каскадно видаляє її `care_events` і `chat_messages`. **Підтверджено тестом** `ChatMessageDaoTest.replaceOnInsertPlant_documentsCascadeDataLoss_andUpdatePlantIsSafe` (після REPLACE дочірніх записів 0; `updatePlant` їх зберігає).
+- Поточний production-код викликає `insertPlant` лише для НОВИХ рослин (id = 0, `PlantsViewModel`, гілка створення); редагування йде через `updatePlant`. Тож втрата зараз не відтворюється в застосунку — ризик латентний (майбутні виклики, імпорт/відновлення).
+- `PlantDao` у цьому кроці НЕ змінювався (за вимогою без рефакторингу без погодження).
+- **Пропозиція безпечного рішення (потрібне погодження):** змінити `insertPlant` на `OnConflictStrategy.ABORT` (або `@Upsert`, який виконує UPDATE при конфлікті і не каскадить) окремим малим завданням з тестом; тест характеризації тоді перетвориться на тест безпеки.
+
+### Верифікація
+- JVM unit: 254/254 (0 failures/errors/skipped).
+- Instrumented (емулятор `small_phone`, API 36, `emulator-5584`): 46/46 (0 failed/skipped), у т.ч. 3 тести `RoomMigrationV3ToV4Test` і 10 тестів `ChatMessageDaoTest`. Під час роботи виправлено дві помилки самих тестів: хибнопозитивна перевірка слів `DELETE`/`UPDATE` усередині `ON DELETE CASCADE`/`ON UPDATE NO ACTION`; `RoomMigrationV2ToV3Test` мав зареєструвати `MIGRATION_3_4`, бо тепер відкриває БД v4.
+- `bundleRelease` (Adoptium JDK 21): BUILD SUCCESSFUL, AAB 17 629 075 байт.
+- Збереження старих даних (v3→v4, ізольована тестова БД): 2 рослини, шляхи фото, усі події WATER/DELAY/HEALTH_CHECK (з `daysDelayed`, `notes`, `photoUri`), нова таблиця спочатку порожня.

@@ -309,6 +309,106 @@ class GeminiPlantServiceTest {
     }
 
     @Test
+    fun `parseHealthDiagnosisResponse returns null when is_plant is missing null or not a boolean`() {
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true }
+        )
+
+        // Missing is_plant
+        val jsonNoIsPlant = """
+            {
+              "probable_cause": "Хлороз",
+              "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [],
+              "first_aid_steps": ["Ізолюйте рослину"],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonNoIsPlant))
+
+        // is_plant is string "true" instead of boolean
+        val jsonStringIsPlant = """
+            {
+              "is_plant": "true",
+              "probable_cause": "Хлороз",
+              "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [],
+              "first_aid_steps": ["Ізолюйте рослину"],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonStringIsPlant))
+
+        // is_plant is null
+        val jsonNullIsPlant = """
+            {
+              "is_plant": null,
+              "probable_cause": "Хлороз",
+              "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [],
+              "first_aid_steps": ["Ізолюйте рослину"],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonNullIsPlant))
+    }
+
+    @Test
+    fun `parseHealthDiagnosisResponse returns null when symptoms or alternatives contain null or invalid types`() {
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true }
+        )
+
+        // visible_symptoms contains null
+        val jsonSymptomsWithNull = """
+            {
+              "is_plant": true,
+              "probable_cause": "Хлороз",
+              "confidence": "HIGH",
+              "visible_symptoms": ["Жовте листя", null],
+              "alternative_causes": [],
+              "first_aid_steps": ["Ізолюйте рослину"],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonSymptomsWithNull))
+
+        // alternative_causes contains number instead of string
+        val jsonAlternativesWithNumber = """
+            {
+              "is_plant": true,
+              "probable_cause": "Хлороз",
+              "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [42],
+              "first_aid_steps": ["Ізолюйте рослину"],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonAlternativesWithNumber))
+
+        // missing visible_symptoms array
+        val jsonNoSymptomsArray = """
+            {
+              "is_plant": true,
+              "probable_cause": "Хлороз",
+              "confidence": "HIGH",
+              "alternative_causes": [],
+              "first_aid_steps": ["Ізолюйте рослину"],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonNoSymptomsArray))
+    }
+
+    @Test
     fun `parseHealthDiagnosisResponse returns null on missing or blank required fields`() {
         val service = GeminiPlantService(
             catalogDao = failingProxy(),
@@ -322,6 +422,8 @@ class GeminiPlantServiceTest {
               "is_plant": true,
               "probable_cause": "   ",
               "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [],
               "first_aid_steps": ["Ізолюйте рослину"],
               "follow_up_advice": "Огляньте через 3 дні"
             }
@@ -334,6 +436,8 @@ class GeminiPlantServiceTest {
               "is_plant": true,
               "probable_cause": "Хлороз",
               "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [],
               "first_aid_steps": [],
               "follow_up_advice": "Огляньте через 3 дні"
             }
@@ -346,6 +450,8 @@ class GeminiPlantServiceTest {
               "is_plant": true,
               "probable_cause": "Хлороз",
               "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [],
               "first_aid_steps": [null, 123],
               "follow_up_advice": "Огляньте через 3 дні"
             }
@@ -358,6 +464,8 @@ class GeminiPlantServiceTest {
               "is_plant": true,
               "probable_cause": "Хлороз",
               "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [],
               "first_aid_steps": ["Ізолюйте рослину"],
               "follow_up_advice": "  "
             }
@@ -378,6 +486,8 @@ class GeminiPlantServiceTest {
               "is_plant": true,
               "probable_cause": "Борошниста роса",
               "confidence": "SUPER_HIGH_CERTAIN",
+              "visible_symptoms": [],
+              "alternative_causes": [],
               "first_aid_steps": ["Ізолюйте рослину"],
               "follow_up_advice": "Огляньте через 5 днів"
             }
@@ -401,6 +511,8 @@ class GeminiPlantServiceTest {
               "is_plant": true,
               "probable_cause": "Попелиця",
               "confidence": "HIGH",
+              "visible_symptoms": ["Липкий наліт"],
+              "alternative_causes": [],
               "first_aid_steps": [
                 "Обробіть рослину сильним інсектицидом або дихлофосом",
                 "Розведіть мідний купорос та обприскайте листя"
@@ -412,7 +524,6 @@ class GeminiPlantServiceTest {
         val parsed = service.parseHealthDiagnosisResponse(jsonDangerousChemicals)
         assertNotNull(parsed)
         assertTrue(parsed!!.isSafetySanitized)
-        // Замінено на безпечні нейтральні заходи
         assertFalse(parsed.firstAidSteps.any { it.contains("дихлофос") || it.contains("купорос") })
         assertTrue(parsed.firstAidSteps.any { it.contains("Ізолюйте") })
         assertTrue(parsed.preliminaryNotice.contains("Увага: початкові рекомендації містили потенційно небезпечні"))

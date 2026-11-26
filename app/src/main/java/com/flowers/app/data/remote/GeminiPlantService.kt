@@ -500,16 +500,16 @@ class GeminiPlantService(
                 return null
             }
 
+            // Строгий контракт: is_plant має бути явним булевим значенням
             val isPlantElement = jsonObject.get("is_plant")
-            val isPlant = if (isPlantElement != null && isPlantElement.isJsonPrimitive && isPlantElement.asJsonPrimitive.isBoolean) {
-                isPlantElement.asBoolean
-            } else {
-                true
+            if (isPlantElement == null || !isPlantElement.isJsonPrimitive || !isPlantElement.asJsonPrimitive.isBoolean) {
+                return null
             }
+            val isPlant = isPlantElement.asBoolean
 
             // Якщо на фото не виявлено рослину
             if (!isPlant) {
-                val cause = jsonObject.get("probable_cause")?.takeIf { it.isJsonPrimitive }?.asString?.trim() ?: ""
+                val cause = jsonObject.get("probable_cause")?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isString }?.asString?.trim() ?: ""
                 return PlantHealthDiagnosisResponse(
                     isPlant = false,
                     probableCause = cause.ifBlank { "На фотографії не розпізнано рослину." },
@@ -554,7 +554,7 @@ class GeminiPlantService(
             val rawFirstAidSteps = mutableListOf<String>()
             for (element in rawFirstAidArray) {
                 if (!element.isJsonPrimitive || !element.asJsonPrimitive.isString) {
-                    return null // елемент не є рядком (наприклад, null або вкладений об'єкт)
+                    return null // некоректний тип елемента у списку (null, об'єкт або число)
                 }
                 val step = element.asString.trim()
                 if (step.isNotBlank()) {
@@ -565,31 +565,35 @@ class GeminiPlantService(
                 return null
             }
 
-            // 4. Валідація видимих симптомів
+            // 4. Строга валідація видимих симптомів (масив валідних рядків, null/не-рядки заборонені)
             val visibleSymptoms = mutableListOf<String>()
             val symptomsElement = jsonObject.get("visible_symptoms")
-            if (symptomsElement != null && symptomsElement.isJsonArray) {
-                for (element in symptomsElement.asJsonArray) {
-                    if (element.isJsonPrimitive && element.asJsonPrimitive.isString) {
-                        val sym = element.asString.trim()
-                        if (sym.isNotBlank()) {
-                            visibleSymptoms.add(sym)
-                        }
-                    }
+            if (symptomsElement == null || !symptomsElement.isJsonArray) {
+                return null
+            }
+            for (element in symptomsElement.asJsonArray) {
+                if (!element.isJsonPrimitive || !element.asJsonPrimitive.isString) {
+                    return null
+                }
+                val sym = element.asString.trim()
+                if (sym.isNotBlank()) {
+                    visibleSymptoms.add(sym)
                 }
             }
 
-            // 5. Валідація альтернативних причин (без вигадування штучних причин)
+            // 5. Строга валідація альтернативних причин (масив валідних рядків, null/не-рядки заборонені)
             val alternativeCauses = mutableListOf<String>()
             val altElement = jsonObject.get("alternative_causes")
-            if (altElement != null && altElement.isJsonArray) {
-                for (element in altElement.asJsonArray) {
-                    if (element.isJsonPrimitive && element.asJsonPrimitive.isString) {
-                        val alt = element.asString.trim()
-                        if (alt.isNotBlank()) {
-                            alternativeCauses.add(alt)
-                        }
-                    }
+            if (altElement == null || !altElement.isJsonArray) {
+                return null
+            }
+            for (element in altElement.asJsonArray) {
+                if (!element.isJsonPrimitive || !element.asJsonPrimitive.isString) {
+                    return null
+                }
+                val alt = element.asString.trim()
+                if (alt.isNotBlank()) {
+                    alternativeCauses.add(alt)
                 }
             }
 

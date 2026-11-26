@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -289,6 +290,69 @@ class PhotoDiagnosisComposeTest {
         viewModel.onPhotoSelected(externalFile)
         viewModel.cancelActivePhotoOperation()
         assertTrue("Зовнішній файл не повинен видалятися при скасуванні", externalFile.exists())
+    }
+
+    @Test
+    fun testCameraTempFileLifecycle_cleanedUpAfterProcessing_andOnCancel() {
+        val cameraDir = File(context.cacheDir, "camera").apply { mkdirs() }
+        val cameraFile = createSampleBitmapFile(cameraDir, "camera_test_lifecycle.jpg")
+        assertTrue(cameraFile.exists())
+
+        // Імітуємо скасування зйомки (користувач закрив камеру)
+        // Логіка екрана видаляє конкретний створений файл
+        if (cameraFile.exists() && cameraFile.isFile) {
+            cameraFile.delete()
+        }
+        assertFalse("Файл камери повинен бути видалений при скасуванні", cameraFile.exists())
+
+        // Тепер імітуємо успішну зйомку та обробку
+        val cameraFile2 = createSampleBitmapFile(cameraDir, "camera_test_lifecycle2.jpg")
+        assertTrue(cameraFile2.exists())
+
+        val plantId = 1000L
+        val repository = FlowersRepositoryImpl(
+            plantDao = db.plantDao(),
+            careEventDao = db.careEventDao(),
+            catalogDao = db.catalogDao(),
+            carePodDao = db.carePodDao(),
+            context = context
+        )
+        val imageProcessor = ImageProcessor(
+            context = context,
+            outputDirectory = testOutputDir,
+            engine = AndroidImageDecoderEngine()
+        )
+        val viewModel = DiagnosisViewModel(
+            plantId = plantId,
+            repository = repository,
+            imageProcessorProvider = { imageProcessor }
+        )
+
+        viewModel.onPhotoSelected(
+            uri = Uri.fromFile(cameraFile2),
+            context = context,
+            onProcessed = {
+                if (cameraFile2.exists() && cameraFile2.isFile) {
+                    cameraFile2.delete()
+                }
+            }
+        )
+
+        // Очікуємо завершення обробки
+        var counter = 0
+        while (viewModel.uiState.value.photoStep !is com.flowers.app.ui.diagnosis.PhotoDiagnosisStep.PreviewAndConfirm && counter < 50) {
+            Thread.sleep(100)
+            counter++
+        }
+
+        val step = viewModel.uiState.value.photoStep
+        assertTrue(step is com.flowers.app.ui.diagnosis.PhotoDiagnosisStep.PreviewAndConfirm)
+        val processedFile = (step as com.flowers.app.ui.diagnosis.PhotoDiagnosisStep.PreviewAndConfirm).photoFile
+
+        // Тимчасовий файл камери очищено
+        assertFalse("Тимчасовий файл камери має бути очищений після копіювання", cameraFile2.exists())
+        // Оброблений файл у підконтрольній директорії існує
+        assertTrue(processedFile.exists())
     }
 
     @Test

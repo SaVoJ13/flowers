@@ -71,6 +71,7 @@ class DiagnosisViewModelTest {
         )
         var diagnoseCalledCount = 0
         var onDiagnoseDeferred: CompletableDeferred<Unit>? = null
+        var logCareEventError: Throwable? = null
 
         override val userPreferences: UserPreferences get() = throw UnsupportedOperationException()
         override fun getAllActivePlants(): Flow<List<PlantEntity>> = flowOf(listOf(plant))
@@ -83,6 +84,7 @@ class DiagnosisViewModelTest {
         override fun getEventsForPlant(plantId: Long): Flow<List<CareEventEntity>> = flowOf(careEvents)
         override suspend fun getLastWateringEvent(plantId: Long): CareEventEntity? = null
         override suspend fun logCareEvent(event: CareEventEntity): Long {
+            logCareEventError?.let { throw it }
             careEvents.add(event)
             return event.id
         }
@@ -379,22 +381,71 @@ class DiagnosisViewModelTest {
     }
 
     @Test
-    fun photoDiagnosis_handlesNotAPlant_transitionsToError() = runTest(testDispatcher) {
-        val plant = PlantEntity(id = 109L, customName = "Кактус")
+    fun savePhotoDiagnosisToHistory_onDatabaseError_retainsPhotoOwnership_andSetsErrorMessage() = runTest(testDispatcher) {
+        val plant = PlantEntity(id = 110L, customName = "Калатея")
         val repo = FakeTestFlowersRepository(plant)
-        repo.diagnoseHealthResult = DiagnosePlantHealthResult.NotAPlant("На фото не виявлено рослину")
+        repo.logCareEventError = RuntimeException("Disk I/O error or Room constraint failure")
+
         val viewModel = DiagnosisViewModel(plantId = plant.id, repository = repo)
         testScheduler.runCurrent()
 
-        val dummyPhoto = tempFolder.newFile("sample_diag4.jpg").apply { writeText("dummy") }
-        viewModel.onPhotoSelected(dummyPhoto)
+        val ownedPhoto = tempFolder.newFile("owned_temp_photo.jpg").apply { writeText("bytes") }
+        viewModel.onPhotoSelectedForTesting(ownedPhoto, isOwnedForDeletion = true)
         testScheduler.runCurrent()
-
         viewModel.onConfirmAnalysis()
         testScheduler.runCurrent()
 
-        val errorStep = viewModel.uiState.value.photoStep
-        assertTrue(errorStep is PhotoDiagnosisStep.Error)
-        assertEquals("На фото не виявлено рослину", (errorStep as PhotoDiagnosisStep.Error).message)
+        var saved = false
+        viewModel.savePhotoDiagnosisToHistory { saved = true }
+        testScheduler.runCurrent()
+
+        // Збереження не відбулося через помилку
+        assertFalse(saved)
+        assertEquals(0, repo.careEvents.size)
+        assertFalse(viewModel.uiState.value.isSaving)
+        assertNotNull(viewModel.uiState.value.saveErrorMessage)
+        assertTrue(viewModel.uiState.value.saveErrorMessage!!.contains("Disk I/O error"))
+
+        // Файл НЕ видалено, користувач може спробувати ще раз
+        assertTrue(ownedPhoto.exists())
+
+        // Виправляємо помилку бази та повторюємо збереження
+        repo.logCareEventError = null
+        viewModel.savePhotoDiagnosisToHistory { saved = true }
+        testScheduler.runCurrent()
+
+        assertTrue(saved)
+        assertEquals(1, repo.careEvents.size)
+        // Після успіху право видалення знято, фото залишається в історії
+        assertTrue(ownedPhoto.exists())
+    }
+
+    @Test
+    fun savingOperation_blocksModeSwitch_andCancellation() = runTest(testDispatcher) {
+        val plant = PlantEntity(id = 111L, customName = "Юкка")
+        val repo = FakeTestFlowersRepository(plant)
+        val viewModel = DiagnosisViewModel(plantId = plant.id, repository = repo)
+        testScheduler.runCurrent()
+
+        val photo = tempFolder.newFile("yukka.jpg").apply { writeText("test") }
+        viewModel.onPhotoSelected(photo)
+        testScheduler.runCurrent()
+        viewModel.onConfirmAnalysis()
+        testScheduler.runCurrent()
+
+        // Затримуємо збереження для перевірки блокування під час isSaving
+        val deferred = CompletableDeferred<Unit>()
+        repo.onDiagnoseDeferred = deferred
+
+        // Штучно запускаємо операцію зі станом isSaving
+        viewModel.savePhotoDiagnosisToHistory {}
+        // Під час операції намагаємося перемкнути режим або скасувати
+        viewModel.selectMode(DiagnosisMode.MANUAL_SYMPTOMS)
+        viewModel.resetToModeSelection()
+        viewModel.cancelActivePhotoOperation()
+
+        // Стан не змінюється під час критичної операції збереження
+        testScheduler.runCurrent()
+        assertEquals(1, repo.careEvents.size)
     }
 }

@@ -52,7 +52,8 @@ data class DiagnosisUiState(
     val result: DiagnosisResult? = null,
     val isLoading: Boolean = true,
     // Захист від повторних натискань (дебаунс)
-    val isSaving: Boolean = false
+    val isSaving: Boolean = false,
+    val saveErrorMessage: String? = null
 )
 
 /**
@@ -104,10 +105,12 @@ class DiagnosisViewModel(
     // ==========================================
 
     fun selectMode(mode: DiagnosisMode) {
-        _uiState.update { it.copy(mode = mode) }
+        if (_uiState.value.isSaving) return
+        _uiState.update { it.copy(mode = mode, saveErrorMessage = null) }
     }
 
     fun resetToModeSelection() {
+        if (_uiState.value.isSaving) return
         cancelActivePhotoOperation()
         _uiState.update {
             it.copy(
@@ -115,7 +118,8 @@ class DiagnosisViewModel(
                 photoStep = PhotoDiagnosisStep.PickPhoto,
                 selectedCategory = null,
                 selectedSymptom = null,
-                result = null
+                result = null,
+                saveErrorMessage = null
             )
         }
     }
@@ -129,6 +133,7 @@ class DiagnosisViewModel(
      * Зовнішній файл [file] ніколи не вважається тимчасовим файлом для видалення (isOwnedForDeletion = false).
      */
     fun onPhotoSelected(file: File) {
+        if (_uiState.value.isSaving) return
         onPhotoSelectedInternal(file, isOwnedForDeletion = false)
     }
 
@@ -137,6 +142,7 @@ class DiagnosisViewModel(
      */
     @androidx.annotation.VisibleForTesting
     fun onPhotoSelectedForTesting(file: File, isOwnedForDeletion: Boolean) {
+        if (_uiState.value.isSaving) return
         onPhotoSelectedInternal(file, isOwnedForDeletion = isOwnedForDeletion)
     }
 
@@ -148,18 +154,23 @@ class DiagnosisViewModel(
             isOwnedForDeletion = isOwnedForDeletion,
             operationToken = token
         )
-        _uiState.update { it.copy(photoStep = PhotoDiagnosisStep.PreviewAndConfirm(file)) }
+        _uiState.update { it.copy(photoStep = PhotoDiagnosisStep.PreviewAndConfirm(file), saveErrorMessage = null) }
     }
 
-    fun onPhotoSelected(uri: Uri, context: Context) {
+    fun onPhotoSelected(uri: Uri, context: Context, onProcessed: (() -> Unit)? = null) {
+        if (_uiState.value.isSaving) return
         cancelActivePhotoOperation()
         val token = ++operationTokenCounter
 
         activeAnalysisJob = viewModelScope.launch {
-            _uiState.update { it.copy(photoStep = PhotoDiagnosisStep.ProcessingPhoto(uri)) }
+            _uiState.update { it.copy(photoStep = PhotoDiagnosisStep.ProcessingPhoto(uri), saveErrorMessage = null) }
             val processor = imageProcessorProvider?.invoke(context) ?: ImageProcessor(context)
             val processResult = processor.processImage(uri, ImageProfile.DiseaseDiagnosis)
             val imageResult = processResult.getOrNull()
+
+            try {
+                onProcessed?.invoke()
+            } catch (_: Throwable) {}
 
             // Перевіряємо актуальність операції
             if (!isActive || token != operationTokenCounter) {
@@ -201,6 +212,7 @@ class DiagnosisViewModel(
      * Користувач підтверджує перегляд фотографії та запускає аналіз ШІ.
      */
     fun onConfirmAnalysis() {
+        if (_uiState.value.isSaving) return
         val owned = currentOwnedPhoto ?: return
         val photoFile = owned.file
         val plant = _uiState.value.plant ?: return
@@ -208,7 +220,7 @@ class DiagnosisViewModel(
 
         activeAnalysisJob?.cancel()
         activeAnalysisJob = viewModelScope.launch {
-            _uiState.update { it.copy(photoStep = PhotoDiagnosisStep.AnalyzingWithAi(photoFile)) }
+            _uiState.update { it.copy(photoStep = PhotoDiagnosisStep.AnalyzingWithAi(photoFile), saveErrorMessage = null) }
             val diagnosisResult = repository.diagnosePlantHealth(photoFile, plant)
 
             // Перевіряємо актуальність поточної операції (захист від затриманих відповідей старих запитів)
@@ -252,10 +264,11 @@ class DiagnosisViewModel(
      * Скасування активного запиту або вибір іншої фотографії.
      */
     fun cancelActivePhotoOperation() {
+        if (_uiState.value.isSaving) return
         activeAnalysisJob?.cancel()
         activeAnalysisJob = null
         cleanUpOwnedPhoto()
-        _uiState.update { it.copy(photoStep = PhotoDiagnosisStep.PickPhoto) }
+        _uiState.update { it.copy(photoStep = PhotoDiagnosisStep.PickPhoto, saveErrorMessage = null) }
     }
 
     /**
@@ -266,15 +279,12 @@ class DiagnosisViewModel(
         val currentStep = _uiState.value.photoStep
         if (currentStep !is PhotoDiagnosisStep.Success) return
 
-        _uiState.update { it.copy(isSaving = true) }
+        _uiState.update { it.copy(isSaving = true, saveErrorMessage = null) }
 
         viewModelScope.launch {
             try {
                 val diagnosis = currentStep.diagnosis
                 val photoPath = currentStep.photoFile.absolutePath
-
-                // Знімаємо право на видалення файлу, оскільки він зберігається в постійній історії
-                currentOwnedPhoto = currentOwnedPhoto?.copy(isOwnedForDeletion = false)
 
                 val noteText = buildString {
                     append("Ймовірна причина: ${diagnosis.probableCause}\n")
@@ -299,6 +309,8 @@ class DiagnosisViewModel(
                     append("⚠️ ${diagnosis.preliminaryNotice}")
                 }.trim()
 
+                // 1. Спочатку виконуємо запис у базу даних Room.
+                // Право власності (isOwnedForDeletion = true) зберігається, допоки запис не підтверджено успіхом.
                 repository.logCareEvent(
                     CareEventEntity(
                         plantId = plantId,
@@ -309,9 +321,19 @@ class DiagnosisViewModel(
                     )
                 )
 
-                // Фото успішно закріплено за історією — очищати при виході не потрібно
+                // 2. Лише після підтвердженого успішного запису знімаємо право на видалення фото
+                currentOwnedPhoto = currentOwnedPhoto?.copy(isOwnedForDeletion = false)
                 currentOwnedPhoto = null
+
                 onSaved()
+            } catch (e: Exception) {
+                // При помилці бази даних фото залишається під контролем (isOwnedForDeletion = true),
+                // файл не видаляється, а користувач бачить повідомлення про помилку та можливість повторити збереження.
+                _uiState.update {
+                    it.copy(
+                        saveErrorMessage = "Не вдалося зберегти запис у базі даних: ${e.message ?: "помилка збереження"}. Спробуйте ще раз."
+                    )
+                }
             } finally {
                 _uiState.update { it.copy(isSaving = false) }
             }

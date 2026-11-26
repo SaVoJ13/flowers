@@ -49,9 +49,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -74,25 +77,43 @@ fun PlantDiagnosisScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    // Тимчасовий файл для зйомки камерою через FileProvider
-    val cameraTempFile = remember {
-        File(context.cacheDir, "camera/diagnosis_cam_${System.currentTimeMillis()}.jpg").apply {
-            parentFile?.mkdirs()
-        }
-    }
-    val cameraUri = remember(cameraTempFile) {
+    // Контрольований життєвий цикл тимчасового файлу зйомки системною камерою
+    var cameraTempFile by remember { mutableStateOf<File?>(null) }
+
+    fun cleanUpCameraTemp() {
         try {
-            FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", cameraTempFile)
-        } catch (_: Exception) {
-            null
+            cameraTempFile?.let { file ->
+                if (file.exists() && file.isFile) {
+                    file.delete()
+                }
+            }
+        } catch (_: Throwable) {}
+        cameraTempFile = null
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            cleanUpCameraTemp()
         }
     }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success && cameraUri != null) {
-            viewModel.onPhotoSelected(cameraUri, context)
+        val file = cameraTempFile
+        if (success && file != null && file.exists()) {
+            val uri = try {
+                FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+            } catch (_: Exception) {
+                null
+            }
+            if (uri != null) {
+                viewModel.onPhotoSelected(uri, context, onProcessed = { cleanUpCameraTemp() })
+            } else {
+                cleanUpCameraTemp()
+            }
+        } else {
+            cleanUpCameraTemp()
         }
     }
 
@@ -290,7 +311,22 @@ fun PlantDiagnosisScreen(
                                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                                     ) {
                                         Button(
-                                            onClick = { cameraUri?.let { cameraLauncher.launch(it) } },
+                                            onClick = {
+                                                cleanUpCameraTemp()
+                                                val newFile = File(context.cacheDir, "camera/diagnosis_cam_${System.currentTimeMillis()}.jpg").apply {
+                                                    parentFile?.mkdirs()
+                                                }
+                                                cameraTempFile = newFile
+                                                val uri = try {
+                                                    FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", newFile)
+                                                } catch (_: Exception) {
+                                                    null
+                                                }
+                                                if (uri != null) {
+                                                    cameraLauncher.launch(uri)
+                                                }
+                                            },
+                                            enabled = !uiState.isSaving,
                                             modifier = Modifier
                                                 .weight(1f)
                                                 .testTag("btn_take_photo"),
@@ -430,6 +466,7 @@ fun PlantDiagnosisScreen(
                                 photoFile = step.photoFile,
                                 diagnosis = step.diagnosis,
                                 isSaving = uiState.isSaving,
+                                saveErrorMessage = uiState.saveErrorMessage,
                                 onSaveToHistory = { viewModel.savePhotoDiagnosisToHistory(onSaved = onNavigateBack) },
                                 onTryAnotherPhoto = { viewModel.cancelActivePhotoOperation() }
                             )
@@ -703,6 +740,7 @@ fun PhotoDiagnosisResultView(
     photoFile: File,
     diagnosis: PlantHealthDiagnosisResponse,
     isSaving: Boolean,
+    saveErrorMessage: String? = null,
     onSaveToHistory: () -> Unit,
     onTryAnotherPhoto: () -> Unit
 ) {
@@ -985,8 +1023,32 @@ fun PhotoDiagnosisResultView(
             }
         }
 
+        if (saveErrorMessage != null) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = saveErrorMessage,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
+        }
+
         OutlinedButton(
             onClick = onTryAnotherPhoto,
+            enabled = !isSaving,
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag("btn_retry_photo"),

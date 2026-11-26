@@ -6,6 +6,7 @@ import com.flowers.app.data.local.dao.CarePodDao
 import com.flowers.app.data.local.dao.CatalogDao
 import com.flowers.app.data.local.entity.CarePodEntity
 import com.flowers.app.data.local.entity.CatalogPlantEntity
+import com.flowers.app.data.local.entity.PlantEntity
 import com.google.firebase.Firebase
 import com.google.firebase.ai.type.GenerativeBackend
 import com.google.firebase.ai.ai
@@ -98,6 +99,48 @@ sealed class IdentifyPlantResult {
         val message: String,
         val isOffline: Boolean = false
     ) : IdentifyPlantResult()
+}
+
+/**
+ * Відповідь моделі на мультимодальну діагностику здоров'я та шкідників рослини (TASK-055).
+ */
+data class PlantHealthDiagnosisResponse(
+    @SerializedName("is_plant")
+    val isPlant: Boolean = true,
+
+    @SerializedName("probable_cause")
+    val probableCause: String = "",
+
+    @SerializedName("confidence")
+    val confidence: String = "MEDIUM",
+
+    @SerializedName("visible_symptoms")
+    val visibleSymptoms: List<String> = emptyList(),
+
+    @SerializedName("alternative_causes")
+    val alternativeCauses: List<String> = emptyList(),
+
+    @SerializedName("first_aid_steps")
+    val firstAidSteps: List<String> = emptyList(),
+
+    @SerializedName("follow_up_advice")
+    val followUpAdvice: String = "",
+
+    @SerializedName("preliminary_notice")
+    val preliminaryNotice: String = "Попередня оцінка за фотографією. Не замінює очного огляду фахівцем.",
+
+    val isSafetySanitized: Boolean = false
+)
+
+sealed class DiagnosePlantHealthResult {
+    data class Success(val response: PlantHealthDiagnosisResponse) : DiagnosePlantHealthResult()
+    data class NotAPlant(
+        val message: String = "На фото не виявлено рослину. Будь ласка, сфотографуйте уражену частину рослини при кращому освітленні."
+    ) : DiagnosePlantHealthResult()
+    data class Error(
+        val message: String,
+        val isOffline: Boolean = false
+    ) : DiagnosePlantHealthResult()
 }
 
 class GeminiPlantService(
@@ -332,6 +375,263 @@ class GeminiPlantService(
             )
         } catch (e: Exception) {
             e.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun diagnosePlantHealth(
+        bitmap: Bitmap?,
+        plant: PlantEntity,
+        lastWateredTimestamp: Long? = null
+    ): DiagnosePlantHealthResult = withContext(Dispatchers.IO) {
+        if (!networkChecker.isOnline()) {
+            return@withContext DiagnosePlantHealthResult.Error(
+                message = AiErrorMapper.MSG_NO_INTERNET,
+                isOffline = true
+            )
+        }
+
+        val plantSummary = buildString {
+            append("Назва: ${plant.customName}")
+            if (!plant.speciesName.isNullOrBlank()) append(", Вид: ${plant.speciesName}")
+            if (!plant.botanicalName.isNullOrBlank()) append(" (${plant.botanicalName})")
+            append(", Освітлення: ${plant.lightLevel}")
+            append(", Кімната: ${plant.roomLocation}")
+            if (!plant.wateringAdvice.isNullOrBlank()) append(", Рекомендація щодо поливу: ${plant.wateringAdvice}")
+            if (lastWateredTimestamp != null) {
+                val daysAgo = ((System.currentTimeMillis() - lastWateredTimestamp) / 86400000L).coerceAtLeast(0)
+                append(", Останній полив: $daysAgo дн. тому")
+            }
+        }
+
+        val prompt = AiPrompt.diagnosePlantHealthPrompt(plantSummary)
+
+        try {
+            val responseText = generateMultimodal(bitmap, prompt) ?: ""
+            if (responseText.isBlank()) {
+                return@withContext DiagnosePlantHealthResult.Error("Отримано порожню відповідь від сервісу діагностики.")
+            }
+
+            val parsed = parseHealthDiagnosisResponse(responseText)
+                ?: return@withContext DiagnosePlantHealthResult.Error(
+                    "Не вдалося розпізнати або валідувати результат діагностики. Спробуйте зробити чіткіше фото."
+                )
+
+            if (!parsed.isPlant) {
+                return@withContext DiagnosePlantHealthResult.NotAPlant(
+                    message = parsed.probableCause.ifBlank {
+                        "На фото не виявлено рослину. Будь ласка, сфотографуйте уражену частину рослини при кращому освітленні."
+                    }
+                )
+            }
+
+            DiagnosePlantHealthResult.Success(parsed)
+        } catch (e: Exception) {
+            val mapped = AiErrorMapper.map(e)
+            val isOffline = !networkChecker.isOnline()
+            DiagnosePlantHealthResult.Error(mapped, isOffline = isOffline)
+        }
+    }
+
+    suspend fun diagnosePlantHealth(
+        imageFile: File,
+        plant: PlantEntity,
+        lastWateredTimestamp: Long? = null,
+        decoder: (File) -> Bitmap? = { BitmapFactory.decodeFile(it.absolutePath) }
+    ): DiagnosePlantHealthResult = withContext(Dispatchers.IO) {
+        if (!imageFile.exists() || !imageFile.isFile) {
+            return@withContext DiagnosePlantHealthResult.Error("Файл фотографії не знайдено.")
+        }
+
+        val bitmap = try {
+            decoder(imageFile)
+        } catch (e: OutOfMemoryError) {
+            return@withContext DiagnosePlantHealthResult.Error("Недостатньо оперативної пам'яті для обробки фотографії.")
+        } catch (e: Exception) {
+            return@withContext DiagnosePlantHealthResult.Error("Не вдалося прочитати файл фотографії: ${e.message}")
+        } ?: return@withContext DiagnosePlantHealthResult.Error("Не вдалося декодувати зображення для аналізу.")
+
+        try {
+            diagnosePlantHealth(bitmap, plant, lastWateredTimestamp)
+        } finally {
+            try {
+                bitmap.recycle()
+            } catch (_: Throwable) {}
+        }
+    }
+
+    fun parseHealthDiagnosisResponse(rawText: String): PlantHealthDiagnosisResponse? {
+        return try {
+            val cleaned = rawText
+                .trim()
+                .removePrefix("```json")
+                .removePrefix("```")
+                .removeSuffix("```")
+                .trim()
+
+            if (cleaned.isBlank() || cleaned == "{}" || cleaned == "[]") {
+                return null
+            }
+
+            val candidateText = if (cleaned.startsWith("{") && cleaned.contains("\"candidates\"")) {
+                val root = gson.fromJson(cleaned, Map::class.java)
+                val candidates = root["candidates"] as? List<*>
+                val firstCandidate = candidates?.firstOrNull() as? Map<*, *>
+                val content = firstCandidate?.get("content") as? Map<*, *>
+                val parts = content?.get("parts") as? List<*>
+                val firstPart = parts?.firstOrNull() as? Map<*, *>
+                val text = firstPart?.get("text") as? String
+                text?.trim()?.removePrefix("```json")?.removePrefix("```")?.removeSuffix("```")?.trim() ?: cleaned
+            } else {
+                cleaned
+            }
+
+            if (candidateText.isBlank() || candidateText == "{}" || candidateText == "[]") {
+                return null
+            }
+
+            // Сувора валідація JSON: розбір через JsonParser для перевірки типів і відсутності обов'язкових полів
+            val jsonElement = com.google.gson.JsonParser.parseString(candidateText)
+            if (!jsonElement.isJsonObject) {
+                return null
+            }
+            val jsonObject = jsonElement.asJsonObject
+            if (jsonObject.size() == 0) {
+                return null
+            }
+
+            // Строгий контракт: is_plant має бути явним булевим значенням
+            val isPlantElement = jsonObject.get("is_plant")
+            if (isPlantElement == null || !isPlantElement.isJsonPrimitive || !isPlantElement.asJsonPrimitive.isBoolean) {
+                return null
+            }
+            val isPlant = isPlantElement.asBoolean
+
+            // Якщо на фото не виявлено рослину
+            if (!isPlant) {
+                val cause = jsonObject.get("probable_cause")?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isString }?.asString?.trim() ?: ""
+                return PlantHealthDiagnosisResponse(
+                    isPlant = false,
+                    probableCause = cause.ifBlank { "На фотографії не розпізнано рослину." },
+                    confidence = "LOW",
+                    visibleSymptoms = emptyList(),
+                    alternativeCauses = emptyList(),
+                    firstAidSteps = emptyList(),
+                    followUpAdvice = "",
+                    preliminaryNotice = "На фотографії не розпізнано рослину."
+                )
+            }
+
+            // 1. Обов'язкове поле: ймовірна причина (не порожній рядок)
+            val probableCauseElement = jsonObject.get("probable_cause")
+            if (probableCauseElement == null || !probableCauseElement.isJsonPrimitive || !probableCauseElement.asJsonPrimitive.isString) {
+                return null
+            }
+            val probableCause = probableCauseElement.asString.trim()
+            if (probableCause.isBlank()) {
+                return null
+            }
+
+            // 2. Обов'язкове поле: рекомендація повторного огляду (не порожній рядок)
+            val followUpElement = jsonObject.get("follow_up_advice")
+            if (followUpElement == null || !followUpElement.isJsonPrimitive || !followUpElement.asJsonPrimitive.isString) {
+                return null
+            }
+            val followUpAdvice = followUpElement.asString.trim()
+            if (followUpAdvice.isBlank()) {
+                return null
+            }
+
+            // 3. Обов'язкове поле: перша допомога (непустий масив валідних рядків)
+            val firstAidElement = jsonObject.get("first_aid_steps")
+            if (firstAidElement == null || !firstAidElement.isJsonArray) {
+                return null
+            }
+            val rawFirstAidArray = firstAidElement.asJsonArray
+            if (rawFirstAidArray.size() == 0) {
+                return null
+            }
+            val rawFirstAidSteps = mutableListOf<String>()
+            for (element in rawFirstAidArray) {
+                if (!element.isJsonPrimitive || !element.asJsonPrimitive.isString) {
+                    return null // некоректний тип елемента у списку (null, об'єкт або число)
+                }
+                val step = element.asString.trim()
+                if (step.isNotBlank()) {
+                    rawFirstAidSteps.add(step)
+                }
+            }
+            if (rawFirstAidSteps.isEmpty()) {
+                return null
+            }
+
+            // 4. Строга валідація видимих симптомів (масив валідних рядків, null/не-рядки заборонені)
+            val visibleSymptoms = mutableListOf<String>()
+            val symptomsElement = jsonObject.get("visible_symptoms")
+            if (symptomsElement == null || !symptomsElement.isJsonArray) {
+                return null
+            }
+            for (element in symptomsElement.asJsonArray) {
+                if (!element.isJsonPrimitive || !element.asJsonPrimitive.isString) {
+                    return null
+                }
+                val sym = element.asString.trim()
+                if (sym.isNotBlank()) {
+                    visibleSymptoms.add(sym)
+                }
+            }
+
+            // 5. Строга валідація альтернативних причин (масив валідних рядків, null/не-рядки заборонені)
+            val alternativeCauses = mutableListOf<String>()
+            val altElement = jsonObject.get("alternative_causes")
+            if (altElement == null || !altElement.isJsonArray) {
+                return null
+            }
+            for (element in altElement.asJsonArray) {
+                if (!element.isJsonPrimitive || !element.asJsonPrimitive.isString) {
+                    return null
+                }
+                val alt = element.asString.trim()
+                if (alt.isNotBlank()) {
+                    alternativeCauses.add(alt)
+                }
+            }
+
+            // 6. Валідація confidence: невідоме значення не підвищується до MEDIUM
+            val rawConfidence = jsonObject.get("confidence")?.takeIf { it.isJsonPrimitive }?.asString?.trim()?.uppercase()
+            val sanitizedConfidence = when (rawConfidence) {
+                "HIGH" -> "HIGH"
+                "MEDIUM" -> "MEDIUM"
+                "LOW" -> "LOW"
+                "UNCERTAIN" -> "LOW"
+                else -> "LOW" // Будь-яке невідоме значення чи відсутність поля maps to LOW
+            }
+
+            // 7. Попередження
+            val preliminaryNotice = jsonObject.get("preliminary_notice")?.takeIf { it.isJsonPrimitive }?.asString?.trim()?.ifBlank {
+                "Попередня оцінка за фотографією. Не замінює очного огляду фахівцем."
+            } ?: "Попередня оцінка за фотографією. Не замінює очного огляду фахівцем."
+
+            // 8. Захисний шар безпеки (Safety Guardrail)
+            val (sanitizedSteps, isSanitized) = PlantSafetyGuardrail.sanitizeFirstAidSteps(rawFirstAidSteps)
+            val finalNotice = if (isSanitized) {
+                "$preliminaryNotice\n${PlantSafetyGuardrail.SAFETY_NOTICE_MODIFIED}"
+            } else {
+                preliminaryNotice
+            }
+
+            PlantHealthDiagnosisResponse(
+                isPlant = true,
+                probableCause = probableCause,
+                confidence = sanitizedConfidence,
+                visibleSymptoms = visibleSymptoms,
+                alternativeCauses = alternativeCauses,
+                firstAidSteps = sanitizedSteps,
+                followUpAdvice = followUpAdvice,
+                preliminaryNotice = finalNotice,
+                isSafetySanitized = isSanitized
+            )
+        } catch (_: Exception) {
             null
         }
     }

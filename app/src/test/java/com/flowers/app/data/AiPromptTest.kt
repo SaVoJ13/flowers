@@ -42,4 +42,25 @@ class AiPromptTest {
             assertTrue("missing field: $field", photoPrompt.contains("\"$field\""))
         }
     }
+
+    @Test
+    fun `diagnosePlantHealthPrompt contains required disease diagnosis fields and safety requirements`() {
+        val diagnosisPrompt = AiPrompt.diagnosePlantHealthPrompt("Фікус Бенджаміна")
+        listOf(
+            "is_plant",
+            "probable_cause",
+            "confidence",
+            "visible_symptoms",
+            "alternative_causes",
+            "first_aid_steps",
+            "follow_up_advice",
+            "preliminary_notice"
+        ).forEach { field ->
+            assertTrue("missing field: $field", diagnosisPrompt.contains("\"$field\""))
+        }
+        assertTrue(diagnosisPrompt.contains("Фікус Бенджаміна"))
+        // Safety requirements: no toxic pesticides, priority on isolation and gentle care
+        assertTrue(diagnosisPrompt.contains("ізоляція", ignoreCase = true))
+        assertTrue(diagnosisPrompt.contains("пестицид", ignoreCase = true))
+    }
 }

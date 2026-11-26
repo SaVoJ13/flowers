@@ -13,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
@@ -216,5 +217,382 @@ class GeminiPlantServiceTest {
         assertTrue(result is IdentifyPlantResult.Error)
         val error = result as IdentifyPlantResult.Error
         assertTrue(error.message.contains("не знайдено"))
+    }
+
+    @Test
+    fun `diagnosePlantHealth parses valid HIGH confidence response`() = runBlocking {
+        val testPlant = com.flowers.app.data.local.entity.PlantEntity(
+            id = 1L,
+            customName = "Монстера",
+            speciesName = "Монстера делікатесна",
+            botanicalName = "Monstera deliciosa"
+        )
+        val mockJson = """
+            {
+              "is_plant": true,
+              "probable_cause": "Надлишковий полив (перелив)",
+              "confidence": "HIGH",
+              "visible_symptoms": ["Пожовтіння нижнього листя", "Коричневі вологі плями"],
+              "alternative_causes": ["Недостатнє освітлення"],
+              "first_aid_steps": [
+                "Ізолюйте рослину від інших вазонів для спостереження.",
+                "Перевірте вологість ґрунту на глибині 3-4 см перед наступним поливом.",
+                "Злийте залишки води з піддона."
+              ],
+              "follow_up_advice": "Повторно оцініть стан листка через 5 днів.",
+              "preliminary_notice": "Попередня оцінка за фотографією. Не замінює лабораторного аналізу."
+            }
+        """.trimIndent()
+
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true },
+            generateMultimodal = { _, _ -> mockJson }
+        )
+
+        val result = service.diagnosePlantHealth(null as Bitmap?, testPlant)
+        assertTrue(result is com.flowers.app.data.remote.DiagnosePlantHealthResult.Success)
+        val success = (result as com.flowers.app.data.remote.DiagnosePlantHealthResult.Success).response
+        assertTrue(success.isPlant)
+        assertEquals("Надлишковий полив (перелив)", success.probableCause)
+        assertEquals("HIGH", success.confidence)
+        assertEquals(2, success.visibleSymptoms.size)
+        assertEquals(3, success.firstAidSteps.size)
+        assertTrue(success.firstAidSteps[0].contains("Ізолюйте"))
+    }
+
+    @Test
+    fun `diagnosePlantHealth with MEDIUM confidence preserves empty alternative causes without hallucination`() = runBlocking {
+        val testPlant = com.flowers.app.data.local.entity.PlantEntity(id = 2L, customName = "Фікус")
+        val mockJson = """
+            {
+              "is_plant": true,
+              "probable_cause": "Павутинний кліщ",
+              "confidence": "MEDIUM",
+              "visible_symptoms": ["Дрібні цятки на листі"],
+              "alternative_causes": [],
+              "first_aid_steps": ["Обережно промийте листя теплою водою"],
+              "follow_up_advice": "Огляньте зворотний бік листя через 3 дні",
+              "preliminary_notice": "Попередня оцінка за фотографією."
+            }
+        """.trimIndent()
+
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true },
+            generateMultimodal = { _, _ -> mockJson }
+        )
+
+        val result = service.diagnosePlantHealth(null as Bitmap?, testPlant)
+        assertTrue(result is com.flowers.app.data.remote.DiagnosePlantHealthResult.Success)
+        val response = (result as com.flowers.app.data.remote.DiagnosePlantHealthResult.Success).response
+        assertEquals("MEDIUM", response.confidence)
+        // Не вигадуємо альтернативи, якщо модель їх не надала
+        assertTrue(response.alternativeCauses.isEmpty())
+        assertFalse(response.isSafetySanitized)
+    }
+
+    @Test
+    fun `parseHealthDiagnosisResponse returns null on empty JSON object or empty array`() {
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true }
+        )
+
+        assertNull(service.parseHealthDiagnosisResponse("{}"))
+        assertNull(service.parseHealthDiagnosisResponse("[]"))
+        assertNull(service.parseHealthDiagnosisResponse(""))
+        assertNull(service.parseHealthDiagnosisResponse("```json\n{}\n```"))
+    }
+
+    @Test
+    fun `parseHealthDiagnosisResponse returns null when is_plant is missing null or not a boolean`() {
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true }
+        )
+
+        // Missing is_plant
+        val jsonNoIsPlant = """
+            {
+              "probable_cause": "Хлороз",
+              "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [],
+              "first_aid_steps": ["Ізолюйте рослину"],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonNoIsPlant))
+
+        // is_plant is string "true" instead of boolean
+        val jsonStringIsPlant = """
+            {
+              "is_plant": "true",
+              "probable_cause": "Хлороз",
+              "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [],
+              "first_aid_steps": ["Ізолюйте рослину"],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonStringIsPlant))
+
+        // is_plant is null
+        val jsonNullIsPlant = """
+            {
+              "is_plant": null,
+              "probable_cause": "Хлороз",
+              "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [],
+              "first_aid_steps": ["Ізолюйте рослину"],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonNullIsPlant))
+    }
+
+    @Test
+    fun `parseHealthDiagnosisResponse returns null when symptoms or alternatives contain null or invalid types`() {
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true }
+        )
+
+        // visible_symptoms contains null
+        val jsonSymptomsWithNull = """
+            {
+              "is_plant": true,
+              "probable_cause": "Хлороз",
+              "confidence": "HIGH",
+              "visible_symptoms": ["Жовте листя", null],
+              "alternative_causes": [],
+              "first_aid_steps": ["Ізолюйте рослину"],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonSymptomsWithNull))
+
+        // alternative_causes contains number instead of string
+        val jsonAlternativesWithNumber = """
+            {
+              "is_plant": true,
+              "probable_cause": "Хлороз",
+              "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [42],
+              "first_aid_steps": ["Ізолюйте рослину"],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonAlternativesWithNumber))
+
+        // missing visible_symptoms array
+        val jsonNoSymptomsArray = """
+            {
+              "is_plant": true,
+              "probable_cause": "Хлороз",
+              "confidence": "HIGH",
+              "alternative_causes": [],
+              "first_aid_steps": ["Ізолюйте рослину"],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonNoSymptomsArray))
+    }
+
+    @Test
+    fun `parseHealthDiagnosisResponse returns null on missing or blank required fields`() {
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true }
+        )
+
+        // 1. Порожня ймовірна причина
+        val jsonNoCause = """
+            {
+              "is_plant": true,
+              "probable_cause": "   ",
+              "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [],
+              "first_aid_steps": ["Ізолюйте рослину"],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonNoCause))
+
+        // 2. Порожній список дій
+        val jsonNoSteps = """
+            {
+              "is_plant": true,
+              "probable_cause": "Хлороз",
+              "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [],
+              "first_aid_steps": [],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonNoSteps))
+
+        // 3. Список дій з null / некоректними типами
+        val jsonInvalidSteps = """
+            {
+              "is_plant": true,
+              "probable_cause": "Хлороз",
+              "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [],
+              "first_aid_steps": [null, 123],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonInvalidSteps))
+
+        // 4. Відсутня рекомендація повторного огляду
+        val jsonNoFollowUp = """
+            {
+              "is_plant": true,
+              "probable_cause": "Хлороз",
+              "confidence": "HIGH",
+              "visible_symptoms": [],
+              "alternative_causes": [],
+              "first_aid_steps": ["Ізолюйте рослину"],
+              "follow_up_advice": "  "
+            }
+        """.trimIndent()
+        assertNull(service.parseHealthDiagnosisResponse(jsonNoFollowUp))
+    }
+
+    @Test
+    fun `parseHealthDiagnosisResponse maps unknown confidence to LOW`() {
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true }
+        )
+
+        val jsonUnknownConf = """
+            {
+              "is_plant": true,
+              "probable_cause": "Борошниста роса",
+              "confidence": "SUPER_HIGH_CERTAIN",
+              "visible_symptoms": [],
+              "alternative_causes": [],
+              "first_aid_steps": ["Ізолюйте рослину"],
+              "follow_up_advice": "Огляньте через 5 днів"
+            }
+        """.trimIndent()
+
+        val parsed = service.parseHealthDiagnosisResponse(jsonUnknownConf)
+        assertNotNull(parsed)
+        assertEquals("LOW", parsed!!.confidence)
+    }
+
+    @Test
+    fun `parseHealthDiagnosisResponse activates PlantSafetyGuardrail on toxic chemicals`() {
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true }
+        )
+
+        val jsonDangerousChemicals = """
+            {
+              "is_plant": true,
+              "probable_cause": "Попелиця",
+              "confidence": "HIGH",
+              "visible_symptoms": ["Липкий наліт"],
+              "alternative_causes": [],
+              "first_aid_steps": [
+                "Обробіть рослину сильним інсектицидом або дихлофосом",
+                "Розведіть мідний купорос та обприскайте листя"
+              ],
+              "follow_up_advice": "Огляньте через 3 дні"
+            }
+        """.trimIndent()
+
+        val parsed = service.parseHealthDiagnosisResponse(jsonDangerousChemicals)
+        assertNotNull(parsed)
+        assertTrue(parsed!!.isSafetySanitized)
+        assertFalse(parsed.firstAidSteps.any { it.contains("дихлофос") || it.contains("купорос") })
+        assertTrue(parsed.firstAidSteps.any { it.contains("Ізолюйте") })
+        assertTrue(parsed.preliminaryNotice.contains("Увага: початкові рекомендації містили потенційно небезпечні"))
+    }
+
+    @Test
+    fun `diagnosePlantHealth with is_plant false returns NotAPlant`() = runBlocking {
+        val testPlant = com.flowers.app.data.local.entity.PlantEntity(id = 3L, customName = "Тест")
+        val mockJson = """
+            {
+              "is_plant": false,
+              "probable_cause": "На фото не виявлено рослину",
+              "confidence": "LOW",
+              "visible_symptoms": [],
+              "alternative_causes": [],
+              "first_aid_steps": [],
+              "follow_up_advice": "",
+              "preliminary_notice": "Фотографія не містить рослини для аналізу."
+            }
+        """.trimIndent()
+
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true },
+            generateMultimodal = { _, _ -> mockJson }
+        )
+
+        val result = service.diagnosePlantHealth(null as Bitmap?, testPlant)
+        assertTrue(result is com.flowers.app.data.remote.DiagnosePlantHealthResult.NotAPlant)
+    }
+
+    @Test
+    fun `diagnosePlantHealth returns Error when offline without calling model`() = runBlocking {
+        var called = false
+        val testPlant = com.flowers.app.data.local.entity.PlantEntity(id = 4L, customName = "Тест")
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { false },
+            generateMultimodal = { _, _ ->
+                called = true
+                null
+            }
+        )
+
+        val result = service.diagnosePlantHealth(null as Bitmap?, testPlant)
+        assertFalse(called)
+        assertTrue(result is com.flowers.app.data.remote.DiagnosePlantHealthResult.Error)
+        val error = result as com.flowers.app.data.remote.DiagnosePlantHealthResult.Error
+        assertTrue(error.isOffline)
+        assertEquals(AiErrorMapper.MSG_NO_INTERNET, error.message)
+    }
+
+    @Test
+    fun `diagnosePlantHealth handles 429 quota exceeded`() = runBlocking {
+        val testPlant = com.flowers.app.data.local.entity.PlantEntity(id = 5L, customName = "Тест")
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true },
+            generateMultimodal = { _, _ ->
+                throw SdkExceptions.server("RESOURCE_EXHAUSTED: 429 quota exceeded")
+            }
+        )
+
+        val result = service.diagnosePlantHealth(null as Bitmap?, testPlant)
+        assertTrue(result is com.flowers.app.data.remote.DiagnosePlantHealthResult.Error)
+        val error = result as com.flowers.app.data.remote.DiagnosePlantHealthResult.Error
+        assertEquals(AiErrorMapper.MSG_RATE_LIMIT, error.message)
     }
 }

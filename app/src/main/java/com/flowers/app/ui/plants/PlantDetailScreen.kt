@@ -47,8 +47,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import java.io.File
 import com.flowers.app.data.local.entity.CareEventEntity
 import com.flowers.app.ui.components.AiDisclaimerText
 import com.flowers.app.ui.components.AiReportButton
@@ -287,7 +290,8 @@ fun CareEventItem(
         "WATER" -> "💧 Полив проведено"
         "DELAY" -> "⏳ Перевірку відкладено"
         "SKIP" -> "⏭️ Пропущено"
-        "CHECK_STATE" -> "🔍 Аналіз стану (діагностика)"
+        "CHECK_STATE" -> "🔍 Аналіз стану (симптоми)"
+        "HEALTH_CHECK" -> "🩺 Фото-діагностика ШІ"
         else -> "🌿 Догляд"
     }
 
@@ -311,6 +315,21 @@ fun CareEventItem(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+            if (!event.photoUri.isNullOrBlank()) {
+                val photoFile = remember(event.photoUri) { File(event.photoUri) }
+                if (photoFile.exists()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    AsyncImage(
+                        model = photoFile,
+                        contentDescription = "Фото ураження",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(140.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
             if (!event.notes.isNullOrBlank()) {
                 Spacer(modifier = Modifier.height(4.dp))

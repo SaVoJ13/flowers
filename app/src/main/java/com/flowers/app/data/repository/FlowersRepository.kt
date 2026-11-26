@@ -6,6 +6,7 @@ import com.flowers.app.data.local.entity.CatalogPlantEntity
 import com.flowers.app.data.local.entity.PlantEntity
 import com.flowers.app.data.model.SymptomTreeRoot
 import com.flowers.app.data.preferences.UserPreferences
+import com.flowers.app.data.remote.DiagnosePlantHealthResult
 import com.flowers.app.data.remote.GeneratePlantResult
 import com.flowers.app.data.remote.IdentifyPlantResult
 import kotlinx.coroutines.flow.Flow
@@ -40,4 +41,5 @@ interface FlowersRepository {
 
     suspend fun generatePlantWithAi(plantQuery: String): GeneratePlantResult
     suspend fun identifyPlantFromPhoto(imageFile: File): IdentifyPlantResult
+    suspend fun diagnosePlantHealth(imageFile: File, plant: PlantEntity): DiagnosePlantHealthResult
 }

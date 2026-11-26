@@ -1,0 +1,102 @@
+# TASK-055 — Фото-діагностика захворювань та шкідників рослин за допомогою ШІ
+
+## Мета
+
+Реалізувати наступний ключовий етап Flowers 2.0 (ADR-021, `FLOWERS_2_0_MVP_PLAN.md`):
+1. Надання користувачеві вибору між сучасною фото-діагностикою за допомогою ШІ та існуючим ручним деревом симптомів без регресій.
+2. Локальна безпечна обробка фотографії ураженої частини рослини через `ImageProcessor` із профілем `DiseaseDiagnosis` (до 1536 px, JPEG 85%, видалення GPS/EXIF, недоторканність оригіналу, захист від перезапису).
+3. Мультимодальний аналіз у `GeminiPlantService` через метод `diagnosePlantHealth`:
+   - контекст конкретної рослини (вид, освітлення, полив, дата останнього поливу);
+   - структурована відповідь: ймовірна причина, ступінь впевненості (HIGH / MEDIUM / LOW), видимі симптоми, обов'язкові альтернативні причини (для MEDIUM і LOW), безпечні кроки першої допомоги (без токсичних пестицидів; ізоляція, перевірка ґрунту, світла, вентиляції), рекомендація повторного огляду, застереження про попередню оцінку;
+   - захист від галюцинацій: чесне повідомлення при недостатності даних або відсутності рослини на фото.
+4. Збереження результату в історії догляду (`CareEventEntity` з `eventType = "HEALTH_CHECK"`, `photoUri`, структуровані деталі в `notes`, збереження схеми Room v3).
+5. Надійне UI/UX: попередній перегляд перед аналізом, індикатори невизначеності, безпечне скасування активного аналізу з видаленням лише тимчасового фото, захист від подвійного збереження (дебаунс), автономна робота історії офлайн.
+
+---
+
+## Архітектурний план
+
+### 1. Модель даних та сервіс ШІ (`GeminiPlantService.kt`)
+- `PlantHealthDiagnosisResponse`:
+  - `is_plant: Boolean`
+  - `probable_cause: String`
+  - `confidence: String` ("HIGH", "MEDIUM", "LOW", "UNCERTAIN")
+  - `visible_symptoms: List<String>`
+  - `alternative_causes: List<String>`
+  - `first_aid_steps: List<String>`
+  - `follow_up_advice: String`
+  - `preliminary_notice: String`
+- `DiagnosePlantHealthResult`:
+  - `Success(response: PlantHealthDiagnosisResponse)`
+  - `NotAPlant(message: String)`
+  - `Error(message: String, isOffline: Boolean)`
+- `AiPrompt.diagnosePlantHealthPrompt(plantSummary: String)`: суворий системний промпт із забороною токсичних пестицидів, обов'язковими альтернативами при невпевненості та чесним розпізнаванням відсутності симптомів або рослини.
+- `diagnosePlantHealth`: підтримка передачі `Bitmap` або `File`, перевірка підключення через `NetworkChecker`, мапінг помилок через `AiErrorMapper`, безпечне вивільнення пам'яті (`bitmap.recycle()`).
+
+### 2. Репозиторій (`FlowersRepository.kt`, `FlowersRepositoryImpl.kt`)
+- Метод `diagnosePlantHealth(imageFile: File, plant: PlantEntity): DiagnosePlantHealthResult`:
+  - зчитує дату останнього поливу з `CareEventDao`;
+  - передає контекст у `GeminiPlantService`.
+
+### 3. Стан та логіка діагностики (`DiagnosisViewModel.kt`)
+- Режим діагностики `DiagnosisMode`:
+  - `MODE_SELECTION`: екран вибору способу (Фото-діагностика ШІ чи Ручний вибір симптомів).
+  - `PHOTO_DIAGNOSIS`: стан фото-діагностики (`Idle`, `ProcessingPhoto`, `PreviewAndConfirm`, `AnalyzingWithAi`, `DiagnosisSuccess`, `DiagnosisError`).
+  - `MANUAL_SYMPTOMS`: існуюче дерево симптомів (`SymptomCategory` -> `SymptomNode` -> `DiagnosisResult`).
+- Кероване скасування:
+  - `cancelAnalysis()`: скасовує активний `Job`, очищає лише тимчасовий `pendingPhotoFile`, повертає в безпечний стан.
+- Збереження в журнал:
+  - Формує запис `CareEventEntity` з `eventType = "HEALTH_CHECK"`, шляхом до фото `photoUri` та форматованим описом.
+  - Синхронний дебаунс: прапорець `isSavingDiagnosis` для запобігання подвійному кліку.
+  - Після збереження тимчасове фото стає постійним файлом історії.
+
+### 4. Інтерфейс користувача (`PlantDiagnosisScreen.kt`, `PlantDetailScreen.kt`)
+- Вибір режиму: дві чіткі картки «Діагностика за фото (ШІ)» та «Ручний аналіз симптомів».
+- Фото-потік:
+  - Кнопки камери та галереї.
+  - Попередній перегляд обраного фото з кнопкою «Аналізувати стан» та можливістю змінити фото.
+  - Індикатор завантаження під час аналізу з кнопкою «Скасувати».
+  - Картка результату: фото ураження, ймовірна причина з колірним індикатором впевненості (HIGH — зелений/акцентний з позначкою орієнтовності, MEDIUM — помаранчевий з обов'язковими альтернативами, LOW — нейтральний/жовтий), видимі симптоми, покроковий план першої допомоги, рекомендація повторного огляду.
+  - Кнопки дій: «Зберегти в історію» та «Спробувати інше фото».
+- Відображення в історії (`PlantDetailScreen.kt`):
+  - `CareEventItem` для `HEALTH_CHECK`: піктограма `🩺 Фото-діагностика ШІ`, мініатюра фотокартки (якщо є `photoUri`), дата та детальний текст дій.
+
+---
+
+## Тестування та перевірки
+
+1. **Unit-тести (`GeminiPlantServiceTest.kt`, `DiagnosisViewModelTest.kt`, `AiPromptTest.kt`):**
+   - парсинг HIGH, MEDIUM, LOW, UNCERTAIN та відсутності рослини (`NotAPlant`);
+   - обов'язкові альтернативи при середній/низькій впевненості;
+   - обробка офлайн-режиму, квоти (429), тайм-ауту та некоректного JSON;
+   - скасування активного запиту та очищення лише `pendingPhotoFile`;
+   - захист від повторного натискання кнопки «Зберегти» (дебаунс);
+   - перевірка безпеки рекомендацій (відсутність отрутохімікатів);
+   - збереження існуючої ручної діагностики.
+   - **Результат:** 239/239 тестів успішно пройдено (`BUILD SUCCESSFUL`).
+2. **Instrumented-тести (`PhotoDiagnosisComposeTest.kt` на емуляторі `small_phone`):**
+   - вибір режиму діагностики;
+   - взаємодія з попереднім переглядом фото та кнопкою аналізу;
+   - відображення результату ШІ з альтернативними варіантами;
+   - збереження `HEALTH_CHECK` та поява в історії вазона;
+   - відкриття історії без інтернету;
+   - недоторканність сторонніх фотографій у `filesDir/plants` (`testPreExistingUserPhotosInPlantsDirectoryAreNeverTouched`).
+   - **Результат:** 30/30 тестів успішно пройдено (`BUILD SUCCESSFUL`).
+3. **Релізна збірка:**
+   - `./gradlew.bat bundleRelease` на Adoptium JDK 21 — **BUILD SUCCESSFUL**, R8/ProGuard та ресурсний шринкінг пройдені без зауважень.
+
+---
+
+## Журнал виконання
+
+- **2026-11-26:**
+  - Створено гілку `feat/task-055-photo-diagnosis` від `main` (`ff5d5b6`).
+  - Додано `AiPrompt.diagnosePlantHealthPrompt` із вимогами безпеки: заборона токсичних пестицидів, першочергова ізоляція, перевірка зволоження/освітлення/вентиляції, обов'язкові альтернативи для MEDIUM/LOW.
+  - Реалізовано `GeminiPlantService.diagnosePlantHealth`, `PlantHealthDiagnosisResponse`, `DiagnosePlantHealthResult`.
+  - Додано репозиторний метод `FlowersRepository.diagnosePlantHealth(imageFile, plant)`.
+  - Оновлено `DiagnosisViewModel`: підтримка вибору режиму `DiagnosisMode`, кроків `PhotoDiagnosisStep`, скасування аналізу з очищенням тимчасового фото, захист від подвійного збереження (дебаунс `isSaving`).
+  - Оновлено `PlantDiagnosisScreen`: картки вибору режиму, пікер фото, екран попереднього перегляду перед відправкою, стан скасування під час аналізу, багата картка результату (`PhotoDiagnosisResultView`), дебаунс на кнопці збереження.
+  - Оновлено `PlantDetailScreen`: відображення події `HEALTH_CHECK` в історії догляду з бейджем `🩺 Фото-діагностика ШІ` та мініатюрою фото ураження через `AsyncImage`.
+  - Створено та перевірено набір unit-тестів: `AiPromptTest`, `GeminiPlantServiceTest`, `DiagnosisViewModelTest` (разом 239 тестів).
+  - Написано та запущено на емуляторі `small_phone` інструментальні тести `PhotoDiagnosisComposeTest` (30 тестів успішно).
+  - Виконано `bundleRelease` без помилок та попереджень.

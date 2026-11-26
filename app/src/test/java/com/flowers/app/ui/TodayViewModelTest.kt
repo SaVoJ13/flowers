@@ -122,6 +122,7 @@ class TodayViewModelTest {
 
         override suspend fun generatePlantWithAi(plantQuery: String): GeneratePlantResult = throw UnsupportedOperationException()
         override suspend fun identifyPlantFromPhoto(imageFile: File): IdentifyPlantResult = throw UnsupportedOperationException()
+        override suspend fun diagnosePlantHealth(imageFile: File, plant: PlantEntity): com.flowers.app.data.remote.DiagnosePlantHealthResult = throw UnsupportedOperationException()
     }
 
     @Test

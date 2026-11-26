@@ -217,4 +217,145 @@ class GeminiPlantServiceTest {
         val error = result as IdentifyPlantResult.Error
         assertTrue(error.message.contains("не знайдено"))
     }
+
+    @Test
+    fun `diagnosePlantHealth parses valid HIGH confidence response`() = runBlocking {
+        val testPlant = com.flowers.app.data.local.entity.PlantEntity(
+            id = 1L,
+            customName = "Монстера",
+            speciesName = "Монстера делікатесна",
+            botanicalName = "Monstera deliciosa"
+        )
+        val mockJson = """
+            {
+              "is_plant": true,
+              "probable_cause": "Надлишковий полив (перелив)",
+              "confidence": "HIGH",
+              "visible_symptoms": ["Пожовтіння нижнього листя", "Коричневі вологі плями"],
+              "alternative_causes": ["Недостатнє освітлення"],
+              "first_aid_steps": [
+                "Ізолюйте рослину від інших вазонів для спостереження.",
+                "Перевірте вологість ґрунту на глибині 3-4 см перед наступним поливом.",
+                "Злийте залишки води з піддона."
+              ],
+              "follow_up_advice": "Повторно оцініть стан листка через 5 днів.",
+              "preliminary_notice": "Попередня оцінка за фотографією. Не замінює лабораторного аналізу."
+            }
+        """.trimIndent()
+
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true },
+            generateMultimodal = { _, _ -> mockJson }
+        )
+
+        val result = service.diagnosePlantHealth(null as Bitmap?, testPlant)
+        assertTrue(result is com.flowers.app.data.remote.DiagnosePlantHealthResult.Success)
+        val success = (result as com.flowers.app.data.remote.DiagnosePlantHealthResult.Success).response
+        assertTrue(success.isPlant)
+        assertEquals("Надлишковий полив (перелив)", success.probableCause)
+        assertEquals("HIGH", success.confidence)
+        assertEquals(2, success.visibleSymptoms.size)
+        assertEquals(3, success.firstAidSteps.size)
+        assertTrue(success.firstAidSteps[0].contains("Ізолюйте"))
+    }
+
+    @Test
+    fun `diagnosePlantHealth with MEDIUM confidence guarantees alternative causes`() = runBlocking {
+        val testPlant = com.flowers.app.data.local.entity.PlantEntity(id = 2L, customName = "Фікус")
+        val mockJson = """
+            {
+              "is_plant": true,
+              "probable_cause": "Павутинний кліщ",
+              "confidence": "MEDIUM",
+              "visible_symptoms": ["Дрібні цятки на листі"],
+              "alternative_causes": [],
+              "first_aid_steps": ["Обережно промийте листя теплою водою"],
+              "follow_up_advice": "Огляньте зворотний бік листя через 3 дні",
+              "preliminary_notice": "Попередня оцінка за фотографією."
+            }
+        """.trimIndent()
+
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true },
+            generateMultimodal = { _, _ -> mockJson }
+        )
+
+        val result = service.diagnosePlantHealth(null as Bitmap?, testPlant)
+        assertTrue(result is com.flowers.app.data.remote.DiagnosePlantHealthResult.Success)
+        val response = (result as com.flowers.app.data.remote.DiagnosePlantHealthResult.Success).response
+        assertEquals("MEDIUM", response.confidence)
+        // Sanitizer guarantees alternative causes for non-HIGH confidence
+        assertTrue(response.alternativeCauses.isNotEmpty())
+    }
+
+    @Test
+    fun `diagnosePlantHealth with is_plant false returns NotAPlant`() = runBlocking {
+        val testPlant = com.flowers.app.data.local.entity.PlantEntity(id = 3L, customName = "Тест")
+        val mockJson = """
+            {
+              "is_plant": false,
+              "probable_cause": "На фото не виявлено рослину",
+              "confidence": "LOW",
+              "visible_symptoms": [],
+              "alternative_causes": [],
+              "first_aid_steps": [],
+              "follow_up_advice": "",
+              "preliminary_notice": "Фотографія не містить рослини для аналізу."
+            }
+        """.trimIndent()
+
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true },
+            generateMultimodal = { _, _ -> mockJson }
+        )
+
+        val result = service.diagnosePlantHealth(null as Bitmap?, testPlant)
+        assertTrue(result is com.flowers.app.data.remote.DiagnosePlantHealthResult.NotAPlant)
+    }
+
+    @Test
+    fun `diagnosePlantHealth returns Error when offline without calling model`() = runBlocking {
+        var called = false
+        val testPlant = com.flowers.app.data.local.entity.PlantEntity(id = 4L, customName = "Тест")
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { false },
+            generateMultimodal = { _, _ ->
+                called = true
+                null
+            }
+        )
+
+        val result = service.diagnosePlantHealth(null as Bitmap?, testPlant)
+        assertFalse(called)
+        assertTrue(result is com.flowers.app.data.remote.DiagnosePlantHealthResult.Error)
+        val error = result as com.flowers.app.data.remote.DiagnosePlantHealthResult.Error
+        assertTrue(error.isOffline)
+        assertEquals(AiErrorMapper.MSG_NO_INTERNET, error.message)
+    }
+
+    @Test
+    fun `diagnosePlantHealth handles 429 quota exceeded`() = runBlocking {
+        val testPlant = com.flowers.app.data.local.entity.PlantEntity(id = 5L, customName = "Тест")
+        val service = GeminiPlantService(
+            catalogDao = failingProxy(),
+            carePodDao = failingProxy(),
+            networkChecker = NetworkChecker { true },
+            generateMultimodal = { _, _ ->
+                throw SdkExceptions.server("RESOURCE_EXHAUSTED: 429 quota exceeded")
+            }
+        )
+
+        val result = service.diagnosePlantHealth(null as Bitmap?, testPlant)
+        assertTrue(result is com.flowers.app.data.remote.DiagnosePlantHealthResult.Error)
+        val error = result as com.flowers.app.data.remote.DiagnosePlantHealthResult.Error
+        assertEquals(AiErrorMapper.MSG_RATE_LIMIT, error.message)
+    }
 }

@@ -12,6 +12,7 @@ import com.flowers.app.data.local.entity.PlantEntity
 import com.flowers.app.data.model.SymptomTreeRoot
 import com.flowers.app.data.preferences.UserPreferences
 import com.flowers.app.data.remote.AndroidNetworkChecker
+import com.flowers.app.data.remote.DiagnosePlantHealthResult
 import com.flowers.app.data.remote.GeminiPlantService
 import com.flowers.app.data.remote.GeneratePlantResult
 import com.flowers.app.data.remote.IdentifyPlantResult
@@ -141,5 +142,10 @@ class FlowersRepositoryImpl(
 
     override suspend fun identifyPlantFromPhoto(imageFile: File): IdentifyPlantResult {
         return geminiPlantService.identifyPlantFromPhoto(imageFile)
+    }
+
+    override suspend fun diagnosePlantHealth(imageFile: File, plant: PlantEntity): DiagnosePlantHealthResult {
+        val lastWatering = careEventDao.getLastWateringEvent(plant.id)
+        return geminiPlantService.diagnosePlantHealth(imageFile, plant, lastWatering?.timestamp)
     }
 }

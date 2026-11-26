@@ -122,6 +122,7 @@ class PlantsViewModelTest {
             onIdentifyDeferred?.await()
             return identifyResult
         }
+        override suspend fun diagnosePlantHealth(imageFile: File, plant: PlantEntity): com.flowers.app.data.remote.DiagnosePlantHealthResult = throw UnsupportedOperationException()
     }
 
     @Test

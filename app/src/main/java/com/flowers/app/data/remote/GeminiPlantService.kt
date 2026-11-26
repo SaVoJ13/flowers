@@ -6,6 +6,7 @@ import com.flowers.app.data.local.dao.CarePodDao
 import com.flowers.app.data.local.dao.CatalogDao
 import com.flowers.app.data.local.entity.CarePodEntity
 import com.flowers.app.data.local.entity.CatalogPlantEntity
+import com.flowers.app.data.local.entity.PlantEntity
 import com.google.firebase.Firebase
 import com.google.firebase.ai.type.GenerativeBackend
 import com.google.firebase.ai.ai
@@ -98,6 +99,46 @@ sealed class IdentifyPlantResult {
         val message: String,
         val isOffline: Boolean = false
     ) : IdentifyPlantResult()
+}
+
+/**
+ * Відповідь моделі на мультимодальну діагностику здоров'я та шкідників рослини (TASK-055).
+ */
+data class PlantHealthDiagnosisResponse(
+    @SerializedName("is_plant")
+    val isPlant: Boolean = true,
+
+    @SerializedName("probable_cause")
+    val probableCause: String = "",
+
+    @SerializedName("confidence")
+    val confidence: String = "MEDIUM",
+
+    @SerializedName("visible_symptoms")
+    val visibleSymptoms: List<String> = emptyList(),
+
+    @SerializedName("alternative_causes")
+    val alternativeCauses: List<String> = emptyList(),
+
+    @SerializedName("first_aid_steps")
+    val firstAidSteps: List<String> = emptyList(),
+
+    @SerializedName("follow_up_advice")
+    val followUpAdvice: String = "",
+
+    @SerializedName("preliminary_notice")
+    val preliminaryNotice: String = "Попередня оцінка за фотографією. Не замінює очного огляду фахівцем."
+)
+
+sealed class DiagnosePlantHealthResult {
+    data class Success(val response: PlantHealthDiagnosisResponse) : DiagnosePlantHealthResult()
+    data class NotAPlant(
+        val message: String = "На фото не виявлено рослину. Будь ласка, сфотографуйте уражену частину рослини при кращому освітленні."
+    ) : DiagnosePlantHealthResult()
+    data class Error(
+        val message: String,
+        val isOffline: Boolean = false
+    ) : DiagnosePlantHealthResult()
 }
 
 class GeminiPlantService(
@@ -329,6 +370,130 @@ class GeminiPlantService(
                 lightLevel = sanitizedLightLevel,
                 defaultCheckIntervalDays = sanitizedInterval,
                 toxicityInfo = parsed.toxicityInfo?.takeIf { it.isNotBlank() } ?: "UNKNOWN"
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun diagnosePlantHealth(
+        bitmap: Bitmap?,
+        plant: PlantEntity,
+        lastWateredTimestamp: Long? = null
+    ): DiagnosePlantHealthResult = withContext(Dispatchers.IO) {
+        if (!networkChecker.isOnline()) {
+            return@withContext DiagnosePlantHealthResult.Error(
+                message = AiErrorMapper.MSG_NO_INTERNET,
+                isOffline = true
+            )
+        }
+
+        val plantSummary = buildString {
+            append("Назва: ${plant.customName}")
+            if (!plant.speciesName.isNullOrBlank()) append(", Вид: ${plant.speciesName}")
+            if (!plant.botanicalName.isNullOrBlank()) append(" (${plant.botanicalName})")
+            append(", Освітлення: ${plant.lightLevel}")
+            append(", Кімната: ${plant.roomLocation}")
+            if (!plant.wateringAdvice.isNullOrBlank()) append(", Рекомендація щодо поливу: ${plant.wateringAdvice}")
+            if (lastWateredTimestamp != null) {
+                val daysAgo = ((System.currentTimeMillis() - lastWateredTimestamp) / 86400000L).coerceAtLeast(0)
+                append(", Останній полив: $daysAgo дн. тому")
+            }
+        }
+
+        val prompt = AiPrompt.diagnosePlantHealthPrompt(plantSummary)
+
+        try {
+            val responseText = generateMultimodal(bitmap, prompt) ?: ""
+            if (responseText.isBlank()) {
+                return@withContext DiagnosePlantHealthResult.Error("Отримано порожню відповідь від сервісу діагностики.")
+            }
+
+            val parsed = parseHealthDiagnosisResponse(responseText)
+                ?: return@withContext DiagnosePlantHealthResult.Error("Не вдалося розпізнати результат діагностики.")
+
+            if (!parsed.isPlant) {
+                return@withContext DiagnosePlantHealthResult.NotAPlant()
+            }
+
+            DiagnosePlantHealthResult.Success(parsed)
+        } catch (e: Exception) {
+            val mapped = AiErrorMapper.map(e)
+            val isOffline = !networkChecker.isOnline()
+            DiagnosePlantHealthResult.Error(mapped, isOffline = isOffline)
+        }
+    }
+
+    suspend fun diagnosePlantHealth(
+        imageFile: File,
+        plant: PlantEntity,
+        lastWateredTimestamp: Long? = null,
+        decoder: (File) -> Bitmap? = { BitmapFactory.decodeFile(it.absolutePath) }
+    ): DiagnosePlantHealthResult = withContext(Dispatchers.IO) {
+        if (!imageFile.exists() || !imageFile.isFile) {
+            return@withContext DiagnosePlantHealthResult.Error("Файл фотографії не знайдено.")
+        }
+
+        val bitmap = try {
+            decoder(imageFile)
+        } catch (e: OutOfMemoryError) {
+            return@withContext DiagnosePlantHealthResult.Error("Недостатньо оперативної пам'яті для обробки фотографії.")
+        } catch (e: Exception) {
+            return@withContext DiagnosePlantHealthResult.Error("Не вдалося прочитати файл фотографії: ${e.message}")
+        } ?: return@withContext DiagnosePlantHealthResult.Error("Не вдалося декодувати зображення для аналізу.")
+
+        try {
+            diagnosePlantHealth(bitmap, plant, lastWateredTimestamp)
+        } finally {
+            try {
+                bitmap.recycle()
+            } catch (_: Throwable) {}
+        }
+    }
+
+    fun parseHealthDiagnosisResponse(rawText: String): PlantHealthDiagnosisResponse? {
+        return try {
+            val cleaned = rawText
+                .trim()
+                .removePrefix("```json")
+                .removePrefix("```")
+                .removeSuffix("```")
+                .trim()
+
+            val candidateText = if (cleaned.startsWith("{") && cleaned.contains("\"candidates\"")) {
+                val root = gson.fromJson(cleaned, Map::class.java)
+                val candidates = root["candidates"] as? List<*>
+                val firstCandidate = candidates?.firstOrNull() as? Map<*, *>
+                val content = firstCandidate?.get("content") as? Map<*, *>
+                val parts = content?.get("parts") as? List<*>
+                val firstPart = parts?.firstOrNull() as? Map<*, *>
+                val text = firstPart?.get("text") as? String
+                text?.trim()?.removePrefix("```json")?.removePrefix("```")?.removeSuffix("```")?.trim() ?: cleaned
+            } else {
+                cleaned
+            }
+
+            val parsed = gson.fromJson(candidateText, PlantHealthDiagnosisResponse::class.java) ?: return null
+
+            val sanitizedConfidence = when (parsed.confidence.uppercase()) {
+                "HIGH" -> "HIGH"
+                "LOW" -> "LOW"
+                else -> "MEDIUM"
+            }
+
+            val sanitizedAlternatives = if (sanitizedConfidence != "HIGH" && parsed.alternativeCauses.isEmpty() && parsed.isPlant) {
+                listOf("Можливе порушення режиму освітлення або зволоження повітря")
+            } else {
+                parsed.alternativeCauses
+            }
+
+            parsed.copy(
+                confidence = sanitizedConfidence,
+                alternativeCauses = sanitizedAlternatives,
+                preliminaryNotice = parsed.preliminaryNotice.ifBlank {
+                    "Попередня оцінка за фотографією. Не замінює очного огляду фахівцем."
+                }
             )
         } catch (e: Exception) {
             e.printStackTrace()

@@ -244,30 +244,143 @@ class DiagnosisViewModelTest {
     }
 
     @Test
-    fun cancelActivePhotoOperation_deletesPendingPhoto_andResetsToPickPhoto() = runTest(testDispatcher) {
+    fun cancelActivePhotoOperation_neverDeletesExternalFiles_butDeletesOwnedTempFiles() = runTest(testDispatcher) {
         val plant = PlantEntity(id = 105L, customName = "Фікус")
         val repo = FakeTestFlowersRepository(plant)
         val viewModel = DiagnosisViewModel(plantId = plant.id, repository = repo)
         testScheduler.runCurrent()
 
-        val dummyPhoto = tempFolder.newFile("sample_diag3.jpg").apply { writeText("dummy") }
-        viewModel.onPhotoSelected(dummyPhoto)
+        // 1. Зовнішній файл (наприклад, оригінал з галереї чи переданий файл)
+        val externalPhoto = tempFolder.newFile("gallery_orig.jpg").apply { writeText("original content") }
+        viewModel.onPhotoSelected(externalPhoto)
         testScheduler.runCurrent()
 
-        val step = viewModel.uiState.value.photoStep as PhotoDiagnosisStep.PreviewAndConfirm
-        val tempPhoto = step.photoFile
-        assertTrue(tempPhoto.exists())
-
+        assertTrue(externalPhoto.exists())
         viewModel.cancelActivePhotoOperation()
         testScheduler.runCurrent()
 
         assertEquals(PhotoDiagnosisStep.PickPhoto, viewModel.uiState.value.photoStep)
-        assertFalse(tempPhoto.exists())
+        // Зовнішній файл НЕ видаляється!
+        assertTrue(externalPhoto.exists())
+        assertEquals("original content", externalPhoto.readText())
+
+        // 2. Власний тимчасовий файл операції (створений ImageProcessor)
+        val ownedTempPhoto = tempFolder.newFile("processor_temp.jpg").apply { writeText("temp content") }
+        viewModel.onPhotoSelectedForTesting(ownedTempPhoto, isOwnedForDeletion = true)
+        testScheduler.runCurrent()
+
+        assertTrue(ownedTempPhoto.exists())
+        viewModel.cancelActivePhotoOperation()
+        testScheduler.runCurrent()
+
+        assertEquals(PhotoDiagnosisStep.PickPhoto, viewModel.uiState.value.photoStep)
+        // Власний тимчасовий файл операції видаляється при скасуванні
+        assertFalse(ownedTempPhoto.exists())
+    }
+
+    @Test
+    fun savePhotoDiagnosisToHistory_preservesSavedPhotoFile_afterViewModelCleared() = runTest(testDispatcher) {
+        val plant = PlantEntity(id = 106L, customName = "Папороть")
+        val repo = FakeTestFlowersRepository(plant)
+        val viewModel = DiagnosisViewModel(plantId = plant.id, repository = repo)
+        testScheduler.runCurrent()
+
+        val ownedPhoto = tempFolder.newFile("saved_history_photo.jpg").apply { writeText("photo bytes") }
+        viewModel.onPhotoSelectedForTesting(ownedPhoto, isOwnedForDeletion = true)
+        testScheduler.runCurrent()
+
+        viewModel.onConfirmAnalysis()
+        testScheduler.runCurrent()
+
+        var saved = false
+        viewModel.savePhotoDiagnosisToHistory { saved = true }
+        testScheduler.runCurrent()
+
+        assertTrue(saved)
+        // Після збереження викликаємо скасування або закриття ViewModel
+        viewModel.cancelActivePhotoOperation()
+        testScheduler.runCurrent()
+
+        // Збережене фото в історії залишається недоторканним
+        assertTrue(ownedPhoto.exists())
+        assertEquals("photo bytes", ownedPhoto.readText())
+    }
+
+    @Test
+    fun delayedSupersededRequest_cannotOverwriteNewOperation_orDeleteNewFile() = runTest(testDispatcher) {
+        val plant = PlantEntity(id = 107L, customName = "Монстера")
+        val repo = FakeTestFlowersRepository(plant)
+        val deferred = CompletableDeferred<Unit>()
+        repo.onDiagnoseDeferred = deferred
+
+        val viewModel = DiagnosisViewModel(plantId = plant.id, repository = repo)
+        testScheduler.runCurrent()
+
+        // Операція 1: повільний запит ШІ
+        val photo1 = tempFolder.newFile("photo_op1.jpg").apply { writeText("photo1") }
+        viewModel.onPhotoSelectedForTesting(photo1, isOwnedForDeletion = true)
+        testScheduler.runCurrent()
+        viewModel.onConfirmAnalysis()
+        testScheduler.runCurrent()
+
+        assertTrue(viewModel.uiState.value.photoStep is PhotoDiagnosisStep.AnalyzingWithAi)
+
+        // Операція 2: користувач скасовує або обирає нове фото
+        val photo2 = tempFolder.newFile("photo_op2.jpg").apply { writeText("photo2") }
+        viewModel.onPhotoSelectedForTesting(photo2, isOwnedForDeletion = true)
+        testScheduler.runCurrent()
+
+        // Стара операція 1 завершується із запізненням
+        deferred.complete(Unit)
+        testScheduler.runCurrent()
+
+        // UI має залишатися на стані Операції 2 (PreviewAndConfirm для photo2)
+        val step = viewModel.uiState.value.photoStep
+        assertTrue(step is PhotoDiagnosisStep.PreviewAndConfirm)
+        assertEquals(photo2.absolutePath, (step as PhotoDiagnosisStep.PreviewAndConfirm).photoFile.absolutePath)
+        // Файл операції 2 не видалено
+        assertTrue(photo2.exists())
+    }
+
+    @Test
+    fun photoDiagnosis_mediumConfidenceWithoutAlternatives_recordsHonestFallbackNote() = runTest(testDispatcher) {
+        val plant = PlantEntity(id = 108L, customName = "Шефлера")
+        val repo = FakeTestFlowersRepository(plant)
+        repo.diagnoseHealthResult = DiagnosePlantHealthResult.Success(
+            PlantHealthDiagnosisResponse(
+                isPlant = true,
+                probableCause = "Брак заліза",
+                confidence = "MEDIUM",
+                visibleSymptoms = listOf("Пожовтіння між жилками"),
+                alternativeCauses = emptyList(), // ШІ не надав альтернатив
+                firstAidSteps = listOf("Ізолювати рослину", "Перевірити якість води"),
+                followUpAdvice = "Оглянути за тиждень"
+            )
+        )
+
+        val viewModel = DiagnosisViewModel(plantId = plant.id, repository = repo)
+        testScheduler.runCurrent()
+
+        val photo = tempFolder.newFile("iron_deficiency.jpg").apply { writeText("test") }
+        viewModel.onPhotoSelected(photo)
+        testScheduler.runCurrent()
+        viewModel.onConfirmAnalysis()
+        testScheduler.runCurrent()
+
+        var saved = false
+        viewModel.savePhotoDiagnosisToHistory { saved = true }
+        testScheduler.runCurrent()
+
+        assertTrue(saved)
+        val event = repo.careEvents.first()
+        // Перевіряємо чесне повідомлення у нотатках замість вигаданих альтернатив
+        assertTrue(event.notes?.contains("надійні альтернативи не визначені ШІ") == true)
+        assertTrue(event.notes?.contains("Рекомендовано перевірку за ручним аналізом симптомів") == true)
     }
 
     @Test
     fun photoDiagnosis_handlesNotAPlant_transitionsToError() = runTest(testDispatcher) {
-        val plant = PlantEntity(id = 106L, customName = "Кактус")
+        val plant = PlantEntity(id = 109L, customName = "Кактус")
         val repo = FakeTestFlowersRepository(plant)
         repo.diagnoseHealthResult = DiagnosePlantHealthResult.NotAPlant("На фото не виявлено рослину")
         val viewModel = DiagnosisViewModel(plantId = plant.id, repository = repo)

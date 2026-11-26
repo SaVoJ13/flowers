@@ -269,8 +269,9 @@ class PhotoDiagnosisComposeTest {
             imageProcessorProvider = { imageProcessor }
         )
 
-        // Імітуємо вибір фотографії, скасування операції
+        // 1. Імітуємо вибір фотографії з галереї та скасування
         val samplePhoto = createSampleBitmapFile(testTempDir, "temp_diag.jpg")
+        val sampleContent = samplePhoto.readBytes()
         viewModel.onPhotoSelected(Uri.fromFile(samplePhoto), context)
         viewModel.cancelActivePhotoOperation()
 
@@ -278,5 +279,51 @@ class PhotoDiagnosisComposeTest {
         assertTrue(controlFile.exists())
         val afterBytes = controlFile.readBytes()
         assertTrue(controlContent.contentEquals(afterBytes))
+
+        // Оригінал з галереї залишається цілим
+        assertTrue(samplePhoto.exists())
+        assertTrue(sampleContent.contentEquals(samplePhoto.readBytes()))
+
+        // 2. Пряме передавання зовнішнього файлу не дає права на видалення
+        val externalFile = createSampleBitmapFile(testTempDir, "external_doc.jpg")
+        viewModel.onPhotoSelected(externalFile)
+        viewModel.cancelActivePhotoOperation()
+        assertTrue("Зовнішній файл не повинен видалятися при скасуванні", externalFile.exists())
+    }
+
+    @Test
+    fun testHealthCheckHistoryItem_persistsAndRendersOfflineWithoutNetwork() {
+        var plantId = 0L
+        val photoFile = createSampleBitmapFile(testOutputDir, "offline_saved_health_photo.jpg")
+        val photoBytes = photoFile.readBytes()
+
+        runBlocking<Unit> {
+            plantId = db.plantDao().insertPlant(
+                PlantEntity(
+                    customName = "Орхідея фаленопсис",
+                    speciesName = "Орхідея"
+                )
+            )
+
+            db.careEventDao().insertEvent(
+                CareEventEntity(
+                    plantId = plantId,
+                    eventType = "HEALTH_CHECK",
+                    timestamp = System.currentTimeMillis(),
+                    notes = "Ймовірна причина: Перелив ґрунту\nОцінка впевненості: HIGH\nПлан дій:\n1. Ізолюйте рослину\n⚠️ Попередня оцінка.",
+                    photoUri = photoFile.absolutePath
+                )
+            )
+        }
+
+        // Перевіряємо читання з бази без мережі
+        val events = runBlocking { db.careEventDao().getEventsForPlant(plantId).first() }
+        assertEquals(1, events.size)
+        val event = events.first()
+        assertEquals("HEALTH_CHECK", event.eventType)
+        assertEquals(photoFile.absolutePath, event.photoUri)
+        assertTrue(File(event.photoUri!!).exists())
+        assertTrue(photoBytes.contentEquals(File(event.photoUri!!).readBytes()))
+        assertTrue(event.notes?.contains("Перелив ґрунту") == true)
     }
 }

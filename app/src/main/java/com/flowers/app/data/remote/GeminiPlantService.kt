@@ -127,7 +127,9 @@ data class PlantHealthDiagnosisResponse(
     val followUpAdvice: String = "",
 
     @SerializedName("preliminary_notice")
-    val preliminaryNotice: String = "Попередня оцінка за фотографією. Не замінює очного огляду фахівцем."
+    val preliminaryNotice: String = "Попередня оцінка за фотографією. Не замінює очного огляду фахівцем.",
+
+    val isSafetySanitized: Boolean = false
 )
 
 sealed class DiagnosePlantHealthResult {
@@ -411,10 +413,16 @@ class GeminiPlantService(
             }
 
             val parsed = parseHealthDiagnosisResponse(responseText)
-                ?: return@withContext DiagnosePlantHealthResult.Error("Не вдалося розпізнати результат діагностики.")
+                ?: return@withContext DiagnosePlantHealthResult.Error(
+                    "Не вдалося розпізнати або валідувати результат діагностики. Спробуйте зробити чіткіше фото."
+                )
 
             if (!parsed.isPlant) {
-                return@withContext DiagnosePlantHealthResult.NotAPlant()
+                return@withContext DiagnosePlantHealthResult.NotAPlant(
+                    message = parsed.probableCause.ifBlank {
+                        "На фото не виявлено рослину. Будь ласка, сфотографуйте уражену частину рослини при кращому освітленні."
+                    }
+                )
             }
 
             DiagnosePlantHealthResult.Success(parsed)
@@ -461,6 +469,10 @@ class GeminiPlantService(
                 .removeSuffix("```")
                 .trim()
 
+            if (cleaned.isBlank() || cleaned == "{}" || cleaned == "[]") {
+                return null
+            }
+
             val candidateText = if (cleaned.startsWith("{") && cleaned.contains("\"candidates\"")) {
                 val root = gson.fromJson(cleaned, Map::class.java)
                 val candidates = root["candidates"] as? List<*>
@@ -474,29 +486,148 @@ class GeminiPlantService(
                 cleaned
             }
 
-            val parsed = gson.fromJson(candidateText, PlantHealthDiagnosisResponse::class.java) ?: return null
-
-            val sanitizedConfidence = when (parsed.confidence.uppercase()) {
-                "HIGH" -> "HIGH"
-                "LOW" -> "LOW"
-                else -> "MEDIUM"
+            if (candidateText.isBlank() || candidateText == "{}" || candidateText == "[]") {
+                return null
             }
 
-            val sanitizedAlternatives = if (sanitizedConfidence != "HIGH" && parsed.alternativeCauses.isEmpty() && parsed.isPlant) {
-                listOf("Можливе порушення режиму освітлення або зволоження повітря")
+            // Сувора валідація JSON: розбір через JsonParser для перевірки типів і відсутності обов'язкових полів
+            val jsonElement = com.google.gson.JsonParser.parseString(candidateText)
+            if (!jsonElement.isJsonObject) {
+                return null
+            }
+            val jsonObject = jsonElement.asJsonObject
+            if (jsonObject.size() == 0) {
+                return null
+            }
+
+            val isPlantElement = jsonObject.get("is_plant")
+            val isPlant = if (isPlantElement != null && isPlantElement.isJsonPrimitive && isPlantElement.asJsonPrimitive.isBoolean) {
+                isPlantElement.asBoolean
             } else {
-                parsed.alternativeCauses
+                true
             }
 
-            parsed.copy(
-                confidence = sanitizedConfidence,
-                alternativeCauses = sanitizedAlternatives,
-                preliminaryNotice = parsed.preliminaryNotice.ifBlank {
-                    "Попередня оцінка за фотографією. Не замінює очного огляду фахівцем."
+            // Якщо на фото не виявлено рослину
+            if (!isPlant) {
+                val cause = jsonObject.get("probable_cause")?.takeIf { it.isJsonPrimitive }?.asString?.trim() ?: ""
+                return PlantHealthDiagnosisResponse(
+                    isPlant = false,
+                    probableCause = cause.ifBlank { "На фотографії не розпізнано рослину." },
+                    confidence = "LOW",
+                    visibleSymptoms = emptyList(),
+                    alternativeCauses = emptyList(),
+                    firstAidSteps = emptyList(),
+                    followUpAdvice = "",
+                    preliminaryNotice = "На фотографії не розпізнано рослину."
+                )
+            }
+
+            // 1. Обов'язкове поле: ймовірна причина (не порожній рядок)
+            val probableCauseElement = jsonObject.get("probable_cause")
+            if (probableCauseElement == null || !probableCauseElement.isJsonPrimitive || !probableCauseElement.asJsonPrimitive.isString) {
+                return null
+            }
+            val probableCause = probableCauseElement.asString.trim()
+            if (probableCause.isBlank()) {
+                return null
+            }
+
+            // 2. Обов'язкове поле: рекомендація повторного огляду (не порожній рядок)
+            val followUpElement = jsonObject.get("follow_up_advice")
+            if (followUpElement == null || !followUpElement.isJsonPrimitive || !followUpElement.asJsonPrimitive.isString) {
+                return null
+            }
+            val followUpAdvice = followUpElement.asString.trim()
+            if (followUpAdvice.isBlank()) {
+                return null
+            }
+
+            // 3. Обов'язкове поле: перша допомога (непустий масив валідних рядків)
+            val firstAidElement = jsonObject.get("first_aid_steps")
+            if (firstAidElement == null || !firstAidElement.isJsonArray) {
+                return null
+            }
+            val rawFirstAidArray = firstAidElement.asJsonArray
+            if (rawFirstAidArray.size() == 0) {
+                return null
+            }
+            val rawFirstAidSteps = mutableListOf<String>()
+            for (element in rawFirstAidArray) {
+                if (!element.isJsonPrimitive || !element.asJsonPrimitive.isString) {
+                    return null // елемент не є рядком (наприклад, null або вкладений об'єкт)
                 }
+                val step = element.asString.trim()
+                if (step.isNotBlank()) {
+                    rawFirstAidSteps.add(step)
+                }
+            }
+            if (rawFirstAidSteps.isEmpty()) {
+                return null
+            }
+
+            // 4. Валідація видимих симптомів
+            val visibleSymptoms = mutableListOf<String>()
+            val symptomsElement = jsonObject.get("visible_symptoms")
+            if (symptomsElement != null && symptomsElement.isJsonArray) {
+                for (element in symptomsElement.asJsonArray) {
+                    if (element.isJsonPrimitive && element.asJsonPrimitive.isString) {
+                        val sym = element.asString.trim()
+                        if (sym.isNotBlank()) {
+                            visibleSymptoms.add(sym)
+                        }
+                    }
+                }
+            }
+
+            // 5. Валідація альтернативних причин (без вигадування штучних причин)
+            val alternativeCauses = mutableListOf<String>()
+            val altElement = jsonObject.get("alternative_causes")
+            if (altElement != null && altElement.isJsonArray) {
+                for (element in altElement.asJsonArray) {
+                    if (element.isJsonPrimitive && element.asJsonPrimitive.isString) {
+                        val alt = element.asString.trim()
+                        if (alt.isNotBlank()) {
+                            alternativeCauses.add(alt)
+                        }
+                    }
+                }
+            }
+
+            // 6. Валідація confidence: невідоме значення не підвищується до MEDIUM
+            val rawConfidence = jsonObject.get("confidence")?.takeIf { it.isJsonPrimitive }?.asString?.trim()?.uppercase()
+            val sanitizedConfidence = when (rawConfidence) {
+                "HIGH" -> "HIGH"
+                "MEDIUM" -> "MEDIUM"
+                "LOW" -> "LOW"
+                "UNCERTAIN" -> "LOW"
+                else -> "LOW" // Будь-яке невідоме значення чи відсутність поля maps to LOW
+            }
+
+            // 7. Попередження
+            val preliminaryNotice = jsonObject.get("preliminary_notice")?.takeIf { it.isJsonPrimitive }?.asString?.trim()?.ifBlank {
+                "Попередня оцінка за фотографією. Не замінює очного огляду фахівцем."
+            } ?: "Попередня оцінка за фотографією. Не замінює очного огляду фахівцем."
+
+            // 8. Захисний шар безпеки (Safety Guardrail)
+            val (sanitizedSteps, isSanitized) = PlantSafetyGuardrail.sanitizeFirstAidSteps(rawFirstAidSteps)
+            val finalNotice = if (isSanitized) {
+                "$preliminaryNotice\n${PlantSafetyGuardrail.SAFETY_NOTICE_MODIFIED}"
+            } else {
+                preliminaryNotice
+            }
+
+            PlantHealthDiagnosisResponse(
+                isPlant = true,
+                probableCause = probableCause,
+                confidence = sanitizedConfidence,
+                visibleSymptoms = visibleSymptoms,
+                alternativeCauses = alternativeCauses,
+                firstAidSteps = sanitizedSteps,
+                followUpAdvice = followUpAdvice,
+                preliminaryNotice = finalNotice,
+                isSafetySanitized = isSanitized
             )
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } catch (_: Exception) {
             null
         }
     }

@@ -55,6 +55,18 @@ data class DiagnosisUiState(
     val isSaving: Boolean = false
 )
 
+/**
+ * Модель володіння файлом фотографії у поточному сеансі діагностики.
+ * Лише файли з [isOwnedForDeletion] = true (створені ImageProcessor у межах поточної операції)
+ * дозволено видаляти при скасуванні.
+ * [operationToken] гарантує, що старий запит не може видалити файл нової операції.
+ */
+data class OwnedPhoto(
+    val file: File,
+    val isOwnedForDeletion: Boolean,
+    val operationToken: Long
+)
+
 class DiagnosisViewModel(
     private val plantId: Long,
     private val repository: FlowersRepository,
@@ -64,7 +76,8 @@ class DiagnosisViewModel(
     private val _uiState = MutableStateFlow(DiagnosisUiState())
     val uiState: StateFlow<DiagnosisUiState> = _uiState.asStateFlow()
 
-    private var pendingPhotoFile: File? = null
+    private var currentOwnedPhoto: OwnedPhoto? = null
+    private var operationTokenCounter: Long = 0L
     private var activeAnalysisJob: Job? = null
 
     init {
@@ -112,16 +125,35 @@ class DiagnosisViewModel(
     // ==========================================
 
     /**
-     * Пряме призначення підготовленого файлу фотографії (наприклад, у тестах).
+     * Пряме призначення підготовленого файлу фотографії (наприклад, у зовнішніх інтерфейсах).
+     * Зовнішній файл [file] ніколи не вважається тимчасовим файлом для видалення (isOwnedForDeletion = false).
      */
     fun onPhotoSelected(file: File) {
+        onPhotoSelectedInternal(file, isOwnedForDeletion = false)
+    }
+
+    /**
+     * Спеціальний метод для тестів, що дозволяє явно перевірити логіку життєвого циклу володіння файлом.
+     */
+    @androidx.annotation.VisibleForTesting
+    fun onPhotoSelectedForTesting(file: File, isOwnedForDeletion: Boolean) {
+        onPhotoSelectedInternal(file, isOwnedForDeletion = isOwnedForDeletion)
+    }
+
+    private fun onPhotoSelectedInternal(file: File, isOwnedForDeletion: Boolean) {
         cancelActivePhotoOperation()
-        pendingPhotoFile = file
+        val token = ++operationTokenCounter
+        currentOwnedPhoto = OwnedPhoto(
+            file = file,
+            isOwnedForDeletion = isOwnedForDeletion,
+            operationToken = token
+        )
         _uiState.update { it.copy(photoStep = PhotoDiagnosisStep.PreviewAndConfirm(file)) }
     }
 
     fun onPhotoSelected(uri: Uri, context: Context) {
         cancelActivePhotoOperation()
+        val token = ++operationTokenCounter
 
         activeAnalysisJob = viewModelScope.launch {
             _uiState.update { it.copy(photoStep = PhotoDiagnosisStep.ProcessingPhoto(uri)) }
@@ -129,9 +161,17 @@ class DiagnosisViewModel(
             val processResult = processor.processImage(uri, ImageProfile.DiseaseDiagnosis)
             val imageResult = processResult.getOrNull()
 
+            // Перевіряємо актуальність операції
+            if (!isActive || token != operationTokenCounter) {
+                // Якщо операція застаріла або скасована, видаляємо тільки щойно створений тимчасовий файл
+                imageResult?.file?.let { staleFile ->
+                    try { if (staleFile.exists() && staleFile.isFile) staleFile.delete() } catch (_: Throwable) {}
+                }
+                return@launch
+            }
+
             if (imageResult == null) {
                 val error = processResult.exceptionOrNull()
-                if (!isActive) return@launch
                 _uiState.update {
                     it.copy(
                         photoStep = PhotoDiagnosisStep.Error(
@@ -145,12 +185,12 @@ class DiagnosisViewModel(
             }
 
             val photoFile = imageResult.file
-            pendingPhotoFile = photoFile
-
-            if (!isActive) {
-                cleanUpPendingPhoto()
-                return@launch
-            }
+            // Тільки файл, успішно створений ImageProcessor для поточної активної операції, має право на видалення
+            currentOwnedPhoto = OwnedPhoto(
+                file = photoFile,
+                isOwnedForDeletion = true,
+                operationToken = token
+            )
 
             // Перехід до кроку попереднього перегляду та підтвердження аналізу
             _uiState.update { it.copy(photoStep = PhotoDiagnosisStep.PreviewAndConfirm(photoFile)) }
@@ -161,16 +201,18 @@ class DiagnosisViewModel(
      * Користувач підтверджує перегляд фотографії та запускає аналіз ШІ.
      */
     fun onConfirmAnalysis() {
-        val photoFile = pendingPhotoFile ?: return
+        val owned = currentOwnedPhoto ?: return
+        val photoFile = owned.file
         val plant = _uiState.value.plant ?: return
+        val token = owned.operationToken
 
         activeAnalysisJob?.cancel()
         activeAnalysisJob = viewModelScope.launch {
             _uiState.update { it.copy(photoStep = PhotoDiagnosisStep.AnalyzingWithAi(photoFile)) }
             val diagnosisResult = repository.diagnosePlantHealth(photoFile, plant)
 
-            if (!isActive) {
-                cleanUpPendingPhoto()
+            // Перевіряємо актуальність поточної операції (захист від затриманих відповідей старих запитів)
+            if (!isActive || token != operationTokenCounter) {
                 return@launch
             }
 
@@ -212,7 +254,7 @@ class DiagnosisViewModel(
     fun cancelActivePhotoOperation() {
         activeAnalysisJob?.cancel()
         activeAnalysisJob = null
-        cleanUpPendingPhoto()
+        cleanUpOwnedPhoto()
         _uiState.update { it.copy(photoStep = PhotoDiagnosisStep.PickPhoto) }
     }
 
@@ -231,6 +273,9 @@ class DiagnosisViewModel(
                 val diagnosis = currentStep.diagnosis
                 val photoPath = currentStep.photoFile.absolutePath
 
+                // Знімаємо право на видалення файлу, оскільки він зберігається в постійній історії
+                currentOwnedPhoto = currentOwnedPhoto?.copy(isOwnedForDeletion = false)
+
                 val noteText = buildString {
                     append("Ймовірна причина: ${diagnosis.probableCause}\n")
                     append("Оцінка впевненості: ${diagnosis.confidence} (орієнтовно)\n")
@@ -239,6 +284,8 @@ class DiagnosisViewModel(
                     }
                     if (diagnosis.alternativeCauses.isNotEmpty()) {
                         append("Альтернативні пояснення: ${diagnosis.alternativeCauses.joinToString(", ")}\n")
+                    } else if (!diagnosis.confidence.equals("HIGH", ignoreCase = true)) {
+                        append("Альтернативні пояснення: надійні альтернативи не визначені ШІ. Рекомендовано перевірку за ручним аналізом симптомів.\n")
                     }
                     if (diagnosis.firstAidSteps.isNotEmpty()) {
                         append("План дій:\n")
@@ -263,7 +310,7 @@ class DiagnosisViewModel(
                 )
 
                 // Фото успішно закріплено за історією — очищати при виході не потрібно
-                pendingPhotoFile = null
+                currentOwnedPhoto = null
                 onSaved()
             } finally {
                 _uiState.update { it.copy(isSaving = false) }
@@ -343,15 +390,16 @@ class DiagnosisViewModel(
         }
     }
 
-    private fun cleanUpPendingPhoto() {
-        pendingPhotoFile?.let { file ->
+    private fun cleanUpOwnedPhoto() {
+        val owned = currentOwnedPhoto ?: return
+        if (owned.isOwnedForDeletion) {
             try {
-                if (file.exists() && file.isFile) {
-                    file.delete()
+                if (owned.file.exists() && owned.file.isFile) {
+                    owned.file.delete()
                 }
             } catch (_: Exception) {}
         }
-        pendingPhotoFile = null
+        currentOwnedPhoto = null
     }
 
     override fun onCleared() {

@@ -1,5 +1,7 @@
 # TASK-055 — Фото-діагностика захворювань та шкідників рослин за допомогою ШІ
 
+> **Статус:** ЗАВЕРШЕНО (Злито в `main`, PR #37, merge commit `c7a0ace`)
+
 ## Мета
 
 Реалізувати наступний ключовий етап Flowers 2.0 (ADR-021, `FLOWERS_2_0_MVP_PLAN.md`):
@@ -118,3 +120,8 @@
     - Додано тести: `testDelayedCameraCallback_doesNotDeleteOrAffectNewSessionPhoto` (обробка A -> скасування -> створення B -> запізнілий callback A -> файл B цілий та доступний), перевірка скасування камери та закриття екрана.
     - Створено окремий набір unit-тестів `CameraCaptureManagerTest`.
     - Результати верифікації: 254 unit-тести PASSED, 33 connected Android тести PASSED на емуляторі `small_phone` (0 failures, 0 skipped), `bundleRelease` BUILD SUCCESSFUL (17 622 368 байт).
+  - **Злиття та закриття:**
+    - Отримано погодження Власника на злиття.
+    - PR #37 злито в `main` звичайним merge комітом `c7a0ace`.
+    - До передрелізного QA-беклогу додано пункти фізичної валідації (`QA-PRE-RELEASE-01..05`).
+    - Завдання TASK-055 повністю закрито.

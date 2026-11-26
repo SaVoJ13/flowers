@@ -7,10 +7,15 @@ import com.flowers.app.data.local.entity.CarePodEntity
 import com.flowers.app.data.local.entity.PlantEntity
 import com.flowers.app.data.repository.FlowersRepository
 import com.flowers.app.domain.ReminderCalculator
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,21 +30,39 @@ data class TodayUiState(
 )
 
 class TodayViewModel(
-    private val repository: FlowersRepository
+    private val repository: FlowersRepository,
+    private val nowProvider: () -> Long = System::currentTimeMillis
 ) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     private val _processingPlantIds = MutableStateFlow<Set<Long>>(emptySet())
     private val _plantToConfirmWatering = MutableStateFlow<PlantEntity?>(null)
+    private val _refreshTrigger = MutableStateFlow(0)
+
+    /**
+     * Emits the current time now, again at the next calendar midnight, and whenever the screen is
+     * resumed. No periodic polling: one suspended delay until the next day boundary.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val clock: Flow<Long> = _refreshTrigger.flatMapLatest {
+        flow {
+            while (true) {
+                val now = nowProvider()
+                emit(now)
+                val nextMidnight = ReminderCalculator.calculateSnoozeDate(1, now)
+                delay((nextMidnight - now).coerceAtLeast(1000L) + 500L)
+            }
+        }
+    }
 
     val uiState: StateFlow<TodayUiState> = combine(
-        repository.getAllActivePlants(),
+        repository.getAllActivePlants().combine(clock) { plants, now -> plants to now },
         repository.getGeneralPods(),
         _isLoading,
         _processingPlantIds,
         _plantToConfirmWatering
-    ) { allPlants, generalPods, isLoading, processingIds, plantToConfirm ->
-        val now = System.currentTimeMillis()
+    ) { plantsAndNow, generalPods, isLoading, processingIds, plantToConfirm ->
+        val (allPlants, now) = plantsAndNow
         val due = allPlants.filter { ReminderCalculator.isDue(it.nextCheckDate, now) }
         val upcoming = allPlants.filter { !ReminderCalculator.isDue(it.nextCheckDate, now) }
         TodayUiState(
@@ -55,6 +78,11 @@ class TodayViewModel(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = TodayUiState(isLoading = true)
     )
+
+    /** Called when the app returns to the foreground: recomputes due/upcoming for the current day. */
+    fun onScreenResumed() {
+        _refreshTrigger.update { it + 1 }
+    }
 
     /**
      * Request watering: opens explicit confirmation dialog to prevent accidental clicks.

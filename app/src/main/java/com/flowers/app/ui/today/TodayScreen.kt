@@ -76,6 +76,14 @@ fun TodayScreen(
     onNavigateToDiagnosis: (Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current
+    androidx.compose.runtime.DisposableEffect(lifecycleOwner, viewModel) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) viewModel.onScreenResumed()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
     val todayDateFormatted = remember {
         SimpleDateFormat("EEEE, d MMMM", Locale("uk")).format(Date())
     }

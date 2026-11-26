@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -116,6 +115,8 @@ class TodayViewModelTest {
         }
 
         override suspend fun skipPlant(plant: PlantEntity) {
+            val now = System.currentTimeMillis()
+            updatePlant(plant.copy(nextCheckDate = ReminderCalculator.calculateNextCheckAfterWatering(plant.checkIntervalDays, now)))
             careEvents.add(CareEventEntity(plantId = plant.id, eventType = "SKIP"))
         }
 
@@ -141,7 +142,7 @@ class TodayViewModelTest {
 
         val viewModel = TodayViewModel(repo)
         val collectJob = launch { viewModel.uiState.collect {} }
-        advanceUntilIdle()
+        testScheduler.runCurrent()
 
         val state = viewModel.uiState.value
         assertEquals(1, state.duePlants.size)
@@ -160,17 +161,17 @@ class TodayViewModelTest {
 
         val viewModel = TodayViewModel(repo)
         val collectJob = launch { viewModel.uiState.collect {} }
-        advanceUntilIdle()
+        testScheduler.runCurrent()
 
         viewModel.onWaterClicked(plant)
-        advanceUntilIdle()
+        testScheduler.runCurrent()
 
         assertEquals(plant, viewModel.uiState.value.plantToConfirmWatering)
         assertEquals(0, repo.performWateringCallCount)
 
         // Dismiss without confirm
         viewModel.onWaterConfirmationDismissed()
-        advanceUntilIdle()
+        testScheduler.runCurrent()
 
         assertNull(viewModel.uiState.value.plantToConfirmWatering)
         assertEquals(0, repo.performWateringCallCount)
@@ -193,12 +194,12 @@ class TodayViewModelTest {
 
         val viewModel = TodayViewModel(repo)
         val collectJob = launch { viewModel.uiState.collect {} }
-        advanceUntilIdle()
+        testScheduler.runCurrent()
 
         viewModel.onWaterClicked(plant)
-        advanceUntilIdle()
+        testScheduler.runCurrent()
         viewModel.onWaterConfirmed()
-        advanceUntilIdle()
+        testScheduler.runCurrent()
 
         // Dialog dismissed
         assertNull(viewModel.uiState.value.plantToConfirmWatering)
@@ -234,10 +235,10 @@ class TodayViewModelTest {
 
         val viewModel = TodayViewModel(repo)
         val collectJob = launch { viewModel.uiState.collect {} }
-        advanceUntilIdle()
+        testScheduler.runCurrent()
 
         viewModel.onSnoozeTwoDaysClicked(plant)
-        advanceUntilIdle()
+        testScheduler.runCurrent()
 
         assertEquals(1, repo.snoozePlantCallCount)
         assertEquals(1, repo.careEvents.size)
@@ -263,16 +264,83 @@ class TodayViewModelTest {
 
         val viewModel = TodayViewModel(repo)
         val collectJob = launch { viewModel.uiState.collect {} }
-        advanceUntilIdle()
+        testScheduler.runCurrent()
 
         // Double click snooze
         viewModel.onSnoozeTwoDaysClicked(plant)
         viewModel.onSnoozeTwoDaysClicked(plant)
-        advanceUntilIdle()
+        testScheduler.runCurrent()
 
         assertEquals(1, repo.snoozePlantCallCount)
         assertEquals(1, repo.careEvents.size)
 
+        collectJob.cancel()
+    }
+
+    @Test
+    fun dayRollover_movesPlantFromUpcomingToDue_withoutRoomChanges() = runTest(testDispatcher) {
+        val tz = java.util.TimeZone.getDefault()
+        val day1Noon = java.util.Calendar.getInstance(tz).apply {
+            set(2026, java.util.Calendar.MARCH, 10, 12, 0, 0); set(java.util.Calendar.MILLISECOND, 0)
+        }.timeInMillis
+        val tomorrowStart = ReminderCalculator.calculateSnoozeDate(1, day1Noon)
+        val repo = FakeFlowersRepository()
+        repo.plantsFlow.value = listOf(PlantEntity(id = 7L, customName = "Фікус", nextCheckDate = tomorrowStart))
+
+        // virtual clock: wall-clock = day1Noon + virtual time elapsed
+        val viewModel = TodayViewModel(repo, nowProvider = { day1Noon + testScheduler.currentTime })
+        val collectJob = launch { viewModel.uiState.collect {} }
+        testScheduler.runCurrent()
+        // advanceUntilIdle would loop forever on the endless ticker, so only run to just before midnight
+        assertEquals(0, viewModel.uiState.value.duePlants.size)
+        assertEquals(1, viewModel.uiState.value.upcomingPlants.size)
+
+        // jump to after the next midnight: the ticker fires once, no Room emission needed
+        testScheduler.advanceTimeBy((tomorrowStart - day1Noon) + 2000L)
+        testScheduler.runCurrent()
+        assertEquals(1, viewModel.uiState.value.duePlants.size)
+        assertEquals(0, viewModel.uiState.value.upcomingPlants.size)
+
+        collectJob.cancel()
+    }
+
+    @Test
+    fun onScreenResumed_recomputesWithCurrentClock() = runTest(testDispatcher) {
+        var clock = 1_000_000_000_000L
+        val next = ReminderCalculator.calculateSnoozeDate(1, clock)
+        val repo = FakeFlowersRepository()
+        repo.plantsFlow.value = listOf(PlantEntity(id = 8L, customName = "Алое", nextCheckDate = next))
+        val viewModel = TodayViewModel(repo, nowProvider = { clock })
+        val collectJob = launch { viewModel.uiState.collect {} }
+        testScheduler.runCurrent()
+        assertEquals(1, viewModel.uiState.value.upcomingPlants.size)
+
+        clock = next + 60_000L
+        viewModel.onScreenResumed()
+        testScheduler.runCurrent()
+        assertEquals(1, viewModel.uiState.value.duePlants.size)
+
+        collectJob.cancel()
+    }
+
+    @Test
+    fun skip_movesNextCheckDateAndKeepsLastWateredDate() = runTest(testDispatcher) {
+        val repo = FakeFlowersRepository()
+        val now = System.currentTimeMillis()
+        val plant = PlantEntity(id = 50L, customName = "Каланхое", checkIntervalDays = 10, lastWateredDate = 123L, nextCheckDate = now - 1000L)
+        repo.plantsFlow.value = listOf(plant)
+        val viewModel = TodayViewModel(repo)
+        val collectJob = launch { viewModel.uiState.collect {} }
+        testScheduler.runCurrent()
+        assertEquals(1, viewModel.uiState.value.duePlants.size)
+
+        viewModel.onSkipClicked(plant)
+        repeat(5) { testScheduler.runCurrent() }
+
+        val updated = repo.plantsFlow.value.first { it.id == 50L }
+        assertEquals(123L, updated.lastWateredDate)
+        assertEquals(0, viewModel.uiState.value.duePlants.size)
+        assertEquals("SKIP", repo.careEvents.single().eventType)
         collectJob.cancel()
     }
 }

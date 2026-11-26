@@ -82,7 +82,7 @@ class SoilCheckAdvisorTest {
         )
 
         val advice = SoilCheckAdvisor.getSoilCheckAdvice(plant, autumnTime, tz)
-        assertTrue(advice.contains("Обережно перевірте вологість ґрунту пальцем або дерев'яною шпажкою"))
+        assertTrue(advice.contains("перевірте вологість ґрунту вручну (пальцем або дерев'яною шпажкою)"))
     }
 
     @Test
@@ -118,5 +118,24 @@ class SoilCheckAdvisorTest {
         assertEquals(SoilCheckAdvisor.Season.SPRING, SoilCheckAdvisor.getSeason(createTimestamp(2026, Calendar.MARCH, 20), tz))
         assertEquals(SoilCheckAdvisor.Season.SUMMER, SoilCheckAdvisor.getSeason(createTimestamp(2026, Calendar.JULY, 1), tz))
         assertEquals(SoilCheckAdvisor.Season.AUTUMN, SoilCheckAdvisor.getSeason(createTimestamp(2026, Calendar.OCTOBER, 5), tz))
+    }
+
+    @Test
+    fun ficus_isNotTreatedAsAroid_andGetsDeeperCheck() {
+        val springTime = createTimestamp(2026, Calendar.APRIL, 10)
+        val ficus = PlantEntity(customName = "Лірата", botanicalName = "Ficus lyrata")
+        val advice = SoilCheckAdvisor.getSoilCheckAdvice(ficus, springTime, tz)
+        assertTrue(advice.contains("3–5 см"))
+        assertTrue(!advice.contains("верхні 2–3 см"))
+    }
+
+    @Test
+    fun unknownSpecies_getsCautiousManualCheckWithoutHardRule() {
+        val springTime = createTimestamp(2026, Calendar.APRIL, 10)
+        val plant = PlantEntity(customName = "Невідома рослина")
+        val advice = SoilCheckAdvisor.getSoilCheckAdvice(plant, springTime, tz)
+        assertTrue(advice.contains("вручну"))
+        assertTrue(advice.contains("за потреби"))
+        assertTrue(!advice.contains("см"))
     }
 }

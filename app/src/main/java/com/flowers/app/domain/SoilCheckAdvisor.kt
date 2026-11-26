@@ -42,14 +42,17 @@ object SoilCheckAdvisor {
             isSucculentOrCactus(combinedText) -> {
                 "Ґрунт має повністю просохнути між перевірками. Уникайте застою води в піддоні."
             }
-            isAroidOrTropical(combinedText) -> {
+            isFicus(combinedText) -> {
+                "Перевірте ґрунт на глибину 3–5 см: фікус поливайте, коли верхній шар підсох, а глибше ще злегка вологий. Не допускайте ні застою води, ні сильного пересихання."
+            }
+            isAroid(combinedText) -> {
                 "Перевірте верхні 2–3 см ґрунту: поливайте лише тоді, коли верхній шар підсох."
             }
             isMoistureLoving(combinedText) -> {
                 "Ґрунт має залишатися помірно вологим, але без застою води. Не допускайте пересихання."
             }
             else -> {
-                "Обережно перевірте вологість ґрунту пальцем або дерев'яною шпажкою перед поливом."
+                "Вид визначено не точно, тому перевірте вологість ґрунту вручну (пальцем або дерев'яною шпажкою) і поливайте лише за потреби."
             }
         }
 
@@ -99,13 +102,18 @@ object SoilCheckAdvisor {
         return keywords.any { text.contains(it) }
     }
 
-    private fun isAroidOrTropical(text: String): Boolean {
+    private fun isFicus(text: String): Boolean {
+        val keywords = listOf("ficus", "фікус", "lyrata", "elastica", "benjamina")
+        return keywords.any { text.contains(it) }
+    }
+
+    private fun isAroid(text: String): Boolean {
         val keywords = listOf(
             "monstera", "монстера", "philodendron", "філодендрон",
             "epipremnum", "епіпремнум", "pothos", "потос",
             "spathiphyllum", "спатифілум", "anthurium", "антуріум",
             "syngonium", "сингоніум", "aglaonema", "аглаонема",
-            "ficus", "фікус", "dieffenbachia", "дифенбах"
+            "dieffenbachia", "дифенбах"
         )
         return keywords.any { text.contains(it) }
     }

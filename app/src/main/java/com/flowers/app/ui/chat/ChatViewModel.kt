@@ -269,10 +269,7 @@ class ChatViewModel(
         val token = ++activeRequestToken
         _uiState.update { it.copy(isSending = false) }
         viewModelScope.launch {
-            try {
-                previousJob?.join()
-            } catch (_: CancellationException) {
-            }
+            previousJob?.join()
             if (activeRequestToken == token) {
                 repository.clearChatHistory(plantId)
             }

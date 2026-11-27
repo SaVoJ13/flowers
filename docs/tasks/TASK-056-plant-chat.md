@@ -434,7 +434,7 @@ SQLite виконує REPLACE як DELETE + INSERT; Room вмикає foreign ke
 3. **`ChatViewModel` (`com.flowers.app.ui.chat`):**
    - Створено `ChatUiState(plant, messages, isSending, isLoading, errorMessage)`.
    - Синхронний дебаунс: прапорець `_uiState.value.isSending` блокує повторні виклики `sendMessage` та `retryMessage` синхронно в тому самому кадрі ще до запуску та перемикання корутин.
-   - Серіалізація та усунення гонки в `clearChat()`: очікування завершення попереднього запиту (`join()`) перед видаленням історії у SQLite, прив'язка очищення статусу `isSending` до поточної `activeJob`.
+   - Серіалізація та усунення гонки в `clearChat()`: очікування завершення попереднього запиту (`join()`) перед видаленням історії у SQLite, прив'язка очищення статусу `isSending` до монотонного `activeRequestToken`.
    - Реактивне оновлення: стан підписується на `getChatMessages(plantId)` та `getPlantFlowById(plantId)`.
    - Перевірка існування рослини перед відправкою (захист від `SQLiteConstraintException` при каскаді).
    - Захист від падінь при винятках SQLite/Room через перехоплення `Exception` із переведенням `USER` у `ERROR`.
@@ -450,7 +450,7 @@ SQLite виконує REPLACE як DELETE + INSERT; Room вмикає foreign ke
    - `FlowersRepositoryChatTest`: 6 детальних тестів для всіх методів чату в репозиторії, включно з `activeSendingCounters` та паралельними викликами.
    - Fakes оновлено у `DiagnosisViewModelTest`, `PlantsViewModelTest`, `TodayViewModelTest`.
    - Усі 314 JVM unit-тестів пройшли успішно (100% pass).
-   - Усі 49 Android інструментальних тестів пройшли успішно на `small_phone` (`emulator-5554`).
+   - Інструментальні тести `ChatMessageDaoTest`: 13/13 PASSED на емуляторі `small_phone` (ізольована тестова SQLite БД), загальний набір Room v4 / Chat: 49/49 PASSED.
 
 
 

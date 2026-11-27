@@ -362,9 +362,21 @@ class FlowersRepositoryChatTest {
 
     @Test
     fun `concurrentOverlappingRequestsForSamePlant_maintainAtomicCounter`() = runBlocking {
-        plantDao.plantToReturn = testPlant(1L)
         val deferred1 = CompletableDeferred<Unit>()
-        val deferred2 = CompletableDeferred<Unit>()
+        val entered2 = CompletableDeferred<Unit>()
+        val proceed2 = CompletableDeferred<Unit>()
+
+        var firstCall = true
+        val synchronizedPlantDao = object : FakePlantDao() {
+            override suspend fun getPlantById(plantId: Long): PlantEntity? {
+                if (!firstCall) {
+                    entered2.complete(Unit)
+                    proceed2.await()
+                }
+                firstCall = false
+                return testPlant(plantId)
+            }
+        }
 
         careEventDao = Proxy.newProxyInstance(CareEventDao::class.java.classLoader, arrayOf(CareEventDao::class.java)) { _, m, _ ->
             if (m.name == "getRecentEventsForPlant") emptyList<CareEventEntity>() else null
@@ -376,19 +388,14 @@ class FlowersRepositoryChatTest {
             networkChecker = object : com.flowers.app.data.remote.NetworkChecker {
                 override fun isOnline(): Boolean = true
             },
-            generateChatText = { _, prompt ->
-                if (prompt.contains("Запит 1")) {
-                    deferred1.await()
-                    "Відповідь 1"
-                } else {
-                    deferred2.await()
-                    "Відповідь 2"
-                }
+            generateChatText = { _, _ ->
+                deferred1.await()
+                "Відповідь 1"
             }
         )
 
         val repo = FlowersRepositoryImpl(
-            plantDao = plantDao,
+            plantDao = synchronizedPlantDao,
             careEventDao = careEventDao,
             catalogDao = catalogDao,
             carePodDao = carePodDao,
@@ -404,22 +411,31 @@ class FlowersRepositoryChatTest {
             repo.sendPlantChatMessage(1L, "Запит 2", "uk")
         }
 
-        while (!repo.isPlantChatSending(1L)) {
-            delay(10)
+        try {
+            // Очікуємо детермінованого входу другого запиту в sendPlantChatMessage
+            entered2.await()
+
+            // Обидва запити знаходяться всередині методу, лічильник активний
+            assertTrue(repo.isPlantChatSending(1L))
+
+            // Завершуємо перший запит
+            deferred1.complete(Unit)
+            job1.join()
+
+            // Другий запит ще очікує в getPlantById (перед mutex), лічильник повинен утримувати plantId активним!
+            assertTrue("Лічильник повинен утримувати plantId активним, поки другий запит працює", repo.isPlantChatSending(1L))
+
+            // Відпускаємо другий запит
+            proceed2.complete(Unit)
+            job2.join()
+
+            // Тепер обидва завершені
+            assertFalse(repo.isPlantChatSending(1L))
+        } finally {
+            deferred1.complete(Unit)
+            proceed2.complete(Unit)
+            job1.cancel()
+            job2.cancel()
         }
-        assertTrue(repo.isPlantChatSending(1L))
-
-        // Завершуємо перший запит
-        deferred1.complete(Unit)
-        job1.join()
-
-        // Другий запит ще триває, лічильник гарантує true
-        assertTrue("Лічильник повинен утримувати plantId активним", repo.isPlantChatSending(1L))
-
-        // Завершуємо другий запит
-        deferred2.complete(Unit)
-        job2.join()
-
-        assertFalse(repo.isPlantChatSending(1L))
     }
 }

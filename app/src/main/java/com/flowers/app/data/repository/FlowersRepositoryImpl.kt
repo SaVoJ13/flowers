@@ -21,9 +21,12 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -151,9 +154,34 @@ class FlowersRepositoryImpl(
     }
 
     private val activeSendingCounters = java.util.concurrent.ConcurrentHashMap<Long, java.util.concurrent.atomic.AtomicInteger>()
+    private val plantMutexes = java.util.concurrent.ConcurrentHashMap<Long, Mutex>()
+
+    private fun getPlantMutex(plantId: Long): Mutex {
+        return plantMutexes.computeIfAbsent(plantId) { Mutex() }
+    }
 
     override fun isPlantChatSending(plantId: Long): Boolean {
         return (activeSendingCounters[plantId]?.get() ?: 0) > 0
+    }
+
+    override suspend fun <T> withChatSending(plantId: Long, block: suspend () -> T): T {
+        val mutex = getPlantMutex(plantId)
+        mutex.withLock {
+            activeSendingCounters.compute(plantId) { _, existing ->
+                (existing ?: java.util.concurrent.atomic.AtomicInteger(0)).apply { incrementAndGet() }
+            }
+        }
+        try {
+            return block()
+        } finally {
+            withContext(NonCancellable) {
+                mutex.withLock {
+                    activeSendingCounters.computeIfPresent(plantId) { _, counter ->
+                        if (counter.decrementAndGet() <= 0) null else counter
+                    }
+                }
+            }
+        }
     }
 
     override fun getChatMessages(plantId: Long): Flow<List<com.flowers.app.data.local.entity.ChatMessageEntity>> {
@@ -194,10 +222,16 @@ class FlowersRepositoryImpl(
     }
 
     override suspend fun recoverStaleSendingMessages(plantId: Long): Int {
-        if (!isPlantChatSending(plantId)) {
-            return chatMessageDao?.markSendingAsErrorForPlant(plantId, "Запит перервано через перезапуск застосунку") ?: 0
+        val mutex = getPlantMutex(plantId)
+        return mutex.withLock {
+            if (isPlantChatSending(plantId)) {
+                return@withLock 0
+            }
+            chatMessageDao?.markSendingAsErrorForPlant(
+                plantId,
+                "Запит перервано через перезапуск застосунку"
+            ) ?: 0
         }
-        return 0
     }
 
     override suspend fun sendPlantChatMessage(
@@ -206,8 +240,11 @@ class FlowersRepositoryImpl(
         language: String,
         currentMessageId: Long?
     ): com.flowers.app.data.remote.PlantChatResult = withContext(Dispatchers.IO) {
-        activeSendingCounters.compute(plantId) { _, existing ->
-            (existing ?: java.util.concurrent.atomic.AtomicInteger(0)).apply { incrementAndGet() }
+        val mutex = getPlantMutex(plantId)
+        mutex.withLock {
+            activeSendingCounters.compute(plantId) { _, existing ->
+                (existing ?: java.util.concurrent.atomic.AtomicInteger(0)).apply { incrementAndGet() }
+            }
         }
         try {
             if (userQuestion.isBlank()) {
@@ -231,8 +268,12 @@ class FlowersRepositoryImpl(
 
             geminiPlantService.sendPlantChatMessage(prompt, plantId)
         } finally {
-            activeSendingCounters.computeIfPresent(plantId) { _, counter ->
-                if (counter.decrementAndGet() <= 0) null else counter
+            withContext(NonCancellable) {
+                mutex.withLock {
+                    activeSendingCounters.computeIfPresent(plantId) { _, counter ->
+                        if (counter.decrementAndGet() <= 0) null else counter
+                    }
+                }
             }
         }
     }

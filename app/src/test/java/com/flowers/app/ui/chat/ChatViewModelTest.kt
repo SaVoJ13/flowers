@@ -19,15 +19,19 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -76,6 +80,14 @@ class ChatViewModelTest {
         var simulateInsertError: Boolean = false
         var simulateClearError: Boolean = false
         var sendChatMessageException: Throwable? = null
+        var onAfterInsertChatMessage: (suspend (Long) -> Unit)? = null
+        var onAfterBeginRetry: (suspend (Long) -> Unit)? = null
+
+        private val fakeMutexes = mutableMapOf<Long, Mutex>()
+        private fun getFakeMutex(plantId: Long) = synchronized(fakeMutexes) {
+            fakeMutexes.getOrPut(plantId) { Mutex() }
+        }
+        val sendingCounts = mutableMapOf<Long, Int>()
 
         fun setPlant(plant: PlantEntity) {
             plantsMap[plant.id] = plant
@@ -135,7 +147,34 @@ class ChatViewModelTest {
         override suspend fun identifyPlantFromPhoto(imageFile: File): IdentifyPlantResult = throw UnsupportedOperationException()
         override suspend fun diagnosePlantHealth(imageFile: File, plant: PlantEntity): DiagnosePlantHealthResult = throw UnsupportedOperationException()
 
-        override fun isPlantChatSending(plantId: Long): Boolean = activeSendingPlants.contains(plantId)
+        override fun isPlantChatSending(plantId: Long): Boolean {
+            return synchronized(sendingCounts) { (sendingCounts[plantId] ?: 0) > 0 }
+        }
+
+        override suspend fun <T> withChatSending(plantId: Long, block: suspend () -> T): T {
+            val mutex = getFakeMutex(plantId)
+            mutex.withLock {
+                synchronized(sendingCounts) {
+                    sendingCounts[plantId] = (sendingCounts[plantId] ?: 0) + 1
+                }
+            }
+            try {
+                return block()
+            } finally {
+                withContext(NonCancellable) {
+                    mutex.withLock {
+                        synchronized(sendingCounts) {
+                            val current = (sendingCounts[plantId] ?: 1) - 1
+                            if (current <= 0) {
+                                sendingCounts.remove(plantId)
+                            } else {
+                                sendingCounts[plantId] = current
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         override fun getChatMessages(plantId: Long): Flow<List<ChatMessageEntity>> = getOrCreateMessagesFlow(plantId).asStateFlow()
 
@@ -151,6 +190,7 @@ class ChatViewModelTest {
             val inserted = message.copy(id = id)
             messagesList.add(inserted)
             notifyMessagesChanged(message.plantId)
+            onAfterInsertChatMessage?.invoke(id)
             return id
         }
 
@@ -200,6 +240,7 @@ class ChatViewModelTest {
                 val updated = messagesList[idx].copy(status = MessageStatus.SENDING, errorMessage = null)
                 messagesList[idx] = updated
                 notifyMessagesChanged(plantId)
+                onAfterBeginRetry?.invoke(messageId)
                 return true
             }
             return false
@@ -216,21 +257,24 @@ class ChatViewModelTest {
         }
 
         override suspend fun recoverStaleSendingMessages(plantId: Long): Int {
-            if (activeSendingPlants.contains(plantId)) return 0
-            var count = 0
-            for (i in messagesList.indices) {
-                if (messagesList[i].plantId == plantId && messagesList[i].status == MessageStatus.SENDING) {
-                    messagesList[i] = messagesList[i].copy(
-                        status = MessageStatus.ERROR,
-                        errorMessage = "Запит перервано через перезапуск застосунку"
-                    )
-                    count++
+            val mutex = getFakeMutex(plantId)
+            return mutex.withLock {
+                if (isPlantChatSending(plantId)) return@withLock 0
+                var count = 0
+                for (i in messagesList.indices) {
+                    if (messagesList[i].plantId == plantId && messagesList[i].status == MessageStatus.SENDING) {
+                        messagesList[i] = messagesList[i].copy(
+                            status = MessageStatus.ERROR,
+                            errorMessage = "Запит перервано через перезапуск застосунку"
+                        )
+                        count++
+                    }
                 }
+                if (count > 0) {
+                    notifyMessagesChanged(plantId)
+                }
+                count
             }
-            if (count > 0) {
-                notifyMessagesChanged(plantId)
-            }
-            return count
         }
 
         override suspend fun sendPlantChatMessage(
@@ -245,13 +289,29 @@ class ChatViewModelTest {
             lastSentLanguage = language
             lastSentMessageId = currentMessageId
 
-            activeSendingPlants.add(plantId)
+            val mutex = getFakeMutex(plantId)
+            mutex.withLock {
+                synchronized(sendingCounts) {
+                    sendingCounts[plantId] = (sendingCounts[plantId] ?: 0) + 1
+                }
+            }
             try {
                 sendChatMessageException?.let { throw it }
                 sendDeferred?.await()
                 return chatResult
             } finally {
-                activeSendingPlants.remove(plantId)
+                withContext(NonCancellable) {
+                    mutex.withLock {
+                        synchronized(sendingCounts) {
+                            val current = (sendingCounts[plantId] ?: 1) - 1
+                            if (current <= 0) {
+                                sendingCounts.remove(plantId)
+                            } else {
+                                sendingCounts[plantId] = current
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -877,5 +937,68 @@ class ChatViewModelTest {
 
         assertNotNull(vm.uiState.value.errorMessage)
         assertTrue(vm.uiState.value.errorMessage!!.contains("Simulated clear error"))
+    }
+
+    // 24. Детермінований тест усунення гонки між sendMessage() та паралельним recoverStaleSendingMessages()
+    @Test
+    fun `sendMessage_concurrentRecoveryDoesNotCorruptActiveSendingMessage`() = runTest {
+        val repo = FakeChatRepository()
+        repo.setPlant(testPlant)
+        val vm = ChatViewModel(plantId = 1L, repository = repo)
+        advanceUntilIdle()
+
+        var recoveredCount = -1
+        repo.onAfterInsertChatMessage = {
+            // Симулюємо паралельний запуск відновлення в іншому потоці/екземплярі ViewModel
+            // на етапі, коли повідомлення вже вставлено в базу, але виклик Gemini ще не завершився
+            recoveredCount = repo.recoverStaleSendingMessages(1L)
+        }
+
+        repo.chatResult = PlantChatResult.Success("Відповідь моделі")
+        vm.sendMessage("Тестове запитання")
+        advanceUntilIdle()
+
+        // 1. Відновлення виявило активний статус відправки завдяки withChatSending і повернуло 0
+        assertEquals(0, recoveredCount)
+        // 2. Повідомлення користувача успішно переведено в SENT, а не в ERROR
+        assertEquals(2, vm.uiState.value.messages.size)
+        assertEquals(MessageStatus.SENT, vm.uiState.value.messages[0].status)
+        assertEquals("Тестове запитання", vm.uiState.value.messages[0].content)
+        // 3. Відповідь моделі успішно збережена
+        assertEquals(MessageStatus.SENT, vm.uiState.value.messages[1].status)
+        assertEquals("Відповідь моделі", vm.uiState.value.messages[1].content)
+        assertNull(vm.uiState.value.errorMessage)
+    }
+
+    // 25. Детермінований тест усунення гонки між retryMessage() та паралельним recoverStaleSendingMessages()
+    @Test
+    fun `retryMessage_concurrentRecoveryDoesNotCorruptRetryingMessage`() = runTest {
+        val repo = FakeChatRepository()
+        repo.setPlant(testPlant)
+        val msgId = repo.insertChatMessage(
+            ChatMessageEntity(plantId = 1L, role = MessageRole.USER, content = "Невдале запитання", status = MessageStatus.ERROR)
+        )
+        val vm = ChatViewModel(plantId = 1L, repository = repo)
+        advanceUntilIdle()
+        assertEquals(1, vm.uiState.value.messages.size)
+
+        var recoveredCount = -1
+        repo.onAfterBeginRetry = {
+            // Симулюємо виклик recovery під час виконання ретраю
+            recoveredCount = repo.recoverStaleSendingMessages(1L)
+        }
+
+        repo.chatResult = PlantChatResult.Success("Відповідь на повтор")
+        vm.retryMessage(msgId)
+        advanceUntilIdle()
+
+        // 1. Відновлення виявило активний статус відправки під час ретраю і повернуло 0
+        assertEquals(0, recoveredCount)
+        // 2. Повідомлення успішно відправлено та збережено відповідь
+        assertEquals(2, vm.uiState.value.messages.size)
+        assertEquals(MessageStatus.SENT, vm.uiState.value.messages[0].status)
+        assertEquals(MessageStatus.SENT, vm.uiState.value.messages[1].status)
+        assertEquals("Відповідь на повтор", vm.uiState.value.messages[1].content)
+        assertNull(vm.uiState.value.errorMessage)
     }
 }

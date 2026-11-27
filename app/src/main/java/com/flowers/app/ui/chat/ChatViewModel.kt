@@ -129,37 +129,45 @@ class ChatViewModel(
                 pendingClearJob?.join()
                 pendingRecoveryJob?.join()
 
-                // 1. Збереження повідомлення USER зі статусом SENDING у Room
-                val userMessage = ChatMessageEntity(
-                    plantId = plantId,
-                    role = MessageRole.USER,
-                    content = trimmed,
-                    status = MessageStatus.SENDING,
-                    errorMessage = null,
-                    timestamp = System.currentTimeMillis()
-                )
-                createdMessageId = repository.insertChatMessage(userMessage)
-                if (createdMessageId <= 0) {
-                    return@launch
-                }
+                repository.withChatSending(plantId) {
+                    // 1. Збереження повідомлення USER зі статусом SENDING у Room
+                    val userMessage = ChatMessageEntity(
+                        plantId = plantId,
+                        role = MessageRole.USER,
+                        content = trimmed,
+                        status = MessageStatus.SENDING,
+                        errorMessage = null,
+                        timestamp = System.currentTimeMillis()
+                    )
+                    createdMessageId = repository.insertChatMessage(userMessage)
+                    if (createdMessageId <= 0) {
+                        return@withChatSending
+                    }
 
-                // 2. Виклик FlowersRepository.sendPlantChatMessage
-                executeChatRequest(createdMessageId, trimmed)
+                    // 2. Виклик FlowersRepository.sendPlantChatMessage та збереження результату
+                    try {
+                        executeChatRequest(createdMessageId, trimmed)
+                    } catch (ce: CancellationException) {
+                        throw ce
+                    } catch (e: Exception) {
+                        if (createdMessageId > 0) {
+                            try {
+                                repository.updateChatMessageStatus(
+                                    createdMessageId,
+                                    MessageStatus.ERROR,
+                                    e.message ?: "Помилка збереження або обробки повідомлення"
+                                )
+                            } catch (innerCe: CancellationException) {
+                                throw innerCe
+                            } catch (_: Exception) {
+                            }
+                        }
+                        throw e
+                    }
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                if (createdMessageId > 0) {
-                    try {
-                        repository.updateChatMessageStatus(
-                            createdMessageId,
-                            MessageStatus.ERROR,
-                            e.message ?: "Помилка збереження або обробки повідомлення"
-                        )
-                    } catch (ce: CancellationException) {
-                        throw ce
-                    } catch (_: Exception) {
-                    }
-                }
                 _uiState.update { it.copy(errorMessage = e.message ?: "Помилка відправки повідомлення") }
             } finally {
                 if (activeRequestToken == token) {
@@ -202,26 +210,34 @@ class ChatViewModel(
                     return@launch
                 }
 
-                // Атомарна зміна статусу ERROR -> SENDING у БД
-                val retryStarted = repository.beginChatMessageRetry(messageId, plantId)
-                if (!retryStarted) {
-                    return@launch
-                }
+                repository.withChatSending(plantId) {
+                    // Атомарна зміна статусу ERROR -> SENDING у БД
+                    val retryStarted = repository.beginChatMessageRetry(messageId, plantId)
+                    if (!retryStarted) {
+                        return@withChatSending
+                    }
 
-                executeChatRequest(messageId, message.content)
+                    try {
+                        executeChatRequest(messageId, message.content)
+                    } catch (ce: CancellationException) {
+                        throw ce
+                    } catch (e: Exception) {
+                        try {
+                            repository.updateChatMessageStatus(
+                                messageId,
+                                MessageStatus.ERROR,
+                                e.message ?: "Помилка повтору повідомлення"
+                            )
+                        } catch (innerCe: CancellationException) {
+                            throw innerCe
+                        } catch (_: Exception) {
+                        }
+                        throw e
+                    }
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                try {
-                    repository.updateChatMessageStatus(
-                        messageId,
-                        MessageStatus.ERROR,
-                        e.message ?: "Помилка повтору повідомлення"
-                    )
-                } catch (ce: CancellationException) {
-                    throw ce
-                } catch (_: Exception) {
-                }
                 _uiState.update { it.copy(errorMessage = e.message ?: "Помилка повтору повідомлення") }
             } finally {
                 if (activeRequestToken == token) {

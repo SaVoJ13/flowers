@@ -65,4 +65,5 @@ interface FlowersRepository {
     suspend fun clearChatHistory(plantId: Long): Int
     suspend fun recoverStaleSendingMessages(plantId: Long): Int
     fun isPlantChatSending(plantId: Long): Boolean
+    suspend fun <T> withChatSending(plantId: Long, block: suspend () -> T): T = block()
 }

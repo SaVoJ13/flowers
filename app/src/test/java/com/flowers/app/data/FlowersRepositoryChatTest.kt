@@ -121,6 +121,7 @@ class FlowersRepositoryChatTest {
     private lateinit var catalogDao: CatalogDao
     private lateinit var carePodDao: CarePodDao
     private lateinit var context: Context
+    private lateinit var geminiService: GeminiPlantService
 
     private inline fun <reified T : Any> stubProxy(): T =
         Proxy.newProxyInstance(T::class.java.classLoader, arrayOf(T::class.java)) { _, m, _ ->
@@ -135,6 +136,14 @@ class FlowersRepositoryChatTest {
         catalogDao = stubProxy()
         carePodDao = stubProxy()
         context = object : ContextWrapper(null) {}
+        geminiService = GeminiPlantService(
+            catalogDao = catalogDao,
+            carePodDao = carePodDao,
+            networkChecker = object : com.flowers.app.data.remote.NetworkChecker {
+                override fun isOnline(): Boolean = true
+            },
+            generateChatText = { _, _ -> "Фікус почувається чудово." }
+        )
     }
 
     private fun testPlant(id: Long = 1L) = PlantEntity(
@@ -452,6 +461,122 @@ class FlowersRepositoryChatTest {
             } finally {
                 deferred1.complete(Unit)
                 job1.cancel()
+            }
+        }
+    }
+
+    // 7. withChatSending координує життєвий цикл і захищає повідомлення від передчасного recovery
+    @Test
+    fun `withChatSending_coordinatesWithRecoveryOnSamePlant_preventsMarkingAsError`() = runBlocking {
+        val chatMessageDao = FakeChatMessageDao()
+        val plantDao = FakePlantDao().apply {
+            plantToReturn = PlantEntity(id = 1L, customName = "Тест", speciesName = "Тест", botanicalName = "Test")
+        }
+        val repo = FlowersRepositoryImpl(
+            plantDao = plantDao,
+            careEventDao = careEventDao,
+            catalogDao = catalogDao,
+            carePodDao = carePodDao,
+            context = context,
+            chatMessageDao = chatMessageDao,
+            geminiPlantService = geminiService
+        )
+
+        withTimeout(5_000L) {
+            val insideBlockEntered = CompletableDeferred<Unit>()
+            val allowBlockExit = CompletableDeferred<Unit>()
+            var recoveryResultInside = -1
+
+            val sendingJob = launch(Dispatchers.IO) {
+                repo.withChatSending(1L) {
+                    // 1. Вставляємо повідомлення зі статусом SENDING
+                    chatMessageDao.insertMessage(
+                        ChatMessageEntity(id = 100L, plantId = 1L, role = com.flowers.app.data.local.entity.MessageRole.USER, content = "Питання", status = MessageStatus.SENDING)
+                    )
+                    insideBlockEntered.complete(Unit)
+                    // Очікуємо команди на вихід
+                    allowBlockExit.await()
+                }
+            }
+
+            try {
+                insideBlockEntered.await()
+                assertTrue(repo.isPlantChatSending(1L))
+
+                // 2. Паралельно викликаємо відновлення для тієї самої рослини
+                recoveryResultInside = repo.recoverStaleSendingMessages(1L)
+
+                // Відновлення виявило активний стан і не торкнулося повідомлення
+                assertEquals(0, recoveryResultInside)
+                val msgInside = chatMessageDao.getById(100L)
+                assertEquals(MessageStatus.SENDING, msgInside?.status)
+
+                // 3. Дозволяємо завершити блок withChatSending
+                allowBlockExit.complete(Unit)
+                sendingJob.join()
+
+                assertFalse(repo.isPlantChatSending(1L))
+
+                // 4. Після завершення сесії відправки (якщо повідомлення залишилося SENDING, симулюючи збій процесу)
+                // наступний виклик recovery успішно переводить його в ERROR
+                val recoveryResultAfter = repo.recoverStaleSendingMessages(1L)
+                assertEquals(1, recoveryResultAfter)
+                val msgAfter = chatMessageDao.getById(100L)
+                assertEquals(MessageStatus.ERROR, msgAfter?.status)
+            } finally {
+                allowBlockExit.complete(Unit)
+                sendingJob.cancel()
+            }
+        }
+    }
+
+    // 8. recoverStaleSendingMessages для іншої рослини не блокується активною відправкою
+    @Test
+    fun `withChatSending_onDifferentPlants_doesNotBlockEachOther`() = runBlocking {
+        val chatMessageDao = FakeChatMessageDao()
+        chatMessageDao.insertMessage(
+            ChatMessageEntity(id = 200L, plantId = 2L, role = com.flowers.app.data.local.entity.MessageRole.USER, content = "Старе для рослини 2", status = MessageStatus.SENDING)
+        )
+        val plantDao = FakePlantDao().apply {
+            plantToReturn = PlantEntity(id = 1L, customName = "Тест 1", speciesName = "Тест 1", botanicalName = "Test 1")
+        }
+        val repo = FlowersRepositoryImpl(
+            plantDao = plantDao,
+            careEventDao = careEventDao,
+            catalogDao = catalogDao,
+            carePodDao = carePodDao,
+            context = context,
+            chatMessageDao = chatMessageDao,
+            geminiPlantService = geminiService
+        )
+
+        withTimeout(5_000L) {
+            val plant1Entered = CompletableDeferred<Unit>()
+            val allowPlant1Exit = CompletableDeferred<Unit>()
+
+            val plant1Job = launch(Dispatchers.IO) {
+                repo.withChatSending(1L) {
+                    plant1Entered.complete(Unit)
+                    allowPlant1Exit.await()
+                }
+            }
+
+            try {
+                plant1Entered.await()
+                assertTrue(repo.isPlantChatSending(1L))
+                assertFalse(repo.isPlantChatSending(2L))
+
+                // Рослина 2 успішно відновлюється без жодного блокування рослиною 1
+                val recoveredPlant2 = repo.recoverStaleSendingMessages(2L)
+                assertEquals(1, recoveredPlant2)
+                val msg2 = chatMessageDao.getById(200L)
+                assertEquals(MessageStatus.ERROR, msg2?.status)
+
+                allowPlant1Exit.complete(Unit)
+                plant1Job.join()
+            } finally {
+                allowPlant1Exit.complete(Unit)
+                plant1Job.cancel()
             }
         }
     }

@@ -52,7 +52,7 @@ object PlantChatContextBuilder {
         userQuestion: String,
         language: String = "uk"
     ): PlantChatPrompt {
-        val normalizedLangCode = language.trim().lowercase().ifBlank { "uk" }
+        val normalizedLangCode = language.trim().lowercase().split("-", "_")[0].ifBlank { "uk" }
         val targetLanguageName = SUPPORTED_LANGUAGES[normalizedLangCode] ?: SUPPORTED_LANGUAGES["uk"]!!
 
         val sanitizedQuestion = sanitizeText(userQuestion, MAX_USER_QUESTION_CHARS)
@@ -64,10 +64,10 @@ object PlantChatContextBuilder {
             .take(MAX_CARE_EVENTS)
 
         // 2. Детермінований відбір завершених повідомлень (тільки поточна рослина, статус SENT, не дублює поточне питання)
-        val trimmedQuestion = sanitizedQuestion.trim()
+        val normalizedQuestion = sanitizedQuestion.trim().lowercase()
         val validChatHistory = chatHistory
             .filter { it.plantId == plant.id && it.status == MessageStatus.SENT }
-            .filter { it.content.trim() != trimmedQuestion }
+            .filter { it.content.trim().lowercase() != normalizedQuestion }
             .sortedWith(compareBy<ChatMessageEntity> { it.timestamp }.thenBy { it.id })
             .takeLast(MAX_CHAT_MESSAGES)
 
@@ -75,12 +75,20 @@ object PlantChatContextBuilder {
 
         // Побудова блоків даних із контролем бюджету символів
         var currentChatList = validChatHistory
-        var userPrompt = constructUserPrompt(plant, validEvents, currentChatList, sanitizedQuestion)
+        var currentEventList = validEvents
+        var userPrompt = constructUserPrompt(plant, currentEventList, currentChatList, sanitizedQuestion)
 
-        // Механізм контролю загального обсягу: якщо загальний промпт перевищує ліміт, скорочуємо старіші репліки
+        // Механізм контролю загального обсягу:
+        // 1. Спочатку скорочуємо старіші репліки діалогу
         while ((systemInstruction.length + userPrompt.length) > MAX_TOTAL_PROMPT_CHARS && currentChatList.isNotEmpty()) {
             currentChatList = currentChatList.drop(1)
-            userPrompt = constructUserPrompt(plant, validEvents, currentChatList, sanitizedQuestion)
+            userPrompt = constructUserPrompt(plant, currentEventList, currentChatList, sanitizedQuestion)
+        }
+
+        // 2. Якщо ліміт все одно перевищено, скорочуємо старіші події догляду
+        while ((systemInstruction.length + userPrompt.length) > MAX_TOTAL_PROMPT_CHARS && currentEventList.isNotEmpty()) {
+            currentEventList = currentEventList.dropLast(1)
+            userPrompt = constructUserPrompt(plant, currentEventList, currentChatList, sanitizedQuestion)
         }
 
         val combinedPrompt = """
@@ -130,7 +138,7 @@ $userPrompt
                 appendLine("Ботанічна назва: ${sanitizeText(plant.botanicalName, MAX_TEXT_FIELD_CHARS)}")
             }
             appendLine("Кімната / розташування: ${sanitizeText(plant.roomLocation, MAX_TEXT_FIELD_CHARS)}")
-            appendLine("Освітлення: ${plant.lightLevel}")
+            appendLine("Освітлення: ${sanitizeText(plant.lightLevel, MAX_TEXT_FIELD_CHARS)}")
             appendLine("Базовий інтервал перевірки ґрунту: кожні ${plant.checkIntervalDays} днів")
             if (plant.lastWateredDate != null) {
                 appendLine("Останній зафіксований полив: ${dateFormat.format(Date(plant.lastWateredDate))}")
@@ -161,7 +169,7 @@ $userPrompt
                         "DELAY" -> "Перевірено (ґрунт вологий, відкладено на ${event.daysDelayed ?: 2} дн.)"
                         "SKIP" -> "Пропущено цикл перевірки"
                         "HEALTH_CHECK" -> "Діагностика здоров'я"
-                        else -> event.eventType
+                        else -> sanitizeText(event.eventType, MAX_TEXT_FIELD_CHARS)
                     }
                     val notesPart = if (!event.notes.isNullOrBlank()) {
                         ": ${sanitizeText(event.notes, MAX_NOTE_CHARS)}"

@@ -107,6 +107,27 @@ class GeminiPlantServiceChatTest {
         val s2 = service(chatGenerator = { "    \n   " })
         val r2 = s2.sendPlantChatMessage(prompt, plantId = 1L)
         assertTrue(r2 is PlantChatResult.InvalidResponse)
+
+        val s3 = service(chatGenerator = { null })
+        val r3 = s3.sendPlantChatMessage(prompt, plantId = 1L)
+        assertTrue(r3 is PlantChatResult.InvalidResponse)
+    }
+
+    @Test
+    fun `cancellationException isRethrownAndNotSwallowed`() = runBlocking {
+        val s = service(chatGenerator = {
+            throw kotlinx.coroutines.CancellationException("User left chat screen")
+        })
+        val prompt = PlantChatContextBuilder.buildPrompt(testPlant(), emptyList(), emptyList(), "Питання", "uk")
+
+        var caughtCancellation = false
+        try {
+            s.sendPlantChatMessage(prompt, plantId = 1L)
+        } catch (_: kotlinx.coroutines.CancellationException) {
+            caughtCancellation = true
+        }
+
+        assertTrue("CancellationException має прокидатися далі", caughtCancellation)
     }
 
     @Test

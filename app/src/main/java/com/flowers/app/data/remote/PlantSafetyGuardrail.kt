@@ -6,17 +6,37 @@ package com.flowers.app.data.remote
  */
 object PlantSafetyGuardrail {
 
+    // Безпечні ботанічні терміни, що містять корінь "хлор", але є нормальними біологічними назвами / симптомами
+    private val SAFE_BOTANICAL_ROOTS = listOf(
+        "хлорофіт", "хлороз", "хлорофіл", "хлоропласт",
+        "chlorophyt", "chloros", "chlorophyll", "chloroplast"
+    )
+
     private val UNSAFE_KEYWORDS = listOf(
-        // Отрутохімікати та пестициди
+        // Отрутохімікати та пестициди (UK / RU / EN)
         "пестицид", "інсектицид", "фунгіцид", "гербіцид", "отрутохімікат", "хімікат",
-        "дихлофос", "актара", "актеллік", "хлор", "білизна", "мідний купорос",
+        "дихлофос", "актара", "актеллік", "білизн", "мідний купорос",
         "залізний купорос", "фундазол", "бордоськ", "марганцівк", "формалін",
-        "гас", "бензин", "ацетон", "дихлофос", "фосфамід", "карбофос",
+        "бензин", "ацетон", "фосфамід", "карбофос",
+        // Російські токсичні еквіваленти
+        "инсектицид", "фунгицид", "гербицид", "отрутохимикат", "химикат",
+        "актеллик", "белизн", "медный купорос", "железный купорос",
+        "бордосск", "марганцовк", "керосин",
         // English equivalents
         "pesticide", "insecticide", "fungicide", "herbicide", "bleach", "chlorine",
         "dichlorvos", "copper sulfate", "formalin", "kerosene", "petrol", "acetone",
         // Небезпечні суміші та концентрати
-        "концентрат", "нерозведений", "окріп", "кип'яток", "сірчана кислота", "соляна кислота"
+        "концентрат", "нерозведений", "нерастворенный", "окріп", "окроп", "кип'яток", "кип'ятк", "кипяток", "кипятк",
+        "сірчана кислота", "соляна кислота", "серная кислота", "соляная кислота",
+        "sulfuric acid", "hydrochloric acid", "boiling water"
+    )
+
+    // Регулярні вирази для слів із короткими коренями, які потребують перевірки меж слів
+    private val STANDALONE_UNSAFE_PATTERNS = listOf(
+        // "хлор", "хлором", "хлору", "хлорі" (якщо не ботанічний термін)
+        Regex("(?<!\\p{L})хлор(?:ом|у|і|а|ний|ная|ное|ні|ная|ный)?(?!\\p{L})", RegexOption.IGNORE_CASE),
+        // "гас", "гасом", "гасу", "гасі" (керасин українською; не плутати зі "згасає", "погасне")
+        Regex("(?<!\\p{L})гас(?:ом|у|і)?(?!\\p{L})", RegexOption.IGNORE_CASE)
     )
 
     val SAFE_DEFAULT_FIRST_AID_STEPS = listOf(
@@ -35,7 +55,21 @@ object PlantSafetyGuardrail {
      */
     fun containsUnsafeAdvice(steps: List<String>): Boolean {
         for (step in steps) {
-            val lower = step.lowercase()
+            var lower = step.lowercase()
+
+            // 1. Спочатку перевіряємо специфічні патерни (хлор, гас) з виключенням безпечних ботанічних назв
+            var textWithoutBotanical = lower
+            for (safeRoot in SAFE_BOTANICAL_ROOTS) {
+                textWithoutBotanical = textWithoutBotanical.replace(safeRoot, "safe_botanical")
+            }
+
+            for (pattern in STANDALONE_UNSAFE_PATTERNS) {
+                if (pattern.containsMatchIn(textWithoutBotanical)) {
+                    return true
+                }
+            }
+
+            // 2. Перевіряємо загальні ключові слова
             for (keyword in UNSAFE_KEYWORDS) {
                 if (lower.contains(keyword)) {
                     return true

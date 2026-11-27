@@ -214,6 +214,10 @@ class PlantChatContextBuilderTest {
 
         assertFalse("Поточне питання не повинно дублюватися в історії діалогу", dialogueSection.contains("Скільки води потрібно?"))
         assertTrue("Відповідь моделі повинна залишитись", dialogueSection.contains("Близько 200 мл"))
+
+        val promptLower = PlantChatContextBuilder.buildPrompt(plant, emptyList(), messages, "скільки води потрібно?", "uk")
+        val dialogueLower = promptLower.userPrompt.substringAfter("<dialogue_history>").substringBefore("</dialogue_history>")
+        assertFalse("Поточне питання в іншому регістрі також не повинно дублюватися", dialogueLower.contains("Скільки води потрібно?"))
     }
 
     @Test
@@ -275,6 +279,12 @@ class PlantChatContextBuilderTest {
 
         val fallbackPrompt = PlantChatContextBuilder.buildPrompt(plant, emptyList(), emptyList(), "Test", "fr")
         assertTrue(fallbackPrompt.systemInstruction.contains("українська"))
+
+        val enUsPrompt = PlantChatContextBuilder.buildPrompt(plant, emptyList(), emptyList(), "Hello", "en-US")
+        assertTrue(enUsPrompt.systemInstruction.contains("English"))
+
+        val ukUaPrompt = PlantChatContextBuilder.buildPrompt(plant, emptyList(), emptyList(), "Привіт", "uk_UA")
+        assertTrue(ukUaPrompt.systemInstruction.contains("українська"))
     }
 
     @Test

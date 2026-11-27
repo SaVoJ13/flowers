@@ -155,6 +155,10 @@ class FlowersRepositoryImpl(
         userQuestion: String,
         language: String
     ): com.flowers.app.data.remote.PlantChatResult = withContext(Dispatchers.IO) {
+        if (userQuestion.isBlank()) {
+            return@withContext com.flowers.app.data.remote.PlantChatResult.ServiceError("Запитання не може бути порожнім.")
+        }
+
         val plant = plantDao.getPlantById(plantId)
             ?: return@withContext com.flowers.app.data.remote.PlantChatResult.ServiceError("Рослину з ID $plantId не знайдено.")
 

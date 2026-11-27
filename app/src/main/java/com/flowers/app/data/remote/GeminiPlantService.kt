@@ -668,18 +668,15 @@ class GeminiPlantService(
         }
 
         try {
-            val rawResponse = kotlinx.coroutines.withTimeoutOrNull(20_000L) {
+            val rawResponse = kotlinx.coroutines.withTimeout(20_000L) {
                 generateChatText(prompt.combinedPrompt)
             }
 
-            if (rawResponse == null) {
-                return@withContext PlantChatResult.Timeout()
+            if (rawResponse.isNullOrBlank()) {
+                return@withContext PlantChatResult.InvalidResponse()
             }
 
             val trimmed = rawResponse.trim()
-            if (trimmed.isBlank()) {
-                return@withContext PlantChatResult.InvalidResponse()
-            }
 
             // Додатковий захист: верифікація через PlantSafetyGuardrail на отрутохімікати/токсичні суміші
             val (sanitizedReply, isSanitized) = if (PlantSafetyGuardrail.containsUnsafeAdvice(listOf(trimmed))) {
@@ -692,7 +689,11 @@ class GeminiPlantService(
             }
 
             PlantChatResult.Success(sanitizedReply, isSanitized)
-        } catch (e: Throwable) {
+        } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+            PlantChatResult.Timeout()
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
             mapChatError(e)
         } finally {
             mutex.unlock()
@@ -705,6 +706,7 @@ class GeminiPlantService(
             AiErrorMapper.MSG_TIMEOUT -> PlantChatResult.Timeout(errorMsg)
             AiErrorMapper.MSG_NO_INTERNET -> PlantChatResult.Offline(errorMsg)
             AiErrorMapper.MSG_RATE_LIMIT -> PlantChatResult.RateLimited(errorMsg)
+            AiErrorMapper.MSG_UNKNOWN -> PlantChatResult.ServiceError("Не вдалося отримати відповідь від помічника. Перевірте підключення до інтернету та спробуйте ще раз.")
             else -> PlantChatResult.ServiceError(errorMsg)
         }
     }

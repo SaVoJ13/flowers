@@ -21,9 +21,12 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -150,31 +153,128 @@ class FlowersRepositoryImpl(
         return geminiPlantService.diagnosePlantHealth(imageFile, plant, lastWatering?.timestamp)
     }
 
+    private val activeSendingCounters = java.util.concurrent.ConcurrentHashMap<Long, java.util.concurrent.atomic.AtomicInteger>()
+    private val plantMutexes = java.util.concurrent.ConcurrentHashMap<Long, Mutex>()
+
+    private fun getPlantMutex(plantId: Long): Mutex {
+        return plantMutexes.computeIfAbsent(plantId) { Mutex() }
+    }
+
+    override fun isPlantChatSending(plantId: Long): Boolean {
+        return (activeSendingCounters[plantId]?.get() ?: 0) > 0
+    }
+
+    override suspend fun <T> withChatSending(plantId: Long, block: suspend () -> T): T {
+        val mutex = getPlantMutex(plantId)
+        mutex.withLock {
+            activeSendingCounters.compute(plantId) { _, existing ->
+                (existing ?: java.util.concurrent.atomic.AtomicInteger(0)).apply { incrementAndGet() }
+            }
+        }
+        try {
+            return block()
+        } finally {
+            withContext(NonCancellable) {
+                mutex.withLock {
+                    activeSendingCounters.computeIfPresent(plantId) { _, counter ->
+                        if (counter.decrementAndGet() <= 0) null else counter
+                    }
+                }
+            }
+        }
+    }
+
+    override fun getChatMessages(plantId: Long): Flow<List<com.flowers.app.data.local.entity.ChatMessageEntity>> {
+        return chatMessageDao?.observeMessages(plantId) ?: kotlinx.coroutines.flow.flowOf(emptyList())
+    }
+
+    override suspend fun getChatMessageById(messageId: Long): com.flowers.app.data.local.entity.ChatMessageEntity? {
+        return chatMessageDao?.getById(messageId)
+    }
+
+    override suspend fun insertChatMessage(message: com.flowers.app.data.local.entity.ChatMessageEntity): Long {
+        return chatMessageDao?.insertMessage(message) ?: -1L
+    }
+
+    override suspend fun updateChatMessageStatus(
+        messageId: Long,
+        status: com.flowers.app.data.local.entity.MessageStatus,
+        errorMessage: String?
+    ): Boolean {
+        val rows = chatMessageDao?.updateStatus(messageId, status, errorMessage) ?: 0
+        return rows > 0
+    }
+
+    override suspend fun saveAssistantResponse(
+        userMessageId: Long,
+        modelMessage: com.flowers.app.data.local.entity.ChatMessageEntity
+    ): Long {
+        return chatMessageDao?.saveAssistantResponse(userMessageId, modelMessage) ?: -1L
+    }
+
+    override suspend fun beginChatMessageRetry(messageId: Long, plantId: Long): Boolean {
+        val rows = chatMessageDao?.beginRetryForPlant(messageId, plantId) ?: 0
+        return rows > 0
+    }
+
+    override suspend fun clearChatHistory(plantId: Long): Int {
+        return chatMessageDao?.deleteAllForPlant(plantId) ?: 0
+    }
+
+    override suspend fun recoverStaleSendingMessages(plantId: Long): Int {
+        val mutex = getPlantMutex(plantId)
+        return mutex.withLock {
+            if (isPlantChatSending(plantId)) {
+                return@withLock 0
+            }
+            chatMessageDao?.markSendingAsErrorForPlant(
+                plantId,
+                "Запит перервано через перезапуск застосунку"
+            ) ?: 0
+        }
+    }
+
     override suspend fun sendPlantChatMessage(
         plantId: Long,
         userQuestion: String,
         language: String,
         currentMessageId: Long?
     ): com.flowers.app.data.remote.PlantChatResult = withContext(Dispatchers.IO) {
-        if (userQuestion.isBlank()) {
-            return@withContext com.flowers.app.data.remote.PlantChatResult.ServiceError("Запитання не може бути порожнім.")
+        val mutex = getPlantMutex(plantId)
+        mutex.withLock {
+            activeSendingCounters.compute(plantId) { _, existing ->
+                (existing ?: java.util.concurrent.atomic.AtomicInteger(0)).apply { incrementAndGet() }
+            }
         }
+        try {
+            if (userQuestion.isBlank()) {
+                return@withContext com.flowers.app.data.remote.PlantChatResult.ServiceError("Запитання не може бути порожнім.")
+            }
 
-        val plant = plantDao.getPlantById(plantId)
-            ?: return@withContext com.flowers.app.data.remote.PlantChatResult.ServiceError("Рослину з ID $plantId не знайдено.")
+            val plant = plantDao.getPlantById(plantId)
+                ?: return@withContext com.flowers.app.data.remote.PlantChatResult.ServiceError("Рослину з ID $plantId не знайдено.")
 
-        val careEvents = careEventDao.getRecentEventsForPlant(plantId, limit = com.flowers.app.domain.PlantChatContextBuilder.MAX_CARE_EVENTS)
-        val chatHistory = chatMessageDao?.getLastSentMessages(plantId, limit = com.flowers.app.domain.PlantChatContextBuilder.MAX_CHAT_MESSAGES) ?: emptyList()
+            val careEvents = careEventDao.getRecentEventsForPlant(plantId, limit = com.flowers.app.domain.PlantChatContextBuilder.MAX_CARE_EVENTS)
+            val chatHistory = chatMessageDao?.getLastSentMessages(plantId, limit = com.flowers.app.domain.PlantChatContextBuilder.MAX_CHAT_MESSAGES) ?: emptyList()
 
-        val prompt = com.flowers.app.domain.PlantChatContextBuilder.buildPrompt(
-            plant = plant,
-            careEvents = careEvents,
-            chatHistory = chatHistory,
-            userQuestion = userQuestion,
-            language = language,
-            currentMessageId = currentMessageId
-        )
+            val prompt = com.flowers.app.domain.PlantChatContextBuilder.buildPrompt(
+                plant = plant,
+                careEvents = careEvents,
+                chatHistory = chatHistory,
+                userQuestion = userQuestion,
+                language = language,
+                currentMessageId = currentMessageId
+            )
 
-        geminiPlantService.sendPlantChatMessage(prompt, plantId)
+            geminiPlantService.sendPlantChatMessage(prompt, plantId)
+        } finally {
+            withContext(NonCancellable) {
+                mutex.withLock {
+                    activeSendingCounters.computeIfPresent(plantId) { _, counter ->
+                        if (counter.decrementAndGet() <= 0) null else counter
+                    }
+                }
+            }
+        }
     }
 }

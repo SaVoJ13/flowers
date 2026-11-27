@@ -1,6 +1,6 @@
 # TASK-056 — Персональний ШІ-чат для кожної рослини з локальною історією
 
-> **Статус:** В РОБОТІ (Крок 1 та Крок 2 завершено, PR #38 і PR #40 злито; Крок 3 очікує дозволу Власника)  
+> **Статус:** В РОБОТІ (Крок 1 та Крок 2 завершено, PR #38 і PR #40 злито; Крок 3 реалізовано, PR #41 відкрито)  
 > **Етап:** Flowers 2.0 MVP (ADR-021, `FLOWERS_2_0_MVP_PLAN.md`)  
 > **Відповідальний:** Агент 0 (Архітектор / Керівник)
 
@@ -400,8 +400,76 @@ SQLite виконує REPLACE як DELETE + INSERT; Room вмикає foreign ke
   - Незалежний QA-аудит: `QA Verified`.
 - **Поточний стан:**
   - `TASK-056 / STEP 2` — ЗАВЕРШЕНО.
-  - `TASK-056 / STEP 3` (ChatViewModel, інтерфейс екрана чату, інтеграція в Compose-навігацію) — ОЧІКУЄ ДОЗВОЛУ Власника.
-  - Завдання `TASK-056` загалом залишається відкритим.
+  - `TASK-056 / STEP 3` — В РОБОТІ (дозволено Власником).
+
+---
+
+## Журнал виконання: Крок 3 (ChatViewModel та керування життєвим циклом чату) — 2026-11-27
+
+**Статус кроку 3:** РЕАЛІЗОВАНО. Оформлено PR, проведено повне тестування, очікує QA та рішення Власника.
+
+### Реалізовані компоненти:
+1. **`ChatMessageDao` (атомарність та безпека):**
+   - Перетворено з `interface` на `abstract class ChatMessageDao` для підтримки транзакційного методу `@Transaction open suspend fun saveAssistantResponse(userMessageId: Long, modelMessage: ChatMessageEntity): Long`.
+   - В `saveAssistantResponse`:
+     - Перевіряється наявність та статус повідомлення користувача (`userMsg != null && userMsg.status == SENDING`).
+     - Якщо повідомлення було скасовано, видалено або чат очищено — оновлення не відбувається, модельне повідомлення не записується (запобігання «повідомленням-привидам»).
+     - Атомарно в одній SQLite-транзакції: статус користувача перемикається на `SENT`, очищається `errorMessage`, вставляється повідомлення моделі.
+   - Додано `beginRetryForPlant(id: Long, plantId: Long): Int`: безпечний ретрай лише в межах відповідної рослини зі статусу `ERROR` у `SENDING`.
+   - Додано `markSendingAsErrorForPlant(plantId: Long, errorMessage: String): Int`: маркування незавершених запитів при відновленні після перезапуску процесу суворо для конкретної рослини.
+
+2. **`FlowersRepository` та `FlowersRepositoryImpl`:**
+   - Додано методи:
+     - `getChatMessages(plantId: Long): Flow<List<ChatMessageEntity>>`
+     - `getChatMessageById(messageId: Long): ChatMessageEntity?`
+     - `insertChatMessage(message: ChatMessageEntity): Long`
+     - `updateChatMessageStatus(messageId: Long, status: MessageStatus, errorMessage: String?): Boolean`
+     - `beginChatMessageRetry(messageId: Long, plantId: Long): Boolean`
+     - `clearChatHistory(plantId: Long): Int`
+     - `saveAssistantResponse(userMessageId: Long, modelMessage: ChatMessageEntity): Long`
+     - `recoverStaleSendingMessages(plantId: Long): Int`
+     - `isPlantChatSending(plantId: Long): Boolean`
+     - `withChatSending(plantId: Long, block: suspend () -> T): T`
+   - Координація життєвого циклу повідомлень та усунення TOCTOU-гонки між `sendMessage()`/`retryMessage()` та `recoverStaleSendingMessages()`:
+     - Впроваджено ізольовану по рослинах синхронізацію через `plantMutexes: ConcurrentHashMap<Long, Mutex>()`.
+     - `withChatSending(plantId)` під м'ютексом рослини реєструє початок відправки в `activeSendingCounters` ще ДО запису репліки у статусі `SENDING` у SQLite і звільняє стан у `finally` під `withContext(NonCancellable)` лише тоді, коли репліка вже досягла фінального статусу (`SENT` або `ERROR`).
+     - `recoverStaleSendingMessages(plantId)` перевіряє `isPlantChatSending(plantId)` під тим самим м'ютексом рослини: якщо відправка активна, відновлення повертає 0 і ніколи не зачіпає активні репліки.
+     - Різні рослини мають незалежні м'ютекси і лічильники, тому чати різних рослин ніколи не блокують один одного.
+     - Після реального збою процесу (`process death`) пам'ять скидається, лічильник дорівнює нулю, і `recoverStaleSendingMessages` коректно переводить осиротілі `SENDING` повідомлення в `ERROR`.
+
+3. **`ChatViewModel` (`com.flowers.app.ui.chat`):**
+   - Створено `ChatUiState(plant, messages, isSending, isLoading, errorMessage)`.
+   - Синхронний дебаунс: прапорець `_uiState.value.isSending` блокує повторні виклики `sendMessage` та `retryMessage` синхронно в тому самому кадрі ще до запуску та перемикання корутин.
+   - Координація з репозиторієм: усі операції `sendMessage` та `retryMessage` обгорнуто у `repository.withChatSending(plantId)`, що унеможливлює помилкове переведення активного повідомлення у статус `ERROR` іншим екземпляром ViewModel чи процесом відновлення.
+   - Серіалізація та усунення гонки в `clearChat()`: гарантоване виконання `clearChatHistory` після скасування `activeJob` та `previousClearJob`, очікування `clearJob` у `sendMessage()`/`retryMessage()`, прив'язка очищення статусу `isSending` до монотонного `activeRequestToken`.
+   - Реактивне оновлення: стан підписується на `getChatMessages(plantId)` та `getPlantFlowById(plantId)`.
+   - Перевірка існування рослини перед відправкою (захист від `SQLiteConstraintException` при каскаді).
+   - Захист від падінь при винятках SQLite/Room через перехоплення `Exception` із переведенням `USER` у `ERROR` ще всередині `withChatSending`.
+   - Автоматичне відновлення після `process death` для поточної рослини при створенні ViewModel з очікуванням завершення відновлення перед новими запитами.
+   - Валідація введення (ігнорування порожніх рядків, ліміт `MAX_QUESTION_LENGTH = 500`).
+   - Обробка типів результатів `PlantChatResult` (Success, Offline, RateLimited, Timeout, InvalidResponse, ServiceError).
+   - Безпечне прокидання `CancellationException`.
+   - Фабрика `ChatViewModel.provideFactory(plantId, repository, language)`.
+
+4. **Тестування:**
+   - `ChatViewModelTest`: 25 вичерпних сценаріїв (синхронний дебаунс `sendMessage` та `retryMessage`, блокування подвійного кліку в одному кадрі, збереження моделі, ретраї, очищення із серіалізацією та очікуванням `clearJob`, негайний send/retry після `clearChat`, відновлення після збою процесу, паралельні одночасні чати двох рослин, перевірка null-рослини, ліміт символів 500, безпечне прокидання `CancellationException`, обробка винятків БД, детермінований тест усунення гонки між `sendMessage` та `recoverStaleSendingMessages`, детермінований тест усунення гонки між `retryMessage` та `recoverStaleSendingMessages`).
+   - `ChatMessageDaoTest`: 3 розширених інструментальних тести (атомарне збереження, відхилення не-USER та не-SENDING реплік, безпечний ретрай з ізоляцією за `plantId`, відновлення незавершених повідомлень).
+   - `FlowersRepositoryChatTest`: 8 детальних тестів для всіх методів чату в репозиторії, включно з `activeSendingCounters`, перехресними викликами, координацією `withChatSending` з відновленням на одній рослині та повною ізоляцією різних рослин.
+   - Fakes оновлено у `DiagnosisViewModelTest`, `PlantsViewModelTest`, `TodayViewModelTest`.
+   - Усі 321 JVM unit-тестів пройшли успішно (100% pass).
+   - Інструментальні тести `ChatMessageDaoTest`: 13/13 PASSED на емуляторі `small_phone` (ізольована тестова SQLite БД), загальний набір Room v4 / Chat: 49/49 PASSED.
+
+---
+
+## 7. Зміна продуктового плану (Погодження Власника: Мультимодальний чат)
+
+> **Рішення Власника (2026-11-27):** Додавання фотографій під час консультації затверджено як обов'язкову функцію Flowers 2.0 MVP.  
+> **Межі PR №41:** PR №41 залишається суворо реалізацією текстового фундаменту `ChatViewModel`, репозиторію та життєвого циклу чату.  
+> **Наступні кроки перед STEP 4:**
+> 1. Після завершення та злиття PR №41 необхідно окремо розробити та погодити з Власником архітектуру вкладень (фотографій) і мультимодального чату (зберігання файлів зображень, прив'язка до `ChatMessageEntity`, передача в `GeminiPlantService` через мультимодальний промпт).
+> 2. Лише після окремого погодження архітектури вкладень розпочинати STEP 4 (UI та навігація `PlantChatScreen`).
+> 3. У межах PR №41 фотографії, додаткові міграції Room, UI або навігація НЕ реалізуються.
+
 
 
 

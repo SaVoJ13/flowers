@@ -118,6 +118,15 @@ class DiagnosisViewModelTest {
             return diagnoseHealthResult
         }
         override suspend fun sendPlantChatMessage(plantId: Long, userQuestion: String, language: String, currentMessageId: Long?): com.flowers.app.data.remote.PlantChatResult = throw UnsupportedOperationException()
+        override fun getChatMessages(plantId: Long): kotlinx.coroutines.flow.Flow<List<com.flowers.app.data.local.entity.ChatMessageEntity>> = kotlinx.coroutines.flow.emptyFlow()
+        override suspend fun getChatMessageById(messageId: Long): com.flowers.app.data.local.entity.ChatMessageEntity? = null
+        override suspend fun insertChatMessage(message: com.flowers.app.data.local.entity.ChatMessageEntity): Long = 0L
+        override suspend fun updateChatMessageStatus(messageId: Long, status: com.flowers.app.data.local.entity.MessageStatus, errorMessage: String?): Boolean = true
+        override suspend fun saveAssistantResponse(userMessageId: Long, modelMessage: com.flowers.app.data.local.entity.ChatMessageEntity): Long = 0L
+        override suspend fun beginChatMessageRetry(messageId: Long, plantId: Long): Boolean = false
+        override suspend fun clearChatHistory(plantId: Long): Int = 0
+        override suspend fun recoverStaleSendingMessages(plantId: Long): Int = 0
+        override fun isPlantChatSending(plantId: Long): Boolean = false
     }
 
     @Test

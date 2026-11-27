@@ -50,6 +50,7 @@ class ChatViewModel(
     val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
 
     private var activeJob: Job? = null
+    private var clearJob: Job? = null
     private var activeRequestToken: Long = 0L
 
     init {
@@ -264,12 +265,14 @@ class ChatViewModel(
      */
     fun clearChat() {
         val previousJob = activeJob
+        val previousClearJob = clearJob
         previousJob?.cancel()
         activeJob = null
         val token = ++activeRequestToken
         _uiState.update { it.copy(isSending = false) }
-        viewModelScope.launch {
+        clearJob = viewModelScope.launch {
             previousJob?.join()
+            previousClearJob?.join()
             if (activeRequestToken == token) {
                 repository.clearChatHistory(plantId)
             }

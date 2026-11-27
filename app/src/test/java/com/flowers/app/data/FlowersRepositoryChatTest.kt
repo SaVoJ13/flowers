@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -362,80 +363,96 @@ class FlowersRepositoryChatTest {
 
     @Test
     fun `concurrentOverlappingRequestsForSamePlant_maintainAtomicCounter`() = runBlocking {
-        val deferred1 = CompletableDeferred<Unit>()
-        val entered2 = CompletableDeferred<Unit>()
-        val proceed2 = CompletableDeferred<Unit>()
+        withTimeout(5_000L) {
+            val entered1 = CompletableDeferred<Unit>()
+            val deferred1 = CompletableDeferred<Unit>()
+            val entered2 = CompletableDeferred<Unit>()
+            val proceed2 = CompletableDeferred<Unit>()
 
-        var firstCall = true
-        val synchronizedPlantDao = object : FakePlantDao() {
-            override suspend fun getPlantById(plantId: Long): PlantEntity? {
-                if (!firstCall) {
-                    entered2.complete(Unit)
-                    proceed2.await()
+            var pauseSecondRequest = false
+            val synchronizedPlantDao = object : FakePlantDao() {
+                override suspend fun getPlantById(plantId: Long): PlantEntity? {
+                    if (pauseSecondRequest) {
+                        entered2.complete(Unit)
+                        proceed2.await()
+                    }
+                    return testPlant(plantId)
                 }
-                firstCall = false
-                return testPlant(plantId)
             }
-        }
 
-        careEventDao = Proxy.newProxyInstance(CareEventDao::class.java.classLoader, arrayOf(CareEventDao::class.java)) { _, m, _ ->
-            if (m.name == "getRecentEventsForPlant") emptyList<CareEventEntity>() else null
-        } as CareEventDao
+            careEventDao = Proxy.newProxyInstance(CareEventDao::class.java.classLoader, arrayOf(CareEventDao::class.java)) { _, m, _ ->
+                if (m.name == "getRecentEventsForPlant") emptyList<CareEventEntity>() else null
+            } as CareEventDao
 
-        val geminiService = GeminiPlantService(
-            catalogDao = catalogDao,
-            carePodDao = carePodDao,
-            networkChecker = object : com.flowers.app.data.remote.NetworkChecker {
-                override fun isOnline(): Boolean = true
-            },
-            generateChatText = { _, _ ->
-                deferred1.await()
-                "Відповідь 1"
+            val geminiService = GeminiPlantService(
+                catalogDao = catalogDao,
+                carePodDao = carePodDao,
+                networkChecker = object : com.flowers.app.data.remote.NetworkChecker {
+                    override fun isOnline(): Boolean = true
+                },
+                generateChatText = { _, _ ->
+                    entered1.complete(Unit)
+                    deferred1.await()
+                    "Відповідь 1"
+                }
+            )
+
+            val repo = FlowersRepositoryImpl(
+                plantDao = synchronizedPlantDao,
+                careEventDao = careEventDao,
+                catalogDao = catalogDao,
+                carePodDao = carePodDao,
+                context = context,
+                chatMessageDao = chatMessageDao,
+                geminiPlantService = geminiService
+            )
+
+            // 1. Запускаємо job1
+            val job1 = launch(Dispatchers.IO) {
+                repo.sendPlantChatMessage(1L, "Запит 1", "uk")
             }
-        )
 
-        val repo = FlowersRepositoryImpl(
-            plantDao = synchronizedPlantDao,
-            careEventDao = careEventDao,
-            catalogDao = catalogDao,
-            carePodDao = carePodDao,
-            context = context,
-            chatMessageDao = chatMessageDao,
-            geminiPlantService = geminiService
-        )
+            try {
+                // Очікуємо гарантованого входу job1 у generateChatText (вже захопив Mutex у GeminiPlantService)
+                entered1.await()
+                assertTrue(repo.isPlantChatSending(1L))
 
-        val job1 = CoroutineScope(Dispatchers.IO).launch {
-            repo.sendPlantChatMessage(1L, "Запит 1", "uk")
-        }
-        val job2 = CoroutineScope(Dispatchers.IO).launch {
-            repo.sendPlantChatMessage(1L, "Запит 2", "uk")
-        }
+                // Вмикаємо паузу для job2 перед запуском другого запиту
+                pauseSecondRequest = true
 
-        try {
-            // Очікуємо детермінованого входу другого запиту в sendPlantChatMessage
-            entered2.await()
+                // 2. Запускаємо job2
+                val job2 = launch(Dispatchers.IO) {
+                    repo.sendPlantChatMessage(1L, "Запит 2", "uk")
+                }
 
-            // Обидва запити знаходяться всередині методу, лічильник активний
-            assertTrue(repo.isPlantChatSending(1L))
+                try {
+                    // Очікуємо гарантованого входу job2 у sendPlantChatMessage (вже інкрементував counter)
+                    entered2.await()
 
-            // Завершуємо перший запит
-            deferred1.complete(Unit)
-            job1.join()
+                    // Обидва запити одночасно активні
+                    assertTrue(repo.isPlantChatSending(1L))
 
-            // Другий запит ще очікує в getPlantById (перед mutex), лічильник повинен утримувати plantId активним!
-            assertTrue("Лічильник повинен утримувати plantId активним, поки другий запит працює", repo.isPlantChatSending(1L))
+                    // Завершуємо перший запит
+                    deferred1.complete(Unit)
+                    job1.join()
 
-            // Відпускаємо другий запит
-            proceed2.complete(Unit)
-            job2.join()
+                    // Другий запит ще активний (очікує в getPlantById), тому repo.isPlantChatSending залишається true!
+                    assertTrue("Лічильник повинен утримувати plantId активним, поки другий запит працює", repo.isPlantChatSending(1L))
 
-            // Тепер обидва завершені
-            assertFalse(repo.isPlantChatSending(1L))
-        } finally {
-            deferred1.complete(Unit)
-            proceed2.complete(Unit)
-            job1.cancel()
-            job2.cancel()
+                    // Відпускаємо другий запит
+                    proceed2.complete(Unit)
+                    job2.join()
+
+                    // Тепер обидва запити завершені
+                    assertFalse(repo.isPlantChatSending(1L))
+                } finally {
+                    proceed2.complete(Unit)
+                    job2.cancel()
+                }
+            } finally {
+                deferred1.complete(Unit)
+                job1.cancel()
+            }
         }
     }
 }

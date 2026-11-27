@@ -18,6 +18,9 @@ interface CareEventDao {
     @Query("SELECT * FROM care_events ORDER BY timestamp DESC LIMIT 50")
     fun getRecentEvents(): Flow<List<CareEventEntity>>
 
+    @Query("SELECT * FROM care_events WHERE plantId = :plantId ORDER BY timestamp DESC, id DESC LIMIT :limit")
+    suspend fun getRecentEventsForPlant(plantId: Long, limit: Int = 10): List<CareEventEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEvent(event: CareEventEntity): Long
 }

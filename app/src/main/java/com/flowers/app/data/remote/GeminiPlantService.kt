@@ -158,9 +158,12 @@ class GeminiPlantService(
             text(prompt)
         }
         defaultModel.generateContent(inputContent).text
-    }
+    },
+    /** Текстовий виклик моделі для персонального ШІ-чату (TASK-056 / Крок 2). */
+    private val generateChatText: suspend (String) -> String? = { prompt -> chatModel.generateContent(prompt).text }
 ) {
     private val gson = Gson()
+    private val plantChatMutexes = java.util.concurrent.ConcurrentHashMap<Long, kotlinx.coroutines.sync.Mutex>()
 
     private companion object {
         val defaultModel by lazy {
@@ -169,6 +172,17 @@ class GeminiPlantService(
                 generationConfig = generationConfig {
                     responseMimeType = "application/json"
                     temperature = 0.2f
+                }
+            )
+        }
+
+        val chatModel by lazy {
+            Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+                modelName = GEMINI_MODEL,
+                generationConfig = generationConfig {
+                    responseMimeType = "text/plain"
+                    temperature = 0.4f
+                    maxOutputTokens = 350
                 }
             )
         }
@@ -633,6 +647,65 @@ class GeminiPlantService(
             )
         } catch (_: Exception) {
             null
+        }
+    }
+
+    /**
+     * Надсилає репліку користувача з ізольованим контекстом рослини до Gemini (TASK-056 / Крок 2).
+     */
+    suspend fun sendPlantChatMessage(
+        prompt: com.flowers.app.domain.PlantChatPrompt,
+        plantId: Long = 0L
+    ): PlantChatResult = withContext(Dispatchers.IO) {
+        if (!networkChecker.isOnline()) {
+            return@withContext PlantChatResult.Offline()
+        }
+
+        // Захист від повторних одночасних викликів для тієї самої рослини
+        val mutex = plantChatMutexes.computeIfAbsent(plantId) { kotlinx.coroutines.sync.Mutex() }
+        if (!mutex.tryLock()) {
+            return@withContext PlantChatResult.ServiceError("Попередній запит для цієї рослини ще обробляється. Зачекайте відповіді.")
+        }
+
+        try {
+            val rawResponse = kotlinx.coroutines.withTimeoutOrNull(20_000L) {
+                generateChatText(prompt.combinedPrompt)
+            }
+
+            if (rawResponse == null) {
+                return@withContext PlantChatResult.Timeout()
+            }
+
+            val trimmed = rawResponse.trim()
+            if (trimmed.isBlank()) {
+                return@withContext PlantChatResult.InvalidResponse()
+            }
+
+            // Додатковий захист: верифікація через PlantSafetyGuardrail на отрутохімікати/токсичні суміші
+            val (sanitizedReply, isSanitized) = if (PlantSafetyGuardrail.containsUnsafeAdvice(listOf(trimmed))) {
+                Pair(
+                    PlantSafetyGuardrail.SAFE_DEFAULT_FIRST_AID_STEPS.joinToString("\n") + "\n\n" + PlantSafetyGuardrail.SAFETY_NOTICE_MODIFIED,
+                    true
+                )
+            } else {
+                Pair(trimmed, false)
+            }
+
+            PlantChatResult.Success(sanitizedReply, isSanitized)
+        } catch (e: Throwable) {
+            mapChatError(e)
+        } finally {
+            mutex.unlock()
+        }
+    }
+
+    private fun mapChatError(e: Throwable): PlantChatResult {
+        val errorMsg = AiErrorMapper.map(e)
+        return when (errorMsg) {
+            AiErrorMapper.MSG_TIMEOUT -> PlantChatResult.Timeout(errorMsg)
+            AiErrorMapper.MSG_NO_INTERNET -> PlantChatResult.Offline(errorMsg)
+            AiErrorMapper.MSG_RATE_LIMIT -> PlantChatResult.RateLimited(errorMsg)
+            else -> PlantChatResult.ServiceError(errorMsg)
         }
     }
 }

@@ -29,6 +29,13 @@ interface ChatMessageDao {
     )
     suspend fun getLastMessages(plantId: Long, limit: Int): List<ChatMessageEntity>
 
+    /** Останні [limit] успішно надісланих реплік рослини (статус SENT) у хронологічному порядку. */
+    @Query(
+        "SELECT * FROM (SELECT * FROM chat_messages WHERE plantId = :plantId AND status = 'SENT' " +
+            "ORDER BY timestamp DESC, id DESC LIMIT :limit) ORDER BY timestamp ASC, id ASC"
+    )
+    suspend fun getLastSentMessages(plantId: Long, limit: Int = 6): List<ChatMessageEntity>
+
     @Query("SELECT * FROM chat_messages WHERE id = :id LIMIT 1")
     suspend fun getById(id: Long): ChatMessageEntity?
 

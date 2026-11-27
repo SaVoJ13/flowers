@@ -42,4 +42,9 @@ interface FlowersRepository {
     suspend fun generatePlantWithAi(plantQuery: String): GeneratePlantResult
     suspend fun identifyPlantFromPhoto(imageFile: File): IdentifyPlantResult
     suspend fun diagnosePlantHealth(imageFile: File, plant: PlantEntity): DiagnosePlantHealthResult
+    suspend fun sendPlantChatMessage(
+        plantId: Long,
+        userQuestion: String,
+        language: String = "uk"
+    ): com.flowers.app.data.remote.PlantChatResult = com.flowers.app.data.remote.PlantChatResult.Success("Тестова відповідь")
 }

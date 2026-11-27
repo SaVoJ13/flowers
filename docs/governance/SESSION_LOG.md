@@ -391,6 +391,27 @@
   - До передрелізного QA-беклогу додано фізичну валідацію: робота камери/галереї, живий Gemini, перегляд `HEALTH_CHECK`, обробка офлайн-помилок та повторні запуски камери.
   - Фізичний Samsung S24 Ultra (`RZCX326349A`) не використовувався; конфігурації Firebase, Billing, Google Play Console не змінювалися. Робоча директорія чиста.
 
+### Сесія 026, TASK-056 / Крок 1: Room v4 та злиття PR #38 (2026-11-26)
+- **Мета:** реалізувати Крок 1 архітектури персонального ШІ-чату для рослин (TASK-056) — міграцію бази даних Room v3 → v4 з додаванням таблиці `chat_messages`, `ChatMessageDao` та міграційних тестів.
+- **Виконані роботи:**
+  1. `ChatMessageEntity`: таблиця `chat_messages`, ролі USER/MODEL, статуси SENDING/SENT/ERROR, зовнішній ключ `plantId -> plants.id` з `ON DELETE CASCADE`, індекс `(plantId, timestamp)`.
+  2. `ChatConverters`: збереження MessageRole та MessageStatus рядками в базі даних.
+  3. `ChatMessageDao`: операції читання повної історії, вибірка останніх N записів у хронологічному порядку для контексту Gemini, безпечна вставка `insertMessage` з `OnConflictStrategy.ABORT`, оновлення статусів, ідемпотентний retry `beginRetry`, відновлення статусів при перезапуску `markInterruptedSendingAsError`, каскадне очищення.
+  4. Room v4 та `MIGRATION_3_4`: адитивні SQL-запити, експортовано схему `schemas/.../4.json`.
+  5. Виявлено ризик каскадного видалення при `PlantDao.insertPlant` через `OnConflictStrategy.REPLACE` (підтверджено тестом). Зареєстровано окреме завдання безпеки `TASK-056-SAFETY-01` для заміни на `ABORT`.
+- **Тестування та верифікація:**
+  - JVM модульні тести: 254/254 PASSED.
+  - Android інструментальні тести: 46/46 PASSED на емуляторі `small_phone` (API 36) включно з `RoomMigrationV3ToV4Test` (3 тести) та `ChatMessageDaoTest` (10 тестів).
+  - Збірка: `bundleRelease` на JDK 21 — BUILD SUCCESSFUL (17.6 МБ).
+  - GitHub Actions CI: run `45884401959` — SUCCESS (1m49s).
+  - Незалежний QA-аудит (субагент `59d3576b-893f-4156-ad24-d1246cd9ba2f`): `QA Verified`.
+- **Злиття:**
+  - За погодженням Власника PR #38 злито в `main` стандартним merge комітом `d931f26`.
+  - Локальний `main` синхронізовано з `origin/main`.
+  - `TASK-056` залишається відкритим (Крок 1 завершено, Крок 2 в очікуванні).
+  - Зареєстровано завдання безпеки `TASK-056-SAFETY-01`.
+  - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався, сторонні сервіси не змінювалися, робоча директорія чиста.
+
 
 
 

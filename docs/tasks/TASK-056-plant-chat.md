@@ -1,6 +1,6 @@
 # TASK-056 — Персональний ШІ-чат для кожної рослини з локальною історією
 
-> **Статус:** АРХІТЕКТУРНИЙ АНАЛІЗ ТА ПРОЄКТУВАННЯ (Очікує погодження Власником)  
+> **Статус:** КРОК 1 ЗАВЕРШЕНО (PR #38 злито в main, коміт d931f26); КРОК 2 В ОЧІКУВАННІ ПОГОДЖЕННЯ ВЛАСНИКА  
 > **Етап:** Flowers 2.0 MVP (ADR-021, `FLOWERS_2_0_MVP_PLAN.md`)  
 > **Відповідальний:** Агент 0 (Архітектор / Керівник)
 
@@ -267,7 +267,7 @@ CREATE INDEX IF NOT EXISTS `index_chat_messages_plantId_timestamp` ON `chat_mess
 
 ## Журнал виконання: Крок 1 (Room v4) — 2026-11-26
 
-**Статус кроку 1:** реалізовано, PR відкрито, очікує QA та окремого дозволу Власника на злиття. Gemini-чат, ContextBuilder, ChatViewModel, UI і навігація НЕ створювались.
+**Статус кроку 1:** ЗАВЕРШЕНО. PR #38 успішно злито в `main` (коміт `d931f26`). Gemini-чат, ContextBuilder, ChatViewModel, UI і навігація не створювались і очікують окремого погодження Власника на наступні кроки. Зареєстровано завдання безпеки `TASK-056-SAFETY-01`.
 
 ### Реалізовано
 - `ChatMessageEntity` (+ `MessageRole` USER/MODEL, `MessageStatus` SENDING/SENT/ERROR), FK `plantId → plants.id ON DELETE CASCADE`.

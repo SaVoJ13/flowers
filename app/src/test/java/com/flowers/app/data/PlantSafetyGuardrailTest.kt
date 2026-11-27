@@ -15,8 +15,10 @@ class PlantSafetyGuardrailTest {
             "Хлорофітум чубатий потребує помірного поливу.",
             "На листі помітний хлороз через дефіцит заліза в ґрунті.",
             "Для синтезу хлорофілу рослині необхідне якісне розсіяне освітлення.",
+            "Хлорофитум хохлатый безопасен для кошек.",
+            "Для выработки хлорофилла необходим рассеянный свет.",
             "Chlorophytum comosum is safe for pets.",
-            "Watch out for signs of iron chlorosis."
+            "Watch out for signs of iron chlorosis or chlorotic spots."
         )
 
         assertFalse("Ботанічні терміни не повинні тригерити захисний шар", PlantSafetyGuardrail.containsUnsafeAdvice(safeTerms))

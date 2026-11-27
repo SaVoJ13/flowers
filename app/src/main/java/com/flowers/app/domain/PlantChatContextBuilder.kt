@@ -64,10 +64,14 @@ object PlantChatContextBuilder {
             .take(MAX_CARE_EVENTS)
 
         // 2. Детермінований відбір завершених повідомлень (тільки поточна рослина, статус SENT, не дублює поточне питання)
-        val normalizedQuestion = sanitizedQuestion.trim().lowercase()
+        val rawNormalizedQuestion = userQuestion.trim().lowercase()
+        val sanitizedNormalizedQuestion = sanitizedQuestion.trim().lowercase()
         val validChatHistory = chatHistory
             .filter { it.plantId == plant.id && it.status == MessageStatus.SENT }
-            .filter { it.content.trim().lowercase() != normalizedQuestion }
+            .filter {
+                val itemContent = it.content.trim().lowercase()
+                itemContent != rawNormalizedQuestion && itemContent != sanitizedNormalizedQuestion
+            }
             .sortedWith(compareBy<ChatMessageEntity> { it.timestamp }.thenBy { it.id })
             .takeLast(MAX_CHAT_MESSAGES)
 

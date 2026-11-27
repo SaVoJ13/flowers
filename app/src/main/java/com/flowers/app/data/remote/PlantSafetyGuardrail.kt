@@ -8,8 +8,12 @@ object PlantSafetyGuardrail {
 
     // Безпечні ботанічні терміни, що містять корінь "хлор", але є нормальними біологічними назвами / симптомами
     private val SAFE_BOTANICAL_ROOTS = listOf(
+        // Українські
         "хлорофіт", "хлороз", "хлорофіл", "хлоропласт",
-        "chlorophyt", "chloros", "chlorophyll", "chloroplast"
+        // Російські
+        "хлорофит", "хлорофил",
+        // English / Latin
+        "chlorophyt", "chloros", "chlorot", "chlorophyll", "chloroplast"
     )
 
     private val UNSAFE_KEYWORDS = listOf(

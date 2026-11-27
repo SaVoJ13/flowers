@@ -26,7 +26,8 @@ class FlowersApplication : Application() {
             careEventDao = database.careEventDao(),
             catalogDao = database.catalogDao(),
             carePodDao = database.carePodDao(),
-            context = this
+            context = this,
+            chatMessageDao = database.chatMessageDao()
         )
     }
 

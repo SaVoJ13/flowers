@@ -33,10 +33,11 @@ class FlowersRepositoryImpl(
     private val catalogDao: CatalogDao,
     private val carePodDao: CarePodDao,
     private val context: Context,
+    private val chatMessageDao: com.flowers.app.data.local.dao.ChatMessageDao? = null,
     private val geminiPlantService: GeminiPlantService = GeminiPlantService(catalogDao, carePodDao, AndroidNetworkChecker(context))
 ) : FlowersRepository {
 
-    override val userPreferences: UserPreferences = UserPreferences(context)
+    override val userPreferences: UserPreferences by lazy { UserPreferences(context) }
     private var cachedSymptomTree: SymptomTreeRoot? = null
 
     init {
@@ -147,5 +148,33 @@ class FlowersRepositoryImpl(
     override suspend fun diagnosePlantHealth(imageFile: File, plant: PlantEntity): DiagnosePlantHealthResult {
         val lastWatering = careEventDao.getLastWateringEvent(plant.id)
         return geminiPlantService.diagnosePlantHealth(imageFile, plant, lastWatering?.timestamp)
+    }
+
+    override suspend fun sendPlantChatMessage(
+        plantId: Long,
+        userQuestion: String,
+        language: String,
+        currentMessageId: Long?
+    ): com.flowers.app.data.remote.PlantChatResult = withContext(Dispatchers.IO) {
+        if (userQuestion.isBlank()) {
+            return@withContext com.flowers.app.data.remote.PlantChatResult.ServiceError("Запитання не може бути порожнім.")
+        }
+
+        val plant = plantDao.getPlantById(plantId)
+            ?: return@withContext com.flowers.app.data.remote.PlantChatResult.ServiceError("Рослину з ID $plantId не знайдено.")
+
+        val careEvents = careEventDao.getRecentEventsForPlant(plantId, limit = com.flowers.app.domain.PlantChatContextBuilder.MAX_CARE_EVENTS)
+        val chatHistory = chatMessageDao?.getLastSentMessages(plantId, limit = com.flowers.app.domain.PlantChatContextBuilder.MAX_CHAT_MESSAGES) ?: emptyList()
+
+        val prompt = com.flowers.app.domain.PlantChatContextBuilder.buildPrompt(
+            plant = plant,
+            careEvents = careEvents,
+            chatHistory = chatHistory,
+            userQuestion = userQuestion,
+            language = language,
+            currentMessageId = currentMessageId
+        )
+
+        geminiPlantService.sendPlantChatMessage(prompt, plantId)
     }
 }

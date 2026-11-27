@@ -158,9 +158,19 @@ class GeminiPlantService(
             text(prompt)
         }
         defaultModel.generateContent(inputContent).text
+    },
+    /** Текстовий виклик моделі для персонального ШІ-чату з передачею systemInstruction окремо (TASK-056 / Крок 2). */
+    private val generateChatText: suspend (systemInstruction: String, userPrompt: String) -> String? = { sysInstruction, userPrompt ->
+        val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+            modelName = GEMINI_MODEL,
+            generationConfig = chatGenerationConfig,
+            systemInstruction = content { text(sysInstruction) }
+        )
+        model.generateContent(userPrompt).text
     }
 ) {
     private val gson = Gson()
+    private val plantChatMutexes = java.util.concurrent.ConcurrentHashMap<Long, kotlinx.coroutines.sync.Mutex>()
 
     private companion object {
         val defaultModel by lazy {
@@ -171,6 +181,14 @@ class GeminiPlantService(
                     temperature = 0.2f
                 }
             )
+        }
+
+        val chatGenerationConfig by lazy {
+            generationConfig {
+                responseMimeType = "text/plain"
+                temperature = 0.4f
+                maxOutputTokens = 350
+            }
         }
     }
 
@@ -633,6 +651,67 @@ class GeminiPlantService(
             )
         } catch (_: Exception) {
             null
+        }
+    }
+
+    /**
+     * Надсилає репліку користувача з ізольованим контекстом рослини до Gemini (TASK-056 / Крок 2).
+     */
+    suspend fun sendPlantChatMessage(
+        prompt: com.flowers.app.domain.PlantChatPrompt,
+        plantId: Long = 0L
+    ): PlantChatResult = withContext(Dispatchers.IO) {
+        if (!networkChecker.isOnline()) {
+            return@withContext PlantChatResult.Offline()
+        }
+
+        // Захист від повторних одночасних викликів для тієї самої рослини
+        val mutex = plantChatMutexes.computeIfAbsent(plantId) { kotlinx.coroutines.sync.Mutex() }
+        if (!mutex.tryLock()) {
+            return@withContext PlantChatResult.ServiceError("Попередній запит для цієї рослини ще обробляється. Зачекайте відповіді.")
+        }
+
+        try {
+            val rawResponse = kotlinx.coroutines.withTimeout(20_000L) {
+                generateChatText(prompt.systemInstruction, prompt.userPrompt)
+            }
+
+            if (rawResponse.isNullOrBlank()) {
+                return@withContext PlantChatResult.InvalidResponse()
+            }
+
+            val trimmed = rawResponse.trim()
+
+            // Додатковий захист: верифікація через PlantSafetyGuardrail на отрутохімікати/токсичні суміші
+            val (sanitizedReply, isSanitized) = if (PlantSafetyGuardrail.containsUnsafeAdvice(listOf(trimmed))) {
+                Pair(
+                    PlantSafetyGuardrail.SAFE_DEFAULT_FIRST_AID_STEPS.joinToString("\n") + "\n\n" + PlantSafetyGuardrail.SAFETY_NOTICE_MODIFIED,
+                    true
+                )
+            } else {
+                Pair(trimmed, false)
+            }
+
+            PlantChatResult.Success(sanitizedReply, isSanitized)
+        } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+            PlantChatResult.Timeout()
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            mapChatError(e)
+        } finally {
+            mutex.unlock()
+        }
+    }
+
+    private fun mapChatError(e: Throwable): PlantChatResult {
+        val errorMsg = AiErrorMapper.map(e)
+        return when (errorMsg) {
+            AiErrorMapper.MSG_TIMEOUT -> PlantChatResult.Timeout(errorMsg)
+            AiErrorMapper.MSG_NO_INTERNET -> PlantChatResult.Offline(errorMsg)
+            AiErrorMapper.MSG_RATE_LIMIT -> PlantChatResult.RateLimited(errorMsg)
+            AiErrorMapper.MSG_UNKNOWN -> PlantChatResult.ServiceError("Не вдалося отримати відповідь від помічника. Перевірте підключення до інтернету та спробуйте ще раз.")
+            else -> PlantChatResult.ServiceError(errorMsg)
         }
     }
 }

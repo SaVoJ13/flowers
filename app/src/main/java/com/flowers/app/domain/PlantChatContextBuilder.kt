@@ -73,6 +73,10 @@ object PlantChatContextBuilder {
 
         val systemInstruction = buildSystemInstruction(targetLanguageName)
 
+        val headerTemplate = "\n\nДАНІ РОСЛИНИ ТА ЗАПИТ КОРИСТУВАЧА:\n"
+        fun isWithinBudget(instruction: String, body: String): Boolean =
+            (instruction.length + headerTemplate.length + body.length) <= MAX_TOTAL_PROMPT_CHARS
+
         // Побудова блоків даних із контролем бюджету символів
         var currentChatList = validChatHistory
         var currentEventList = validEvents
@@ -80,13 +84,13 @@ object PlantChatContextBuilder {
 
         // Механізм контролю загального обсягу:
         // 1. Спочатку скорочуємо старіші репліки діалогу
-        while ((systemInstruction.length + userPrompt.length) > MAX_TOTAL_PROMPT_CHARS && currentChatList.isNotEmpty()) {
+        while (!isWithinBudget(systemInstruction, userPrompt) && currentChatList.isNotEmpty()) {
             currentChatList = currentChatList.drop(1)
             userPrompt = constructUserPrompt(plant, currentEventList, currentChatList, sanitizedQuestion)
         }
 
         // 2. Якщо ліміт все одно перевищено, скорочуємо старіші події догляду
-        while ((systemInstruction.length + userPrompt.length) > MAX_TOTAL_PROMPT_CHARS && currentEventList.isNotEmpty()) {
+        while (!isWithinBudget(systemInstruction, userPrompt) && currentEventList.isNotEmpty()) {
             currentEventList = currentEventList.dropLast(1)
             userPrompt = constructUserPrompt(plant, currentEventList, currentChatList, sanitizedQuestion)
         }

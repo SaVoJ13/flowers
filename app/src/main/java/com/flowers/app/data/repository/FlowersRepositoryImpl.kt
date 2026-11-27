@@ -37,7 +37,7 @@ class FlowersRepositoryImpl(
     private val geminiPlantService: GeminiPlantService = GeminiPlantService(catalogDao, carePodDao, AndroidNetworkChecker(context))
 ) : FlowersRepository {
 
-    override val userPreferences: UserPreferences = UserPreferences(context)
+    override val userPreferences: UserPreferences by lazy { UserPreferences(context) }
     private var cachedSymptomTree: SymptomTreeRoot? = null
 
     init {

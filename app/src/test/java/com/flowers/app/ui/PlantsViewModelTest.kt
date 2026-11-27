@@ -123,6 +123,7 @@ class PlantsViewModelTest {
             return identifyResult
         }
         override suspend fun diagnosePlantHealth(imageFile: File, plant: PlantEntity): com.flowers.app.data.remote.DiagnosePlantHealthResult = throw UnsupportedOperationException()
+        override suspend fun sendPlantChatMessage(plantId: Long, userQuestion: String, language: String): com.flowers.app.data.remote.PlantChatResult = throw UnsupportedOperationException()
     }
 
     @Test

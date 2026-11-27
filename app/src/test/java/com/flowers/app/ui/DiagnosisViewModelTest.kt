@@ -117,6 +117,7 @@ class DiagnosisViewModelTest {
             onDiagnoseDeferred?.await()
             return diagnoseHealthResult
         }
+        override suspend fun sendPlantChatMessage(plantId: Long, userQuestion: String, language: String): com.flowers.app.data.remote.PlantChatResult = throw UnsupportedOperationException()
     }
 
     @Test

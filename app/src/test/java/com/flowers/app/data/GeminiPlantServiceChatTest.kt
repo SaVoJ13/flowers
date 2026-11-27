@@ -143,6 +143,20 @@ class GeminiPlantServiceChatTest {
     }
 
     @Test
+    fun `timeoutCancellationException returnsTimeout`() = runBlocking {
+        val s = service(chatGenerator = {
+            kotlinx.coroutines.withTimeout(1L) {
+                kotlinx.coroutines.delay(50L)
+            }
+            "Не дійде"
+        })
+        val prompt = PlantChatContextBuilder.buildPrompt(testPlant(), emptyList(), emptyList(), "Питання", "uk")
+
+        val result = s.sendPlantChatMessage(prompt, plantId = 1L)
+        assertTrue(result is PlantChatResult.Timeout)
+    }
+
+    @Test
     fun `rateLimit429 returnsRateLimited`() = runBlocking {
         val s = service(chatGenerator = {
             throw SdkExceptions.quota()

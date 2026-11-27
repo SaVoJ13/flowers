@@ -46,5 +46,5 @@ interface FlowersRepository {
         plantId: Long,
         userQuestion: String,
         language: String = "uk"
-    ): com.flowers.app.data.remote.PlantChatResult = com.flowers.app.data.remote.PlantChatResult.Success("Тестова відповідь")
+    ): com.flowers.app.data.remote.PlantChatResult
 }

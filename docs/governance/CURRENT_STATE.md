@@ -140,6 +140,25 @@
     - Завдання `TASK-056` залишається ВІДКРИТИМ (наразі завершено Крок 1 та SAFETY-01; Крок 2 очікує дозволу Власника).
   - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався. Хмарні конфігурації (Firebase, Billing, Google Play Console) не змінювалися. Робоча директорія чиста.
 
+- **Сесія 026 (2026-11-27, TASK-056 / Крок 2: ШІ-сервіс, ContextBuilder та злиття PR #40):**
+  - За погодженням Власника успішно реалізовано та злито в `main` Крок 2 завдання `TASK-056` (PR #40, коміт злиття `6f35c8f`).
+  - **Реалізовані компоненти:**
+    1. **`PlantChatContextBuilder`:** складання компактного промпту для Gemini (паспорт рослини, до 10 останніх подій догляду, до 6 повідомлень діалогу, відсікання поточного запиту за ID/статусом із збереженням автентичних повторів питань, нейтралізація ін'єкцій та заміна локальних шляхів `file://`, `content://`, `C:\...`, `/storage/...`, `/data/...` на `[локальний_шлях]`, ліміт 3500 символів, 5 мов).
+    2. **`GeminiPlantService.sendPlantChatMessage`:** модель `gemini-3.5-flash-lite`, динамічне передавання системних інструкцій через офіційний параметр Firebase AI Logic `systemInstruction = content { text(...) }` та запиту користувача окремо через `model.generateContent(userPrompt)`, таймаут 20 секунд, пер-рослинний `Mutex`, типізований результат `PlantChatResult`.
+    3. **`PlantSafetyGuardrail`:** захист від маскування небезпечних речовин вайтлістом ботанічних слів — перехід на точні межі слів `SAFE_BOTANICAL_PATTERNS`, усунення часткового кореня `chlorot`, гарантоване блокування фунгіциду `chlorothalonil` (та варіантів «хлороталоніл», «хлороталонил») окремо та у змішаних реченнях із ботанічними термінами.
+    4. **`FlowersRepository` та `FlowersRepositoryImpl`:** додано метод `sendPlantChatMessage(plantId, userQuestion, language, currentMessageId)` з делегацією до сервісу.
+  - **Тестування та верифікація:**
+    - 291/291 JVM unit-тести (100% pass) включно з `PlantChatContextBuilderTest` (15 тестів), `GeminiPlantServiceChatTest` (12 тестів), `FlowersRepositoryChatTest` (3 тести), `PlantSafetyGuardrailTest` (7 тестів).
+    - 46/46 Android інструментальні тести на емуляторі `small_phone` (Android 16 API 36) пройшли успішно.
+    - `bundleRelease` на Adoptium JDK 21 збирається успішно (17.6 МБ, 17 643 155 байт).
+    - GitHub Actions CI: run `46033756931` — SUCCESS (`Tests and release bundle`, 1m21s).
+    - Незалежний QA-аудит (модель Pro): `QA Verified`.
+  - **Статус завдань:**
+    - `TASK-056 / STEP 2` — ЗАВЕРШЕНО.
+    - `TASK-056 / STEP 3` (ChatViewModel, UI екрана та навігація) — ОЧІКУЄ ДОЗВОЛУ Власника.
+    - `TASK-056` загалом залишається ВІДКРИТИМ.
+  - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався. Хмарні конфігурації (Firebase, Billing, Google Play Console) не змінювалися. Робоча директорія чиста.
+
 
 
 

@@ -9,6 +9,7 @@ import com.flowers.app.data.local.dao.ChatMessageDao
 import com.flowers.app.data.local.dao.PlantDao
 import com.flowers.app.data.local.entity.CareEventEntity
 import com.flowers.app.data.local.entity.ChatMessageEntity
+import com.flowers.app.data.local.entity.MessageStatus
 import com.flowers.app.data.local.entity.PlantEntity
 import com.flowers.app.data.remote.GeminiPlantService
 import com.flowers.app.data.remote.PlantChatResult
@@ -45,9 +46,26 @@ class FlowersRepositoryChatTest {
         override suspend fun updateNextCheckDate(plantId: Long, nextCheck: Long): Int = 1
     }
 
+    private open class FakeChatMessageDao : ChatMessageDao() {
+        var lastSentMessagesToReturn: List<ChatMessageEntity> = emptyList()
+
+        override fun observeMessages(plantId: Long): Flow<List<ChatMessageEntity>> = emptyFlow()
+        override suspend fun getMessages(plantId: Long): List<ChatMessageEntity> = emptyList()
+        override suspend fun getLastMessages(plantId: Long, limit: Int): List<ChatMessageEntity> = emptyList()
+        override suspend fun getLastSentMessages(plantId: Long, limit: Int): List<ChatMessageEntity> = lastSentMessagesToReturn
+        override suspend fun getById(id: Long): ChatMessageEntity? = null
+        override suspend fun insertMessage(message: ChatMessageEntity): Long = 1L
+        override suspend fun updateStatus(id: Long, status: MessageStatus, errorMessage: String?): Int = 1
+        override suspend fun beginRetry(id: Long): Int = 1
+        override suspend fun beginRetryForPlant(id: Long, plantId: Long): Int = 1
+        override suspend fun markInterruptedSendingAsError(errorMessage: String): Int = 0
+        override suspend fun markSendingAsErrorForPlant(plantId: Long, errorMessage: String): Int = 0
+        override suspend fun deleteAllForPlant(plantId: Long): Int = 0
+    }
+
     private lateinit var plantDao: FakePlantDao
     private lateinit var careEventDao: CareEventDao
-    private lateinit var chatMessageDao: ChatMessageDao
+    private lateinit var chatMessageDao: FakeChatMessageDao
     private lateinit var catalogDao: CatalogDao
     private lateinit var carePodDao: CarePodDao
     private lateinit var context: Context
@@ -61,7 +79,7 @@ class FlowersRepositoryChatTest {
     fun setUp() {
         plantDao = FakePlantDao()
         careEventDao = stubProxy()
-        chatMessageDao = stubProxy()
+        chatMessageDao = FakeChatMessageDao()
         catalogDao = stubProxy()
         carePodDao = stubProxy()
         context = object : ContextWrapper(null) {}
@@ -125,9 +143,7 @@ class FlowersRepositoryChatTest {
             if (m.name == "getRecentEventsForPlant") emptyList<CareEventEntity>() else null
         } as CareEventDao
 
-        chatMessageDao = Proxy.newProxyInstance(ChatMessageDao::class.java.classLoader, arrayOf(ChatMessageDao::class.java)) { _, m, _ ->
-            if (m.name == "getLastSentMessages") emptyList<ChatMessageEntity>() else null
-        } as ChatMessageDao
+        chatMessageDao = FakeChatMessageDao()
 
         val geminiService = GeminiPlantService(
             catalogDao = catalogDao,

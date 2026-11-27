@@ -150,31 +150,86 @@ class FlowersRepositoryImpl(
         return geminiPlantService.diagnosePlantHealth(imageFile, plant, lastWatering?.timestamp)
     }
 
+    private val activeSendingPlantIds = java.util.Collections.synchronizedSet(mutableSetOf<Long>())
+
+    override fun isPlantChatSending(plantId: Long): Boolean {
+        return activeSendingPlantIds.contains(plantId)
+    }
+
+    override fun getChatMessages(plantId: Long): Flow<List<com.flowers.app.data.local.entity.ChatMessageEntity>> {
+        return chatMessageDao?.observeMessages(plantId) ?: kotlinx.coroutines.flow.flowOf(emptyList())
+    }
+
+    override suspend fun getChatMessageById(messageId: Long): com.flowers.app.data.local.entity.ChatMessageEntity? {
+        return chatMessageDao?.getById(messageId)
+    }
+
+    override suspend fun insertChatMessage(message: com.flowers.app.data.local.entity.ChatMessageEntity): Long {
+        return chatMessageDao?.insertMessage(message) ?: -1L
+    }
+
+    override suspend fun updateChatMessageStatus(
+        messageId: Long,
+        status: com.flowers.app.data.local.entity.MessageStatus,
+        errorMessage: String?
+    ): Boolean {
+        val rows = chatMessageDao?.updateStatus(messageId, status, errorMessage) ?: 0
+        return rows > 0
+    }
+
+    override suspend fun saveAssistantResponse(
+        userMessageId: Long,
+        modelMessage: com.flowers.app.data.local.entity.ChatMessageEntity
+    ): Long {
+        return chatMessageDao?.saveAssistantResponse(userMessageId, modelMessage) ?: -1L
+    }
+
+    override suspend fun beginChatMessageRetry(messageId: Long, plantId: Long): Boolean {
+        val rows = chatMessageDao?.beginRetryForPlant(messageId, plantId) ?: 0
+        return rows > 0
+    }
+
+    override suspend fun clearChatHistory(plantId: Long): Int {
+        return chatMessageDao?.deleteAllForPlant(plantId) ?: 0
+    }
+
+    override suspend fun recoverStaleSendingMessages(plantId: Long): Int {
+        if (!activeSendingPlantIds.contains(plantId)) {
+            return chatMessageDao?.markSendingAsErrorForPlant(plantId, "Запит перервано через перезапуск застосунку") ?: 0
+        }
+        return 0
+    }
+
     override suspend fun sendPlantChatMessage(
         plantId: Long,
         userQuestion: String,
         language: String,
         currentMessageId: Long?
     ): com.flowers.app.data.remote.PlantChatResult = withContext(Dispatchers.IO) {
-        if (userQuestion.isBlank()) {
-            return@withContext com.flowers.app.data.remote.PlantChatResult.ServiceError("Запитання не може бути порожнім.")
+        activeSendingPlantIds.add(plantId)
+        try {
+            if (userQuestion.isBlank()) {
+                return@withContext com.flowers.app.data.remote.PlantChatResult.ServiceError("Запитання не може бути порожнім.")
+            }
+
+            val plant = plantDao.getPlantById(plantId)
+                ?: return@withContext com.flowers.app.data.remote.PlantChatResult.ServiceError("Рослину з ID $plantId не знайдено.")
+
+            val careEvents = careEventDao.getRecentEventsForPlant(plantId, limit = com.flowers.app.domain.PlantChatContextBuilder.MAX_CARE_EVENTS)
+            val chatHistory = chatMessageDao?.getLastSentMessages(plantId, limit = com.flowers.app.domain.PlantChatContextBuilder.MAX_CHAT_MESSAGES) ?: emptyList()
+
+            val prompt = com.flowers.app.domain.PlantChatContextBuilder.buildPrompt(
+                plant = plant,
+                careEvents = careEvents,
+                chatHistory = chatHistory,
+                userQuestion = userQuestion,
+                language = language,
+                currentMessageId = currentMessageId
+            )
+
+            geminiPlantService.sendPlantChatMessage(prompt, plantId)
+        } finally {
+            activeSendingPlantIds.remove(plantId)
         }
-
-        val plant = plantDao.getPlantById(plantId)
-            ?: return@withContext com.flowers.app.data.remote.PlantChatResult.ServiceError("Рослину з ID $plantId не знайдено.")
-
-        val careEvents = careEventDao.getRecentEventsForPlant(plantId, limit = com.flowers.app.domain.PlantChatContextBuilder.MAX_CARE_EVENTS)
-        val chatHistory = chatMessageDao?.getLastSentMessages(plantId, limit = com.flowers.app.domain.PlantChatContextBuilder.MAX_CHAT_MESSAGES) ?: emptyList()
-
-        val prompt = com.flowers.app.domain.PlantChatContextBuilder.buildPrompt(
-            plant = plant,
-            careEvents = careEvents,
-            chatHistory = chatHistory,
-            userQuestion = userQuestion,
-            language = language,
-            currentMessageId = currentMessageId
-        )
-
-        geminiPlantService.sendPlantChatMessage(prompt, plantId)
     }
 }

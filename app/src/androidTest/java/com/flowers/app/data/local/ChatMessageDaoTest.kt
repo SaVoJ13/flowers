@@ -295,4 +295,87 @@ class ChatMessageDaoTest {
         assertEquals(1, messagesP2.size)
         assertEquals("Чат рослини 2", messagesP2[0].content)
     }
+
+    @Test
+    fun saveAssistantResponse_atomicallyUpdatesUserToSentAndInsertsModel() = runBlocking {
+        val p = plant("Фікус")
+        val dao = db.chatMessageDao()
+
+        val userId = dao.insertMessage(msg(p, "Як доглядати?", 100, MessageRole.USER, MessageStatus.SENDING))
+        val modelMsg = msg(p, "Потрібен помірний полив.", 200, MessageRole.MODEL, MessageStatus.SENT)
+
+        val modelId = dao.saveAssistantResponse(userId, modelMsg)
+        assertTrue(modelId > 0)
+
+        val userAfter = dao.getById(userId)
+        assertNotNull(userAfter)
+        assertEquals(MessageStatus.SENT, userAfter!!.status)
+        assertNull(userAfter.errorMessage)
+
+        val modelAfter = dao.getById(modelId)
+        assertNotNull(modelAfter)
+        assertEquals(MessageRole.MODEL, modelAfter!!.role)
+        assertEquals(MessageStatus.SENT, modelAfter.status)
+        assertEquals("Потрібен помірний полив.", modelAfter.content)
+
+        // Повторний виклик не повинен створювати другу відповідь
+        val duplicateModelId = dao.saveAssistantResponse(userId, modelMsg)
+        assertEquals(-1L, duplicateModelId)
+        assertEquals(1, dao.getMessages(p).count { it.role == MessageRole.MODEL })
+
+        // Виклик для неіснуючого id повертає -1
+        val invalidId = dao.saveAssistantResponse(99999L, modelMsg)
+        assertEquals(-1L, invalidId)
+    }
+
+    @Test
+    fun beginRetryForPlant_onlyAllowsRetryForSamePlantAndStatusError() = runBlocking {
+        val p1 = plant("Рослина 1")
+        val p2 = plant("Рослина 2")
+        val dao = db.chatMessageDao()
+
+        val m1 = dao.insertMessage(msg(p1, "Помилка 1", 100, MessageRole.USER, MessageStatus.ERROR))
+        val m2 = dao.insertMessage(msg(p2, "Помилка 2", 200, MessageRole.USER, MessageStatus.ERROR))
+
+        // Спроба повторити повідомлення рослини 2 з рослини 1 повертає 0
+        val crossPlantRows = dao.beginRetryForPlant(m2, p1)
+        assertEquals(0, crossPlantRows)
+        assertEquals(MessageStatus.ERROR, dao.getById(m2)!!.status)
+
+        // Повтор власного повідомлення повертає 1 та переводить у SENDING
+        val ownRows = dao.beginRetryForPlant(m1, p1)
+        assertEquals(1, ownRows)
+        assertEquals(MessageStatus.SENDING, dao.getById(m1)!!.status)
+
+        // Повторний виклик повертає 0 (бо вже SENDING)
+        val secondCall = dao.beginRetryForPlant(m1, p1)
+        assertEquals(0, secondCall)
+    }
+
+    @Test
+    fun markSendingAsErrorForPlant_onlyMarksSendingOfTargetPlant() = runBlocking {
+        val p1 = plant("Рослина 1")
+        val p2 = plant("Рослина 2")
+        val dao = db.chatMessageDao()
+
+        val p1Sending = dao.insertMessage(msg(p1, "Запит 1", 100, MessageRole.USER, MessageStatus.SENDING))
+        val p1Sent = dao.insertMessage(msg(p1, "Успіх 1", 150, MessageRole.USER, MessageStatus.SENT))
+        val p2Sending = dao.insertMessage(msg(p2, "Запит 2", 200, MessageRole.USER, MessageStatus.SENDING))
+
+        val updatedCount = dao.markSendingAsErrorForPlant(p1, "Перезапуск")
+        assertEquals(1, updatedCount)
+
+        // p1Sending переведено в ERROR
+        val p1SendingAfter = dao.getById(p1Sending)!!
+        assertEquals(MessageStatus.ERROR, p1SendingAfter.status)
+        assertEquals("Перезапуск", p1SendingAfter.errorMessage)
+
+        // p1Sent залишився SENT
+        assertEquals(MessageStatus.SENT, dao.getById(p1Sent)!!.status)
+
+        // p2Sending залишився недоторканим у SENDING
+        val p2SendingAfter = dao.getById(p2Sending)!!
+        assertEquals(MessageStatus.SENDING, p2SendingAfter.status)
+        assertNull(p2SendingAfter.errorMessage)
+    }
 }

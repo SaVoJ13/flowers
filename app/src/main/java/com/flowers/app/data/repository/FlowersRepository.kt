@@ -48,4 +48,21 @@ interface FlowersRepository {
         language: String = "uk",
         currentMessageId: Long? = null
     ): com.flowers.app.data.remote.PlantChatResult
+
+    fun getChatMessages(plantId: Long): Flow<List<com.flowers.app.data.local.entity.ChatMessageEntity>>
+    suspend fun getChatMessageById(messageId: Long): com.flowers.app.data.local.entity.ChatMessageEntity?
+    suspend fun insertChatMessage(message: com.flowers.app.data.local.entity.ChatMessageEntity): Long
+    suspend fun updateChatMessageStatus(
+        messageId: Long,
+        status: com.flowers.app.data.local.entity.MessageStatus,
+        errorMessage: String?
+    ): Boolean
+    suspend fun saveAssistantResponse(
+        userMessageId: Long,
+        modelMessage: com.flowers.app.data.local.entity.ChatMessageEntity
+    ): Long
+    suspend fun beginChatMessageRetry(messageId: Long, plantId: Long): Boolean
+    suspend fun clearChatHistory(plantId: Long): Int
+    suspend fun recoverStaleSendingMessages(plantId: Long): Int
+    fun isPlantChatSending(plantId: Long): Boolean
 }

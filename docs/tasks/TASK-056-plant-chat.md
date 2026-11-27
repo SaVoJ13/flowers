@@ -400,8 +400,53 @@ SQLite виконує REPLACE як DELETE + INSERT; Room вмикає foreign ke
   - Незалежний QA-аудит: `QA Verified`.
 - **Поточний стан:**
   - `TASK-056 / STEP 2` — ЗАВЕРШЕНО.
-  - `TASK-056 / STEP 3` (ChatViewModel, інтерфейс екрана чату, інтеграція в Compose-навігацію) — ОЧІКУЄ ДОЗВОЛУ Власника.
-  - Завдання `TASK-056` загалом залишається відкритим.
+  - `TASK-056 / STEP 3` — В РОБОТІ (дозволено Власником).
+
+---
+
+## Журнал виконання: Крок 3 (ChatViewModel та керування життєвим циклом чату) — 2026-11-27
+
+**Статус кроку 3:** РЕАЛІЗОВАНО. Оформлено PR, проведено повне тестування, очікує QA та рішення Власника.
+
+### Реалізовані компоненти:
+1. **`ChatMessageDao` (атомарність та безпека):**
+   - Перетворено з `interface` на `abstract class ChatMessageDao` для підтримки транзакційного методу `@Transaction open suspend fun saveAssistantResponse(userMessageId: Long, modelMessage: ChatMessageEntity): Long`.
+   - В `saveAssistantResponse`:
+     - Перевіряється наявність та статус повідомлення користувача (`userMsg != null && userMsg.status == SENDING`).
+     - Якщо повідомлення було скасовано, видалено або чат очищено — оновлення не відбувається, модельне повідомлення не записується (запобігання «повідомленням-привидам»).
+     - Атомарно в одній SQLite-транзакції: статус користувача перемикається на `SENT`, очищається `errorMessage`, вставляється повідомлення моделі.
+   - Додано `beginRetryForPlant(id: Long, plantId: Long): Int`: безпечний ретрай лише в межах відповідної рослини зі статусу `ERROR` у `SENDING`.
+   - Додано `markSendingAsErrorForPlant(plantId: Long, errorMessage: String): Int`: маркування незавершених запитів при відновленні після перезапуску процесу суворо для конкретної рослини.
+
+2. **`FlowersRepository` та `FlowersRepositoryImpl`:**
+   - Додано методи:
+     - `observeChatMessages(plantId: Long): Flow<List<ChatMessageEntity>>`
+     - `insertChatMessage(message: ChatMessageEntity): Long`
+     - `beginChatMessageRetry(messageId: Long, plantId: Long): Boolean`
+     - `clearChatHistory(plantId: Long)`
+     - `saveAssistantResponse(userMessageId: Long, modelMessage: ChatMessageEntity): Long`
+     - `recoverStaleSendingMessages(plantId: Long)`
+   - Відстеження активних відправок у пам'яті через потокобезпечний `activeSendingPlantIds: Set<Long>`. Це запобігає переведенню активного запиту в `ERROR` при повторній ініціалізації ViewModel, але коректно відновлює завислі записи після примусового перезапуску застосунку.
+
+3. **`ChatViewModel` (`com.flowers.app.ui.chat`):**
+   - Створено `ChatUiState(plant, messages, isSending, isLoading, errorMessage)`.
+   - Синхронний дебаунс: прапорець `isSendingInProgress` блокує повторні виклики `sendMessage` та `retryMessage` синхронно до запуску корутини.
+   - Реактивне оновлення: стан підписується на `observeChatMessages(plantId)` та `observePlant(plantId)`.
+   - Автоматичне відновлення після `process death` для поточної рослини при створенні ViewModel.
+   - Валідація введення (ігнорування порожніх рядків).
+   - Обробка типів результатів `PlantChatResult` (Success, Offline, RateLimited, Timeout, InvalidResponse, ServiceError) із встановленням локалізованих повідомлень про помилки через `AiErrorMapper`.
+   - Захист при очищенні чату під час активного запиту (`clearChatHistory`) та видаленні рослини.
+   - Безпечне прокидання `CancellationException`.
+   - Фабрика `ChatViewModel.provideFactory(plantId, repository, languageProvider)`.
+
+4. **Тестування:**
+   - `ChatViewModelTest`: 18 ретельних сценаріїв (порожній чат, офлайн історія, відповідь моделі, атомарне збереження, відкат при збої збереження моделі, блокування порожніх реплік, синхронний подвійний клік, обробка помилок результату, ретрай за тим же ID, блокування подвійного ретраю, захист від дублювання зворотних викликів, відновлення після process death, паралельні чати 2 рослин, ізоляція без перетоку повідомлень, видалення рослини під час запиту, очищення чату під час активного запиту, коректне прокидання `CancellationException`, перестворення ViewModel).
+   - `ChatMessageDaoTest`: 3 нових інструментальних тести (`saveAssistantResponse_atomicallyUpdatesUserToSentAndInsertsModel`, `beginRetryForPlant_onlyAllowsRetryForSamePlantAndStatusError`, `markSendingAsErrorForPlant_onlyMarksSendingOfTargetPlant`).
+   - `FlowersRepositoryChatTest`: оновлено та розширено.
+   - Fakes оновлено у `DiagnosisViewModelTest`, `PlantsViewModelTest`, `TodayViewModelTest`.
+   - Усі 309 JVM unit-тестів пройшли успішно (100% pass).
+   - Усі 49 Android інструментальних тестів пройшли успішно на `small_phone` (`emulator-5554`).
+
 
 
 

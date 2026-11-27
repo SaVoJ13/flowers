@@ -6,14 +6,31 @@ package com.flowers.app.data.remote
  */
 object PlantSafetyGuardrail {
 
-    // Безпечні ботанічні терміни, що містять корінь "хлор", але є нормальними біологічними назвами / симптомами
-    private val SAFE_BOTANICAL_ROOTS = listOf(
-        // Українські
-        "хлорофіт", "хлороз", "хлорофіл", "хлоропласт",
-        // Російські
-        "хлорофит", "хлорофил",
+    // Безпечні ботанічні терміни, що містять корінь "хлор", але є нормальними біологічними назвами / симптомами.
+    // Використовуємо точні регулярні вирази з межами слів для цілих слів або допустимих словоформ,
+    // щоб уникнути неоднозначних часткових збігів (substring matching) та випадкового маскування
+    // небезпечних речовин (наприклад, фунгіциду chlorothalonil / хлороталоніл).
+    private val SAFE_BOTANICAL_PATTERNS = listOf(
         // English / Latin
-        "chlorophyt", "chloros", "chlorot", "chlorophyll", "chloroplast"
+        Regex("(?<!\\p{L})chlorotic(?:al|ally)?(?!\\p{L})", RegexOption.IGNORE_CASE),
+        Regex("(?<!\\p{L})chloros(?:is|es)(?!\\p{L})", RegexOption.IGNORE_CASE),
+        Regex("(?<!\\p{L})chlorophyll(?:s|ic)?(?!\\p{L})", RegexOption.IGNORE_CASE),
+        Regex("(?<!\\p{L})chlorophytum(?:s)?(?!\\p{L})", RegexOption.IGNORE_CASE),
+        Regex("(?<!\\p{L})chloroplast(?:s|ic)?(?!\\p{L})", RegexOption.IGNORE_CASE),
+
+        // Українські та російські форми
+        // Хлороз (хлороз, хлорозу, хлорозом, хлорозі, хлорози, хлорозов, хлорозах...)
+        Regex("(?<!\\p{L})хлороз(?:у|ом|і|а|е|ів|ов|ам|ами|ах|и|ы)?(?!\\p{L})", RegexOption.IGNORE_CASE),
+        // Хлоротичний / хлоротичный (хлоротичні, хлоротичного, хлоротичные...)
+        Regex("(?<!\\p{L})хлоротичн\\p{L}*(?!\\p{L})", RegexOption.IGNORE_CASE),
+        // Хлорофіл / хлорофилл (хлорофілу, хлорофилла, хлорофільний...)
+        Regex("(?<!\\p{L})хлорофіл\\p{L}*(?!\\p{L})", RegexOption.IGNORE_CASE),
+        Regex("(?<!\\p{L})хлорофилл?\\p{L}*(?!\\p{L})", RegexOption.IGNORE_CASE),
+        // Хлорофітум / хлорофитум
+        Regex("(?<!\\p{L})хлорофітум\\p{L}*(?!\\p{L})", RegexOption.IGNORE_CASE),
+        Regex("(?<!\\p{L})хлорофитум\\p{L}*(?!\\p{L})", RegexOption.IGNORE_CASE),
+        // Хлоропласт
+        Regex("(?<!\\p{L})хлоропласт\\p{L}*(?!\\p{L})", RegexOption.IGNORE_CASE)
     )
 
     private val UNSAFE_KEYWORDS = listOf(
@@ -22,12 +39,15 @@ object PlantSafetyGuardrail {
         "дихлофос", "актар", "актеллік", "білизн", "купорос",
         "фундазол", "бордоськ", "марганцівк", "формалін",
         "бензин", "ацетон", "фосфамід", "карбофос",
+        "хлороталоніл",
         // Російські токсичні еквіваленти
         "инсектицид", "фунгицид", "гербицид", "отрутохимикат", "химикат", "ядохимикат",
         "актеллик", "белизн", "бордосск", "марганцовк", "керосин", "формалин",
+        "хлороталонил",
         // English equivalents
         "pesticide", "insecticide", "fungicide", "herbicide", "bleach",
         "dichlorvos", "copper sulfate", "formalin", "kerosene", "petrol", "acetone",
+        "chlorothalonil",
         // Небезпечні суміші та концентрати
         "концентрат", "нерозведений", "нерастворенный",
         "сірчана кислота", "соляна кислота", "серная кислота", "соляная кислота",
@@ -65,10 +85,10 @@ object PlantSafetyGuardrail {
         for (step in steps) {
             var lower = step.lowercase()
 
-            // 1. Спочатку перевіряємо специфічні патерни (хлор, гас) з виключенням безпечних ботанічних назв
+            // 1. Спочатку замінюємо безпечні ботанічні терміни на нейтральний маркер за точними патернами
             var textWithoutBotanical = lower
-            for (safeRoot in SAFE_BOTANICAL_ROOTS) {
-                textWithoutBotanical = textWithoutBotanical.replace(safeRoot, "safe_botanical")
+            for (pattern in SAFE_BOTANICAL_PATTERNS) {
+                textWithoutBotanical = pattern.replace(textWithoutBotanical, "safe_botanical")
             }
 
             for (pattern in STANDALONE_UNSAFE_PATTERNS) {

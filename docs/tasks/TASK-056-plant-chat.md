@@ -373,5 +373,20 @@ SQLite виконує REPLACE як DELETE + INSERT; Room вмикає foreign ke
    - Android Instrumented Tests: **46 / 46 PASSED** на емуляторі `small_phone` (`emulator-5554`).
    - `bundleRelease` на JDK 21: BUILD SUCCESSFUL (AAB 17 642 725 байт).
 
+### Безпекове виправлення PlantSafetyGuardrail (2026-11-27):
+1. **Захист від маскування небезпечних речовин ботанічним вайтлістом:**
+   - У `PlantSafetyGuardrail` замінено частковий збіг підрядків (`SAFE_BOTANICAL_ROOTS`) на точні регулярні вирази з межами слів для цілих слів або точних допустимих словоформ (`SAFE_BOTANICAL_PATTERNS`).
+   - Усунуто корінь `chlorot`, який частково збігався з назвою небезпечного фунгіциду `chlorothalonil` і маскував його від перевірки на токсичність.
+   - Забезпечено збереження проходження безпечних ботанічних термінів (`chlorotic`, `chlorosis`, `chlorophyll`, `Chlorophytum`, `chloroplast`, українських «хлороз», «хлоротичний», «хлорофіл», «хлорофітум», «хлоропласт» та російських еквівалентів).
+   - `chlorothalonil` (та варіанти «хлороталоніл», «хлороталонил») гарантовано блокується як самостійно, так і в складі рекомендацій з одночасною наявністю безпечних ботанічних термінів.
+   - Додано захисний дубль: пряме включення `chlorothalonil`, `хлороталоніл`, `хлороталонил` до `UNSAFE_KEYWORDS`.
+2. **Регресійне тестування:**
+   - Додано тест `chlorothalonilIsNotMaskedByBotanicalAllowlist` у `PlantSafetyGuardrailTest` (окрема перевірка безпечних термінів, назви хлороталонілу окремо та складних речень, де одночасно присутні ботанічний термін і хлороталоніл трьома мовами).
+   - Усі 7 тестів `PlantSafetyGuardrailTest` проходять успішно.
+3. **Підсумкова верифікація:**
+   - JVM Unit Tests: **291 / 291 PASSED** (0 failures, 0 errors, 0 skipped, 26 тест-сьютів).
+   - Android Instrumented Tests: **46 / 46 PASSED** на емуляторі `small_phone` (`emulator-5554`).
+   - `bundleRelease` на JDK 21: BUILD SUCCESSFUL (AAB 17 643 155 байт).
+
 
 

@@ -14,8 +14,13 @@ import com.flowers.app.data.local.entity.PlantEntity
 import com.flowers.app.data.remote.GeminiPlantService
 import com.flowers.app.data.remote.PlantChatResult
 import com.flowers.app.data.repository.FlowersRepositoryImpl
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -48,19 +53,65 @@ class FlowersRepositoryChatTest {
 
     private open class FakeChatMessageDao : ChatMessageDao() {
         var lastSentMessagesToReturn: List<ChatMessageEntity> = emptyList()
+        var insertMessageCalledWith: ChatMessageEntity? = null
+        var saveAssistantResponseCalled = false
+        var beginRetryForPlantCalledWith: Pair<Long, Long>? = null
+        var markSendingAsErrorForPlantCalledWith: Pair<Long, String>? = null
+        var deleteAllForPlantCalledWith: Long? = null
+        val messagesMap = mutableMapOf<Long, ChatMessageEntity>()
 
         override fun observeMessages(plantId: Long): Flow<List<ChatMessageEntity>> = emptyFlow()
-        override suspend fun getMessages(plantId: Long): List<ChatMessageEntity> = emptyList()
+        override suspend fun getMessages(plantId: Long): List<ChatMessageEntity> = messagesMap.values.filter { it.plantId == plantId }
         override suspend fun getLastMessages(plantId: Long, limit: Int): List<ChatMessageEntity> = emptyList()
         override suspend fun getLastSentMessages(plantId: Long, limit: Int): List<ChatMessageEntity> = lastSentMessagesToReturn
-        override suspend fun getById(id: Long): ChatMessageEntity? = null
-        override suspend fun insertMessage(message: ChatMessageEntity): Long = 1L
-        override suspend fun updateStatus(id: Long, status: MessageStatus, errorMessage: String?): Int = 1
+        override suspend fun getById(id: Long): ChatMessageEntity? = messagesMap[id]
+        override suspend fun insertMessage(message: ChatMessageEntity): Long {
+            insertMessageCalledWith = message
+            val id = if (message.id == 0L) (messagesMap.keys.maxOrNull() ?: 0L) + 1L else message.id
+            messagesMap[id] = message.copy(id = id)
+            return id
+        }
+        override suspend fun updateStatus(id: Long, status: MessageStatus, errorMessage: String?): Int {
+            val msg = messagesMap[id] ?: return 0
+            messagesMap[id] = msg.copy(status = status, errorMessage = errorMessage)
+            return 1
+        }
         override suspend fun beginRetry(id: Long): Int = 1
-        override suspend fun beginRetryForPlant(id: Long, plantId: Long): Int = 1
+        override suspend fun beginRetryForPlant(id: Long, plantId: Long): Int {
+            beginRetryForPlantCalledWith = Pair(id, plantId)
+            val msg = messagesMap[id] ?: return 0
+            if (msg.plantId == plantId && msg.status == MessageStatus.ERROR) {
+                messagesMap[id] = msg.copy(status = MessageStatus.SENDING, errorMessage = null)
+                return 1
+            }
+            return 0
+        }
         override suspend fun markInterruptedSendingAsError(errorMessage: String): Int = 0
-        override suspend fun markSendingAsErrorForPlant(plantId: Long, errorMessage: String): Int = 0
-        override suspend fun deleteAllForPlant(plantId: Long): Int = 0
+        override suspend fun markSendingAsErrorForPlant(plantId: Long, errorMessage: String): Int {
+            markSendingAsErrorForPlantCalledWith = Pair(plantId, errorMessage)
+            var count = 0
+            messagesMap.forEach { (id, msg) ->
+                if (msg.plantId == plantId && msg.status == MessageStatus.SENDING) {
+                    messagesMap[id] = msg.copy(status = MessageStatus.ERROR, errorMessage = errorMessage)
+                    count++
+                }
+            }
+            return count
+        }
+        override suspend fun deleteAllForPlant(plantId: Long): Int {
+            deleteAllForPlantCalledWith = plantId
+            val before = messagesMap.size
+            messagesMap.entries.removeIf { it.value.plantId == plantId }
+            return before - messagesMap.size
+        }
+        override suspend fun saveAssistantResponse(userMessageId: Long, modelMessage: ChatMessageEntity): Long {
+            saveAssistantResponseCalled = true
+            val userMsg = messagesMap[userMessageId] ?: return -1L
+            if (userMsg.status != MessageStatus.SENDING) return -1L
+            messagesMap[userMessageId] = userMsg.copy(status = MessageStatus.SENT, errorMessage = null)
+            val modelId = insertMessage(modelMessage.copy(plantId = userMsg.plantId, status = MessageStatus.SENT))
+            return modelId
+        }
     }
 
     private lateinit var plantDao: FakePlantDao
@@ -167,5 +218,145 @@ class FlowersRepositoryChatTest {
         val result = repo.sendPlantChatMessage(1L, "Як справи?", "uk")
         assertTrue(result is PlantChatResult.Success)
         assertEquals("Фікус почувається чудово.", (result as PlantChatResult.Success).reply)
+    }
+
+    @Test
+    fun `chatRepositoryMethods delegateCorrectlyToDao`() = runBlocking {
+        val repo = FlowersRepositoryImpl(
+            plantDao = plantDao,
+            careEventDao = careEventDao,
+            catalogDao = catalogDao,
+            carePodDao = carePodDao,
+            context = context,
+            chatMessageDao = chatMessageDao,
+            geminiPlantService = GeminiPlantService(catalogDao, carePodDao, object : com.flowers.app.data.remote.NetworkChecker {
+                override fun isOnline(): Boolean = true
+            })
+        )
+
+        // 1. insertChatMessage & getChatMessageById
+        val msg = ChatMessageEntity(
+            id = 10L,
+            plantId = 1L,
+            role = com.flowers.app.data.local.entity.MessageRole.USER,
+            content = "Тест",
+            status = MessageStatus.SENDING,
+            timestamp = 1000L
+        )
+        val insertedId = repo.insertChatMessage(msg)
+        assertEquals(10L, insertedId)
+        val fetched = repo.getChatMessageById(10L)
+        assertEquals("Тест", fetched?.content)
+
+        // 2. saveAssistantResponse
+        val modelMsg = ChatMessageEntity(
+            id = 11L,
+            plantId = 1L,
+            role = com.flowers.app.data.local.entity.MessageRole.MODEL,
+            content = "Відповідь",
+            status = MessageStatus.SENT,
+            timestamp = 1010L
+        )
+        val savedModelId = repo.saveAssistantResponse(10L, modelMsg)
+        assertEquals(11L, savedModelId)
+        assertTrue(chatMessageDao.saveAssistantResponseCalled)
+        assertEquals(MessageStatus.SENT, repo.getChatMessageById(10L)?.status)
+
+        // 3. beginChatMessageRetry
+        chatMessageDao.messagesMap[12L] = ChatMessageEntity(
+            id = 12L,
+            plantId = 1L,
+            role = com.flowers.app.data.local.entity.MessageRole.USER,
+            content = "Помилкове",
+            status = MessageStatus.ERROR,
+            timestamp = 1020L
+        )
+        val retrySuccess = repo.beginChatMessageRetry(12L, 1L)
+        assertTrue(retrySuccess)
+        assertEquals(MessageStatus.SENDING, repo.getChatMessageById(12L)?.status)
+        assertEquals(Pair(12L, 1L), chatMessageDao.beginRetryForPlantCalledWith)
+
+        // 4. recoverStaleSendingMessages when NOT sending
+        chatMessageDao.messagesMap[13L] = ChatMessageEntity(
+            id = 13L,
+            plantId = 1L,
+            role = com.flowers.app.data.local.entity.MessageRole.USER,
+            content = "Зависле",
+            status = MessageStatus.SENDING,
+            timestamp = 1030L
+        )
+        val recoveredCount = repo.recoverStaleSendingMessages(1L)
+        assertEquals(2, recoveredCount)
+        assertEquals(MessageStatus.ERROR, repo.getChatMessageById(12L)?.status)
+        assertEquals(MessageStatus.ERROR, repo.getChatMessageById(13L)?.status)
+
+        // 5. clearChatHistory
+        val deletedCount = repo.clearChatHistory(1L)
+        assertEquals(1L, chatMessageDao.deleteAllForPlantCalledWith)
+        assertTrue(repo.getChatMessageById(10L) == null)
+    }
+
+    @Test
+    fun `isPlantChatSending tracksActiveRequestsAndPreventsStaleRecoveryDuringRequest`() = runBlocking {
+        plantDao.plantToReturn = testPlant(1L)
+        val deferred = kotlinx.coroutines.CompletableDeferred<Unit>()
+
+        careEventDao = Proxy.newProxyInstance(CareEventDao::class.java.classLoader, arrayOf(CareEventDao::class.java)) { _, m, _ ->
+            if (m.name == "getRecentEventsForPlant") emptyList<CareEventEntity>() else null
+        } as CareEventDao
+
+        val geminiService = GeminiPlantService(
+            catalogDao = catalogDao,
+            carePodDao = carePodDao,
+            networkChecker = object : com.flowers.app.data.remote.NetworkChecker {
+                override fun isOnline(): Boolean = true
+            },
+            generateChatText = { _, _ ->
+                deferred.await()
+                "Відповідь після очікування"
+            }
+        )
+
+        val repo = FlowersRepositoryImpl(
+            plantDao = plantDao,
+            careEventDao = careEventDao,
+            catalogDao = catalogDao,
+            carePodDao = carePodDao,
+            context = context,
+            chatMessageDao = chatMessageDao,
+            geminiPlantService = geminiService
+        )
+
+        assertFalse(repo.isPlantChatSending(1L))
+
+        chatMessageDao.messagesMap[100L] = ChatMessageEntity(
+            id = 100L,
+            plantId = 1L,
+            role = com.flowers.app.data.local.entity.MessageRole.USER,
+            content = "Активне",
+            status = MessageStatus.SENDING,
+            timestamp = 1000L
+        )
+
+        val job = CoroutineScope(Dispatchers.IO).launch {
+            repo.sendPlantChatMessage(1L, "Привіт", "uk")
+        }
+
+        // Чекаємо поки почнеться виконання
+        while (!repo.isPlantChatSending(1L)) {
+            delay(10)
+        }
+        assertTrue(repo.isPlantChatSending(1L))
+
+        // Під час активного надсилання recoverStaleSendingMessages повертає 0 і не чіпає повідомлення
+        val recovered = repo.recoverStaleSendingMessages(1L)
+        assertEquals(0, recovered)
+        assertEquals(MessageStatus.SENDING, repo.getChatMessageById(100L)?.status)
+
+        // Завершуємо запит
+        deferred.complete(Unit)
+        job.join()
+
+        assertFalse(repo.isPlantChatSending(1L))
     }
 }

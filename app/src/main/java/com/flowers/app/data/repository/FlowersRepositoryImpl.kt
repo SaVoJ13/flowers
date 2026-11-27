@@ -150,10 +150,10 @@ class FlowersRepositoryImpl(
         return geminiPlantService.diagnosePlantHealth(imageFile, plant, lastWatering?.timestamp)
     }
 
-    private val activeSendingPlantIds = java.util.Collections.synchronizedSet(mutableSetOf<Long>())
+    private val activeSendingCounters = java.util.concurrent.ConcurrentHashMap<Long, java.util.concurrent.atomic.AtomicInteger>()
 
     override fun isPlantChatSending(plantId: Long): Boolean {
-        return activeSendingPlantIds.contains(plantId)
+        return (activeSendingCounters[plantId]?.get() ?: 0) > 0
     }
 
     override fun getChatMessages(plantId: Long): Flow<List<com.flowers.app.data.local.entity.ChatMessageEntity>> {
@@ -194,7 +194,7 @@ class FlowersRepositoryImpl(
     }
 
     override suspend fun recoverStaleSendingMessages(plantId: Long): Int {
-        if (!activeSendingPlantIds.contains(plantId)) {
+        if (!isPlantChatSending(plantId)) {
             return chatMessageDao?.markSendingAsErrorForPlant(plantId, "Запит перервано через перезапуск застосунку") ?: 0
         }
         return 0
@@ -206,7 +206,7 @@ class FlowersRepositoryImpl(
         language: String,
         currentMessageId: Long?
     ): com.flowers.app.data.remote.PlantChatResult = withContext(Dispatchers.IO) {
-        activeSendingPlantIds.add(plantId)
+        activeSendingCounters.computeIfAbsent(plantId) { java.util.concurrent.atomic.AtomicInteger(0) }.incrementAndGet()
         try {
             if (userQuestion.isBlank()) {
                 return@withContext com.flowers.app.data.remote.PlantChatResult.ServiceError("Запитання не може бути порожнім.")
@@ -229,7 +229,9 @@ class FlowersRepositoryImpl(
 
             geminiPlantService.sendPlantChatMessage(prompt, plantId)
         } finally {
-            activeSendingPlantIds.remove(plantId)
+            activeSendingCounters.computeIfPresent(plantId) { _, counter ->
+                if (counter.decrementAndGet() <= 0) null else counter
+            }
         }
     }
 }

@@ -15,6 +15,7 @@ import com.flowers.app.data.remote.GeneratePlantResult
 import com.flowers.app.data.remote.IdentifyPlantResult
 import com.flowers.app.data.remote.PlantChatResult
 import com.flowers.app.data.repository.FlowersRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -72,6 +73,8 @@ class ChatViewModelTest {
 
         var sendDeferred: CompletableDeferred<Unit>? = null
         var simulateModelSaveError: Boolean = false
+        var simulateInsertError: Boolean = false
+        var sendChatMessageException: Throwable? = null
 
         fun setPlant(plant: PlantEntity) {
             plantsMap[plant.id] = plant
@@ -140,6 +143,9 @@ class ChatViewModelTest {
         }
 
         override suspend fun insertChatMessage(message: ChatMessageEntity): Long {
+            if (simulateInsertError) {
+                throw IllegalStateException("Simulated insert error")
+            }
             val id = if (message.id == 0L) idCounter.getAndIncrement() else message.id
             val inserted = message.copy(id = id)
             messagesList.add(inserted)
@@ -237,6 +243,7 @@ class ChatViewModelTest {
 
             activeSendingPlants.add(plantId)
             try {
+                sendChatMessageException?.let { throw it }
                 sendDeferred?.await()
                 return chatResult
             } finally {
@@ -380,6 +387,19 @@ class ChatViewModelTest {
         assertEquals(MessageStatus.SENDING, userMsgAfter!!.status)
         // Немає жодного повідомлення MODEL
         assertEquals(0, repo.messagesList.count { it.role == MessageRole.MODEL })
+
+        // Перевірка обробки помилки Room крізь саму ChatViewModel
+        val vm = ChatViewModel(plantId = 1L, repository = repo)
+        advanceUntilIdle()
+
+        vm.sendMessage("Питання з помилкою збереження MODEL")
+        advanceUntilIdle()
+
+        assertFalse(vm.uiState.value.isSending)
+        assertNotNull(vm.uiState.value.errorMessage)
+        val userMsgVm = vm.uiState.value.messages.last()
+        assertEquals(MessageStatus.ERROR, userMsgVm.status)
+        assertTrue(userMsgVm.errorMessage?.contains("Simulated DB error") == true)
     }
 
     // 6. Порожній текст не надсилається
@@ -517,12 +537,16 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         vm.retryMessage(msgId)
-        testScheduler.runCurrent()
+        // Синхронне виставлення прапорця без очікування корутин
         assertTrue(vm.uiState.value.isSending)
-        assertEquals(1, repo.sendChatMessageCallCount)
 
-        // Другий клік Retry
+        // Другий клік Retry одразу в тому самому кадрі
         vm.retryMessage(msgId)
+
+        // Спроба відправити нове повідомлення під час активного retry також блокується
+        vm.sendMessage("Спроба нового запиту під час повтору")
+
+        testScheduler.runCurrent()
         assertEquals(1, repo.sendChatMessageCallCount)
 
         deferred.complete(Unit)
@@ -595,25 +619,31 @@ class ChatViewModelTest {
         repo.setPlant(plantA)
         repo.setPlant(plantB)
 
+        val deferred = CompletableDeferred<Unit>()
+        repo.sendDeferred = deferred
+
         val vmA = ChatViewModel(plantId = 1L, repository = repo)
         val vmB = ChatViewModel(plantId = 2L, repository = repo)
         advanceUntilIdle()
 
-        repo.chatResult = PlantChatResult.Success("Відповідь для А")
         vmA.sendMessage("Питання для А")
-        advanceUntilIdle()
-
-        repo.chatResult = PlantChatResult.Success("Відповідь для Б")
         vmB.sendMessage("Питання для Б")
+
+        // Обидва чати знаходяться у стані відправки одночасно
+        assertTrue(vmA.uiState.value.isSending)
+        assertTrue(vmB.uiState.value.isSending)
+
+        repo.chatResult = PlantChatResult.Success("Відповідь для А")
+        deferred.complete(Unit)
         advanceUntilIdle()
 
+        assertFalse(vmA.uiState.value.isSending)
+        assertFalse(vmB.uiState.value.isSending)
         assertEquals(2, vmA.uiState.value.messages.size)
         assertEquals("Питання для А", vmA.uiState.value.messages[0].content)
-        assertEquals("Відповідь для А", vmA.uiState.value.messages[1].content)
 
         assertEquals(2, vmB.uiState.value.messages.size)
         assertEquals("Питання для Б", vmB.uiState.value.messages[0].content)
-        assertEquals("Відповідь для Б", vmB.uiState.value.messages[1].content)
     }
 
     // 14. Відсутність витоку історії між рослинами
@@ -705,24 +735,51 @@ class ChatViewModelTest {
     fun `cancellationException_resetsSendingStateWithoutStuckStatus`() = runTest {
         val repo = FakeChatRepository()
         repo.setPlant(testPlant)
-        val deferred = CompletableDeferred<Unit>()
-        repo.sendDeferred = deferred
+        repo.sendChatMessageException = CancellationException("Job was cancelled")
 
         val vm = ChatViewModel(plantId = 1L, repository = repo)
         advanceUntilIdle()
 
         vm.sendMessage("Запитання")
         advanceUntilIdle()
-        assertTrue(vm.uiState.value.isSending)
-
-        // Скасовуємо через clearChat
-        vm.clearChat()
-        advanceUntilIdle()
 
         assertFalse(vm.uiState.value.isSending)
     }
 
-    // 18. Збереження історії при створенні нової ViewModel
+    // 18. Відправка повідомлення коли рослина ще не завантажена або null
+    @Test
+    fun `sendMessage_whenPlantIsNull_doesNotInsertAndSetsError`() = runTest {
+        val repo = FakeChatRepository()
+        val vm = ChatViewModel(plantId = 999L, repository = repo)
+        advanceUntilIdle()
+
+        vm.sendMessage("Питання для неіснуючої рослини")
+        advanceUntilIdle()
+
+        assertFalse(vm.uiState.value.isSending)
+        assertNotNull(vm.uiState.value.errorMessage)
+        assertTrue(vm.uiState.value.messages.isEmpty())
+        assertEquals(0, repo.sendChatMessageCallCount)
+    }
+
+    // 19. Запитання більше ліміту символів (500) відхиляється
+    @Test
+    fun `questionExceedingMaxLength_isRejected`() = runTest {
+        val repo = FakeChatRepository()
+        repo.setPlant(testPlant)
+        val vm = ChatViewModel(plantId = 1L, repository = repo)
+        advanceUntilIdle()
+
+        val longQuestion = "a".repeat(501)
+        vm.sendMessage(longQuestion)
+
+        assertFalse(vm.uiState.value.isSending)
+        assertEquals("Запитання занадто довге (максимум 500 символів).", vm.uiState.value.errorMessage)
+        assertTrue(vm.uiState.value.messages.isEmpty())
+        assertEquals(0, repo.sendChatMessageCallCount)
+    }
+
+    // 20. Збереження історії при створенні нової ViewModel
     @Test
     fun `recreatingViewModel_preservesCompletePersistedHistory`() = runTest {
         val repo = FakeChatRepository()

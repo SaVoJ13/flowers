@@ -9,6 +9,7 @@ import com.flowers.app.data.local.entity.MessageStatus
 import com.flowers.app.data.local.entity.PlantEntity
 import com.flowers.app.data.remote.PlantChatResult
 import com.flowers.app.data.repository.FlowersRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -97,13 +98,22 @@ class ChatViewModel(
             return
         }
 
+        if (_uiState.value.plant == null) {
+            _uiState.update {
+                it.copy(errorMessage = "Дані про рослину ще завантажуються або рослину видалено.")
+            }
+            return
+        }
+
         // Синхронне блокування повторного натискання
         if (_uiState.value.isSending) {
             return
         }
         _uiState.update { it.copy(isSending = true, errorMessage = null) }
 
-        activeJob = viewModelScope.launch {
+        var currentJob: Job? = null
+        currentJob = viewModelScope.launch {
+            var createdMessageId = -1L
             try {
                 // 1. Збереження повідомлення USER зі статусом SENDING у Room
                 val userMessage = ChatMessageEntity(
@@ -114,17 +124,31 @@ class ChatViewModel(
                     errorMessage = null,
                     timestamp = System.currentTimeMillis()
                 )
-                val userMessageId = repository.insertChatMessage(userMessage)
-                if (userMessageId <= 0) {
+                createdMessageId = repository.insertChatMessage(userMessage)
+                if (createdMessageId <= 0) {
                     return@launch
                 }
 
                 // 2. Виклик FlowersRepository.sendPlantChatMessage
-                executeChatRequest(userMessageId, trimmed)
+                executeChatRequest(createdMessageId, trimmed)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                if (createdMessageId > 0) {
+                    repository.updateChatMessageStatus(
+                        createdMessageId,
+                        MessageStatus.ERROR,
+                        e.message ?: "Помилка збереження або обробки повідомлення"
+                    )
+                }
+                _uiState.update { it.copy(errorMessage = e.message) }
             } finally {
-                _uiState.update { it.copy(isSending = false) }
+                if (activeJob === currentJob) {
+                    _uiState.update { it.copy(isSending = false) }
+                }
             }
         }
+        activeJob = currentJob
     }
 
     /**
@@ -132,31 +156,50 @@ class ChatViewModel(
      * Використовує наявний id репліки без створення нового запису.
      */
     fun retryMessage(messageId: Long) {
-        // Синхронне блокування подвійного натискання
+        // Синхронне блокування повторного натискання
         if (_uiState.value.isSending) {
             return
         }
+        _uiState.update { it.copy(isSending = true, errorMessage = null) }
 
-        activeJob = viewModelScope.launch {
-            // Перевіряємо, що повідомлення належить цій рослині, є USER і має статус ERROR
-            val message = repository.getChatMessageById(messageId) ?: return@launch
-            if (message.plantId != plantId || message.role != MessageRole.USER || message.status != MessageStatus.ERROR) {
-                return@launch
-            }
-
-            // Атомарна зміна статусу ERROR -> SENDING у БД
-            val retryStarted = repository.beginChatMessageRetry(messageId, plantId)
-            if (!retryStarted) {
-                return@launch
-            }
-
-            _uiState.update { it.copy(isSending = true, errorMessage = null) }
+        var currentJob: Job? = null
+        currentJob = viewModelScope.launch {
             try {
+                // Перевіряємо, що повідомлення належить цій рослині, є USER і має статус ERROR
+                val message = repository.getChatMessageById(messageId)
+                if (message == null || message.plantId != plantId || message.role != MessageRole.USER || message.status != MessageStatus.ERROR) {
+                    if (activeJob === currentJob) {
+                        _uiState.update { it.copy(isSending = false) }
+                    }
+                    return@launch
+                }
+
+                // Атомарна зміна статусу ERROR -> SENDING у БД
+                val retryStarted = repository.beginChatMessageRetry(messageId, plantId)
+                if (!retryStarted) {
+                    if (activeJob === currentJob) {
+                        _uiState.update { it.copy(isSending = false) }
+                    }
+                    return@launch
+                }
+
                 executeChatRequest(messageId, message.content)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                repository.updateChatMessageStatus(
+                    messageId,
+                    MessageStatus.ERROR,
+                    e.message ?: "Помилка повтору повідомлення"
+                )
+                _uiState.update { it.copy(errorMessage = e.message) }
             } finally {
-                _uiState.update { it.copy(isSending = false) }
+                if (activeJob === currentJob) {
+                    _uiState.update { it.copy(isSending = false) }
+                }
             }
         }
+        activeJob = currentJob
     }
 
     private suspend fun executeChatRequest(userMessageId: Long, questionText: String) {
@@ -212,9 +255,15 @@ class ChatViewModel(
      * Скасовує активні запити та гарантує, що жодне повідомлення не буде створене після очищення.
      */
     fun clearChat() {
-        activeJob?.cancel()
+        val previousJob = activeJob
+        previousJob?.cancel()
+        activeJob = null
         _uiState.update { it.copy(isSending = false) }
         viewModelScope.launch {
+            try {
+                previousJob?.join()
+            } catch (_: CancellationException) {
+            }
             repository.clearChatHistory(plantId)
         }
     }
@@ -227,7 +276,7 @@ class ChatViewModel(
     }
 
     companion object {
-        const val MAX_QUESTION_LENGTH = 1000
+        const val MAX_QUESTION_LENGTH = 500
 
         fun provideFactory(
             plantId: Long,

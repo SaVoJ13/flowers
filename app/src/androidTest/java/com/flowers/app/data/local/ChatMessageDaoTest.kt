@@ -326,6 +326,17 @@ class ChatMessageDaoTest {
         // Виклик для неіснуючого id повертає -1
         val invalidId = dao.saveAssistantResponse(99999L, modelMsg)
         assertEquals(-1L, invalidId)
+
+        // Виклик для повідомлення зі статусом ERROR повертає -1L і залишає статус ERROR
+        val errorMsgId = dao.insertMessage(msg(p, "Помилка", 300, MessageRole.USER, MessageStatus.ERROR))
+        val errorSaveResult = dao.saveAssistantResponse(errorMsgId, modelMsg)
+        assertEquals(-1L, errorSaveResult)
+        assertEquals(MessageStatus.ERROR, dao.getById(errorMsgId)!!.status)
+
+        // Виклик для повідомлення ролі MODEL повертає -1L
+        val modelSourceId = dao.insertMessage(msg(p, "Відповідь асистента", 400, MessageRole.MODEL, MessageStatus.SENDING))
+        val modelSaveResult = dao.saveAssistantResponse(modelSourceId, modelMsg)
+        assertEquals(-1L, modelSaveResult)
     }
 
     @Test

@@ -63,7 +63,7 @@ abstract class ChatMessageDao {
      * Початок повтору за тим самим id із прив'язкою до plantId: ERROR → SENDING.
      * Запобігає випадковому повтору повідомлення іншої рослини.
      */
-    @Query("UPDATE chat_messages SET status = 'SENDING', errorMessage = NULL WHERE id = :id AND plantId = :plantId AND status = 'ERROR'")
+    @Query("UPDATE chat_messages SET status = 'SENDING', errorMessage = NULL WHERE id = :id AND plantId = :plantId AND status = 'ERROR' AND role = 'USER'")
     abstract suspend fun beginRetryForPlant(id: Long, plantId: Long): Int
 
     /**
@@ -97,8 +97,7 @@ abstract class ChatMessageDao {
         modelMessage: ChatMessageEntity
     ): Long {
         val userMsg = getById(userMessageId) ?: return -1L
-        if (userMsg.status == MessageStatus.SENT) return -1L
-        if (userMsg.status != MessageStatus.SENDING) return -1L
+        if (userMsg.role != MessageRole.USER || userMsg.status != MessageStatus.SENDING) return -1L
 
         val rows = updateStatus(userMessageId, MessageStatus.SENT, null)
         if (rows <= 0) return -1L

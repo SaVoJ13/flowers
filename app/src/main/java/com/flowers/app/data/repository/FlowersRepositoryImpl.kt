@@ -206,7 +206,9 @@ class FlowersRepositoryImpl(
         language: String,
         currentMessageId: Long?
     ): com.flowers.app.data.remote.PlantChatResult = withContext(Dispatchers.IO) {
-        activeSendingCounters.computeIfAbsent(plantId) { java.util.concurrent.atomic.AtomicInteger(0) }.incrementAndGet()
+        activeSendingCounters.compute(plantId) { _, existing ->
+            (existing ?: java.util.concurrent.atomic.AtomicInteger(0)).apply { incrementAndGet() }
+        }
         try {
             if (userQuestion.isBlank()) {
                 return@withContext com.flowers.app.data.remote.PlantChatResult.ServiceError("Запитання не може бути порожнім.")

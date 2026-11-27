@@ -744,6 +744,9 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         assertFalse(vm.uiState.value.isSending)
+        assertNull("CancellationException не повинен записувати errorMessage в UI", vm.uiState.value.errorMessage)
+        assertEquals(1, vm.uiState.value.messages.size)
+        assertEquals("Повідомлення не повинно переводитися в ERROR блоком catch(Exception)", MessageStatus.SENDING, vm.uiState.value.messages.first().status)
     }
 
     // 18. Відправка повідомлення коли рослина ще не завантажена або null

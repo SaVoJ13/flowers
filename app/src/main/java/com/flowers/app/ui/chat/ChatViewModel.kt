@@ -50,6 +50,7 @@ class ChatViewModel(
     val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
 
     private var activeJob: Job? = null
+    private var activeRequestToken: Long = 0L
 
     init {
         loadPlantAndMessages()
@@ -67,7 +68,12 @@ class ChatViewModel(
 
         // 2. Безпечне відновлення завислих реплік SENDING після перезапуску процесу
         viewModelScope.launch {
-            repository.recoverStaleSendingMessages(plantId)
+            try {
+                repository.recoverStaleSendingMessages(plantId)
+            } catch (ce: CancellationException) {
+                throw ce
+            } catch (_: Exception) {
+            }
         }
 
         // 3. Спостереження за історією повідомлень через Flow
@@ -111,8 +117,8 @@ class ChatViewModel(
         }
         _uiState.update { it.copy(isSending = true, errorMessage = null) }
 
-        var currentJob: Job? = null
-        currentJob = viewModelScope.launch {
+        val token = ++activeRequestToken
+        activeJob = viewModelScope.launch {
             var createdMessageId = -1L
             try {
                 // 1. Збереження повідомлення USER зі статусом SENDING у Room
@@ -135,20 +141,24 @@ class ChatViewModel(
                 throw e
             } catch (e: Exception) {
                 if (createdMessageId > 0) {
-                    repository.updateChatMessageStatus(
-                        createdMessageId,
-                        MessageStatus.ERROR,
-                        e.message ?: "Помилка збереження або обробки повідомлення"
-                    )
+                    try {
+                        repository.updateChatMessageStatus(
+                            createdMessageId,
+                            MessageStatus.ERROR,
+                            e.message ?: "Помилка збереження або обробки повідомлення"
+                        )
+                    } catch (ce: CancellationException) {
+                        throw ce
+                    } catch (_: Exception) {
+                    }
                 }
-                _uiState.update { it.copy(errorMessage = e.message) }
+                _uiState.update { it.copy(errorMessage = e.message ?: "Помилка відправки повідомлення") }
             } finally {
-                if (activeJob === currentJob) {
+                if (activeRequestToken == token) {
                     _uiState.update { it.copy(isSending = false) }
                 }
             }
         }
-        activeJob = currentJob
     }
 
     /**
@@ -162,24 +172,18 @@ class ChatViewModel(
         }
         _uiState.update { it.copy(isSending = true, errorMessage = null) }
 
-        var currentJob: Job? = null
-        currentJob = viewModelScope.launch {
+        val token = ++activeRequestToken
+        activeJob = viewModelScope.launch {
             try {
                 // Перевіряємо, що повідомлення належить цій рослині, є USER і має статус ERROR
                 val message = repository.getChatMessageById(messageId)
                 if (message == null || message.plantId != plantId || message.role != MessageRole.USER || message.status != MessageStatus.ERROR) {
-                    if (activeJob === currentJob) {
-                        _uiState.update { it.copy(isSending = false) }
-                    }
                     return@launch
                 }
 
                 // Атомарна зміна статусу ERROR -> SENDING у БД
                 val retryStarted = repository.beginChatMessageRetry(messageId, plantId)
                 if (!retryStarted) {
-                    if (activeJob === currentJob) {
-                        _uiState.update { it.copy(isSending = false) }
-                    }
                     return@launch
                 }
 
@@ -187,19 +191,23 @@ class ChatViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                repository.updateChatMessageStatus(
-                    messageId,
-                    MessageStatus.ERROR,
-                    e.message ?: "Помилка повтору повідомлення"
-                )
-                _uiState.update { it.copy(errorMessage = e.message) }
+                try {
+                    repository.updateChatMessageStatus(
+                        messageId,
+                        MessageStatus.ERROR,
+                        e.message ?: "Помилка повтору повідомлення"
+                    )
+                } catch (ce: CancellationException) {
+                    throw ce
+                } catch (_: Exception) {
+                }
+                _uiState.update { it.copy(errorMessage = e.message ?: "Помилка повтору повідомлення") }
             } finally {
-                if (activeJob === currentJob) {
+                if (activeRequestToken == token) {
                     _uiState.update { it.copy(isSending = false) }
                 }
             }
         }
-        activeJob = currentJob
     }
 
     private suspend fun executeChatRequest(userMessageId: Long, questionText: String) {
@@ -258,13 +266,16 @@ class ChatViewModel(
         val previousJob = activeJob
         previousJob?.cancel()
         activeJob = null
+        val token = ++activeRequestToken
         _uiState.update { it.copy(isSending = false) }
         viewModelScope.launch {
             try {
                 previousJob?.join()
             } catch (_: CancellationException) {
             }
-            repository.clearChatHistory(plantId)
+            if (activeRequestToken == token) {
+                repository.clearChatHistory(plantId)
+            }
         }
     }
 

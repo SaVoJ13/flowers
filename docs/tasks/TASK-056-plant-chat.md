@@ -447,9 +447,9 @@ SQLite виконує REPLACE як DELETE + INSERT; Room вмикає foreign ke
 4. **Тестування:**
    - `ChatViewModelTest`: 20 вичерпних сценаріїв (синхронний дебаунс `sendMessage` та `retryMessage`, блокування подвійного кліку в одному кадрі, збереження моделі, ретраї, очищення із серіалізацією, обробка помилок результату, відновлення після збою процесу, паралельні одночасні чати двох рослин, перевірка null-рослини, ліміт символів 500, безпечне прокидання `CancellationException`, обробка винятків БД).
    - `ChatMessageDaoTest`: 3 розширених інструментальних тести (атомарне збереження, відхилення не-USER та не-SENDING реплік, безпечний ретрай з ізоляцією за `plantId`, відновлення незавершених повідомлень).
-   - `FlowersRepositoryChatTest`: 5 детальних тестів для всіх методів чату в репозиторії, включно з `activeSendingCounters`.
+   - `FlowersRepositoryChatTest`: 6 детальних тестів для всіх методів чату в репозиторії, включно з `activeSendingCounters` та паралельними викликами.
    - Fakes оновлено у `DiagnosisViewModelTest`, `PlantsViewModelTest`, `TodayViewModelTest`.
-   - Усі 309 JVM unit-тестів пройшли успішно (100% pass).
+   - Усі 314 JVM unit-тестів пройшли успішно (100% pass).
    - Усі 49 Android інструментальних тестів пройшли успішно на `small_phone` (`emulator-5554`).
 
 

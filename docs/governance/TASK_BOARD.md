@@ -117,7 +117,7 @@
 - [x] `TASK-053` (злито PR #35, 2026-11-24; QA Verified, CI зелений) [А] M Мультимодальне розпізнавання виду за фото та додавання рослини з обов'язковим підтвердженням користувачем
 - [x] `TASK-054` (злито PR #36, 2026-11-26; QA Verified, CI зелений) [А] S Нагадування перевірити ґрунт (адаптовані до виду рослини), реорганізація меню без вкладки Довідника, захист наявних даних
 - [x] `TASK-055` (злито PR #37, 2026-11-26; QA Verified, CI зелений) [А] M Фото-діагностика захворювань за фото листка з відображенням ступеня невизначеності та планом дій
-- [ ] `TASK-056` [А] M Персональний ШІ-чат для рослини (Крок 1: Room v4 завершено, PR #38 злито; Крок 2: ContextBuilder, Gemini-сервіс та репозиторій завершено, PR #40 злито; Крок 3: ChatViewModel та UI в очікуванні дозволу)
+- [ ] `TASK-056` [А] M Персональний ШІ-чат для рослини (Крок 1: Room v4 завершено, PR #38 злито; Крок 2: ContextBuilder, Gemini-сервіс та репозиторій завершено, PR #40 злито; Крок 3: ChatViewModel, репозиторій та координація життєвого циклу завершено, PR #41 злито; Крок PHOTO ARCHITECTURE в очікуванні погодження Власника)
 - [ ] `TASK-057` [А+В] S Наскрізне сімейне тестування на Samsung S24 Ultra та валідація MVP
 
 ### Завдання безпеки даних (Safety Backlog)
@@ -192,6 +192,19 @@
   5. Тести: 291/291 JVM unit-тестів (100% pass), 46/46 Android інструментальних тестів на емуляторі `small_phone` (Android 16 API 36) пройшли успішно; `bundleRelease` на Adoptium JDK 21 збирається успішно (17.6 МБ).
   6. PR #40 пройшов GitHub Actions CI (run `46033756931`, PASS) та незалежний аудит `QA Verified`, після чого злитий у `main` стандартним merge комітом `6f35c8f` за погодженням Власника.
   7. Статус: `TASK-056 / STEP 2` — ЗАВЕРШЕНО. `TASK-056 / STEP 3` (ChatViewModel, UI екрана та навігація) — ОЧІКУЄ ДОЗВОЛУ Власника. `TASK-056` загалом залишається відкритим.
+
+## Оновлення сесії 026 (TASK-056 Крок 3: ChatViewModel, координація withChatSending та злиття PR #41) — 2026-11-27 (append-only)
+- `TASK-056 / Крок 3`: успішно реалізовано, верифіковано та злито в `main` (`cfedf3a`):
+  1. `ChatMessageDao`: додано `@Transaction open suspend fun saveAssistantResponse` (перевірка ролі USER і статусу SENDING, атомарне переведення в SENT і вставка MODEL), `beginRetryForPlant(id, plantId)` з перевіркою `role == 'USER'` та `markSendingAsErrorForPlant(plantId, errorMessage)`.
+  2. `FlowersRepository` та `FlowersRepositoryImpl`: реалізовано 9 методів життєвого циклу чату; впроваджено `withChatSending(plantId)` та ізольовані по рослинах м'ютекси `plantMutexes: ConcurrentHashMap<Long, Mutex>()`. Стан відправки реєструється в `activeSendingCounters` ще ДО запису або переведення повідомлення у `SENDING` у SQLite і звільняється в `finally` під `withContext(NonCancellable)` лише тоді, коли репліка вже досягла фінального статусу (`SENT` або `ERROR`).
+  3. Усунено TOCTOU-гонку: `recoverStaleSendingMessages(plantId)` під тим самим м'ютексом рослини перевіряє `isPlantChatSending(plantId)`. Активні репліки ніколи не переводяться в `ERROR` іншими екземплярами ViewModel. Відновлення після реального збою процесу (`process death`) збережено у повному обсязі.
+  4. `ChatViewModel`: реактивне спостереження через Flow, синхронний дебаунс `_uiState.value.isSending`, повна серіалізація `clearJob` та `recoveryJob`, захист від гонок через монотонний `activeRequestToken`, перевірка null-рослини, перехоплення винятків Room/Gemini.
+  5. Тести: 321/321 JVM unit-тестів (100% pass) включно з `ChatViewModelTest` (25 тестів з детермінованою симуляцією конкурентного recovery) та `FlowersRepositoryChatTest` (8 тестів); 13/13 Android інструментальних тестів у `ChatMessageDaoTest` на емуляторі `small_phone` (Android 16 API 36). `bundleRelease` на Adoptium JDK 21 зібрано успішно (17.6 МБ).
+  6. PR #41 пройшов GitHub Actions CI (run `46057259383`, PASS, 2m05s) та незалежний аудит `QA Verified`, після чого злитий у `main` стандартним merge комітом `cfedf3a` за погодженням Власника.
+  7. Статус завдань:
+     - `TASK-056 / STEP 3` — ЗАВЕРШЕНО.
+     - `TASK-056 / PHOTO ARCHITECTURE` (персональний мультимодальний чат: погодження архітектури вкладень перед STEP 4) — ОЧІКУЄ ПОГОДЖЕННЯ Власника.
+     - `TASK-056` загалом залишається відкритим.
 
 
 

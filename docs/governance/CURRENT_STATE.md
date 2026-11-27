@@ -159,6 +159,26 @@
     - `TASK-056` загалом залишається ВІДКРИТИМ.
   - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався. Хмарні конфігурації (Firebase, Billing, Google Play Console) не змінювалися. Робоча директорія чиста.
 
+- **Сесія 026 (2026-11-27, TASK-056 / Крок 3: ChatViewModel, координація withChatSending та злиття PR #41):**
+  - За погодженням Власника успішно реалізовано, верифіковано та злито в `main` Крок 3 завдання `TASK-056` (PR #41, коміт злиття `cfedf3a`).
+  - **Реалізовані компоненти:**
+    1. **`ChatMessageDao`:** атомарний метод `@Transaction open suspend fun saveAssistantResponse(userMessageId, modelMessage)` (перевірка існування, ролі `USER` та статусу `SENDING`, переведення репліки користувача у `SENT` і запис репліки моделі з примусовими `MODEL` та `SENT`), `beginRetryForPlant(id, plantId)` з перевіркою `role == 'USER'` та `markSendingAsErrorForPlant(plantId, errorMessage)`.
+    2. **`FlowersRepository` та `FlowersRepositoryImpl`:** додано 9 методів життєвого циклу чату; реалізовано координацію `withChatSending(plantId)` та `plantMutexes: ConcurrentHashMap<Long, Mutex>()`. Стан відправки реєструється в `activeSendingCounters` ще ДО запису чи зміни повідомлення на `SENDING` у SQLite і звільняється у `finally` під `withContext(NonCancellable)` лише тоді, коли репліка вже досягла фінального статусу (`SENT` або `ERROR`).
+    3. **Усунення TOCTOU-гонки:** `recoverStaleSendingMessages(plantId)` під тим самим м'ютексом рослини перевіряє `isPlantChatSending(plantId)`. Активні репліки ніколи не переводяться в `ERROR` паралельними екземплярами ViewModel. Повне відновлення після реального `process death` збережено.
+    4. **`ChatViewModel` (`com.flowers.app.ui.chat`):** реактивне спостереження через Flow, синхронний дебаунс `_uiState.value.isSending`, повна серіалізація `clearJob` та `recoveryJob`, захист від гонок між відповідями моделі через монотонний `activeRequestToken`, перевірка null-рослини, безпечне перехоплення винятків Room/Gemini.
+    5. **Зміна продуктового плану (Мультимодальний чат):** зафіксовано погодження Власника щодо обов'язкового додавання фотографій у Flowers 2.0 MVP. PR #41 залишився суто текстовим фундаментом `ChatViewModel`. Архітектура вкладень і мультимодального чату вимагає окремого погодження перед стартом STEP 4.
+  - **Тестування та верифікація:**
+    - 321/321 JVM unit-тести (100% pass) включно з `ChatViewModelTest` (25 тестів з детермінованими тестами конкурентного recovery) та `FlowersRepositoryChatTest` (8 тестів).
+    - 13/13 Android інструментальні тести у `ChatMessageDaoTest` на емуляторі `small_phone` (Android 16 API 36) пройшли успішно.
+    - `bundleRelease` на Adoptium JDK 21 зібрано успішно (AAB 17 657 556 байт).
+    - GitHub Actions CI: run `46057259383` — SUCCESS (`Tests and release bundle`, 2m05s).
+    - Незалежний QA-аудит (модель Pro): `QA Verified`.
+  - **Статус завдань:**
+    - `TASK-056 / STEP 3` — ЗАВЕРШЕНО.
+    - `TASK-056 / PHOTO ARCHITECTURE` (персональний мультимодальний чат: погодження архітектури вкладень перед STEP 4) — ОЧІКУЄ ПОГОДЖЕННЯ Власника.
+    - `TASK-056` загалом залишається ВІДКРИТИМ.
+  - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався. Хмарні конфігурації (Firebase, Billing, Google Play Console) не змінювалися. Робоча директорія чиста.
+
 
 
 

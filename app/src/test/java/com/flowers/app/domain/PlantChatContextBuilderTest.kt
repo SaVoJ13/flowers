@@ -202,22 +202,54 @@ class PlantChatContextBuilderTest {
     }
 
     @Test
-    fun `currentQuestion notDuplicatedInHistory`() {
+    fun `currentQuestionExcludedByStableIdOrStatus_notByMatchingText`() {
         val plant = testPlant(id = 1L)
         val messages = listOf(
-            msg(plantId = 1L, content = "Скільки води потрібно?", ts = 100L, status = MessageStatus.SENT),
-            msg(plantId = 1L, content = "Близько 200 мл", ts = 150L, role = MessageRole.MODEL, status = MessageStatus.SENT)
+            msg(plantId = 1L, content = "Скільки води потрібно?", ts = 100L, id = 1L, status = MessageStatus.SENT),
+            msg(plantId = 1L, content = "Близько 200 мл", ts = 150L, id = 2L, role = MessageRole.MODEL, status = MessageStatus.SENT),
+            msg(plantId = 1L, content = "Скільки води потрібно?", ts = 200L, id = 3L, status = MessageStatus.SENDING)
         )
 
-        val prompt = PlantChatContextBuilder.buildPrompt(plant, emptyList(), messages, "Скільки води потрібно?", "uk")
+        // Поточна репліка з id = 3 у статусі SENDING або передана через currentMessageId
+        val prompt = PlantChatContextBuilder.buildPrompt(
+            plant = plant,
+            careEvents = emptyList(),
+            chatHistory = messages,
+            userQuestion = "Скільки води потрібно?",
+            language = "uk",
+            currentMessageId = 3L
+        )
         val dialogueSection = prompt.userPrompt.substringAfter("<dialogue_history>").substringBefore("</dialogue_history>")
 
-        assertFalse("Поточне питання не повинно дублюватися в історії діалогу", dialogueSection.contains("Скільки води потрібно?"))
-        assertTrue("Відповідь моделі повинна залишитись", dialogueSection.contains("Близько 200 мл"))
+        // Попередній діалог (id=1, id=2) залишається в контексті!
+        assertTrue("Старе питання користувача має залишитися в історії", dialogueSection.contains("Користувач: Скільки води потрібно?"))
+        assertTrue("Попередня відповідь моделі повинна залишитись", dialogueSection.contains("Помічник: Близько 200 мл"))
+    }
 
-        val promptLower = PlantChatContextBuilder.buildPrompt(plant, emptyList(), messages, "скільки води потрібно?", "uk")
-        val dialogueLower = promptLower.userPrompt.substringAfter("<dialogue_history>").substringBefore("</dialogue_history>")
-        assertFalse("Поточне питання в іншому регістрі також не повинно дублюватися", dialogueLower.contains("Скільки води потрібно?"))
+    @Test
+    fun `userAsksSameQuestionTwiceAtDifferentTimes_pastQuestionAndAnswerRemainInHistory`() {
+        val plant = testPlant(id = 1L)
+        // Користувач питав "Як часто поливати?" раніше, отримав відповідь, а тепер запитує знову
+        val pastMessages = listOf(
+            msg(plantId = 1L, content = "Як часто поливати?", ts = 1000L, id = 10L, role = MessageRole.USER, status = MessageStatus.SENT),
+            msg(plantId = 1L, content = "Поливайте раз на 7 днів після просихання.", ts = 1005L, id = 11L, role = MessageRole.MODEL, status = MessageStatus.SENT)
+        )
+
+        val prompt = PlantChatContextBuilder.buildPrompt(
+            plant = plant,
+            careEvents = emptyList(),
+            chatHistory = pastMessages,
+            userQuestion = "Як часто поливати?",
+            language = "uk",
+            currentMessageId = 12L
+        )
+
+        val dialogueSection = prompt.userPrompt.substringAfter("<dialogue_history>").substringBefore("</dialogue_history>")
+        val userQuestionSection = prompt.userPrompt.substringAfter("<user_question>").substringBefore("</user_question>")
+
+        assertTrue("Попереднє запитання має бути в історії", dialogueSection.contains("Користувач: Як часто поливати?"))
+        assertTrue("Попередня відповідь помічника має бути в історії", dialogueSection.contains("Помічник: Поливайте раз на 7 днів після просихання."))
+        assertTrue("Нове запитання передається у блоці user_question", userQuestionSection.contains("Як часто поливати?"))
     }
 
     @Test
@@ -342,5 +374,48 @@ class PlantChatContextBuilderTest {
 
         assertFalse("URI фото рослини не повинен передаватися в ШІ", text.contains("file:///storage/emulated/0/Android/data"))
         assertFalse("URI фото події не повинен передаватися в ШІ", text.contains("leaf.jpg"))
+    }
+
+    @Test
+    fun `localPathsInFreeTextAreSanitizedToNeutralMarker`() {
+        // Шляхи у вільному тексті: назва, опис, нотатки догляду, повідомлення, питання
+        val plant = testPlant(
+            id = 1L,
+            name = "Монстера з C:\\Users\\user\\Pictures\\plant.png",
+            room = "Кімната /data/user/0/com.flowers.app/room.txt"
+        )
+        val events = listOf(
+            event(
+                plantId = 1L,
+                type = "DELAY",
+                ts = 1000L,
+                notes = "Фото у /storage/emulated/0/DCIM/photo.jpg перевірено"
+            )
+        )
+        val messages = listOf(
+            msg(
+                plantId = 1L,
+                content = "Ось старе фото: content://media/external/images/media/42 все ок",
+                ts = 100L
+            )
+        )
+        val question = "Ось нове фото: file:///data/user/0/com.flowers.app/cache/leaf.jpg чи це хлороз?"
+
+        val prompt = PlantChatContextBuilder.buildPrompt(plant, events, messages, question, "uk")
+        val text = prompt.combinedPrompt
+
+        // Жодних локальних шляхів чи URI у промпті не повинно бути
+        assertFalse("Не повинно містити file://", text.contains("file://"))
+        assertFalse("Не повинно містити content://", text.contains("content://"))
+        assertFalse("Не повинно містити /storage/emulated/", text.contains("/storage/emulated/"))
+        assertFalse("Не повинно містити /data/user/", text.contains("/data/user/"))
+        assertFalse("Не повинно містити Windows-шляхів C:\\", text.contains("""C:\"""))
+
+        // Замінено на нейтральний маркер [локальний_шлях] зі збереженням корисного тексту
+        assertTrue("Корисний текст назви збережено", text.contains("Монстера з [локальний_шлях]"))
+        assertTrue("Корисний текст розташування збережено", text.contains("Кімната [локальний_шлях]"))
+        assertTrue("Корисний текст нотатки збережено", text.contains("Фото у [локальний_шлях] перевірено"))
+        assertTrue("Корисний текст повідомлення збережено", text.contains("Ось старе фото: [локальний_шлях] все ок"))
+        assertTrue("Корисний текст питання збережено", text.contains("Ось нове фото: [локальний_шлях] чи це хлороз?"))
     }
 }

@@ -153,7 +153,8 @@ class FlowersRepositoryImpl(
     override suspend fun sendPlantChatMessage(
         plantId: Long,
         userQuestion: String,
-        language: String
+        language: String,
+        currentMessageId: Long?
     ): com.flowers.app.data.remote.PlantChatResult = withContext(Dispatchers.IO) {
         if (userQuestion.isBlank()) {
             return@withContext com.flowers.app.data.remote.PlantChatResult.ServiceError("Запитання не може бути порожнім.")
@@ -170,7 +171,8 @@ class FlowersRepositoryImpl(
             careEvents = careEvents,
             chatHistory = chatHistory,
             userQuestion = userQuestion,
-            language = language
+            language = language,
+            currentMessageId = currentMessageId
         )
 
         geminiPlantService.sendPlantChatMessage(prompt, plantId)

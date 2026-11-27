@@ -45,6 +45,7 @@ interface FlowersRepository {
     suspend fun sendPlantChatMessage(
         plantId: Long,
         userQuestion: String,
-        language: String = "uk"
+        language: String = "uk",
+        currentMessageId: Long? = null
     ): com.flowers.app.data.remote.PlantChatResult
 }

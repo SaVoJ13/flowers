@@ -355,4 +355,23 @@ SQLite виконує REPLACE як DELETE + INSERT; Room вмикає foreign ke
    - Додано юніт-тести репозиторію `FlowersRepositoryChatTest` (валідація порожнього питання, невідомий plantId, успішна делегація).
 5. **Підсумкові тести:** 287/287 JVM unit-тестів успішно пройдено (100%), `bundleRelease` зібрано успішно (17.6 МБ).
 
+### Архітектурні виправлення за вказівкою Власника (2026-11-27):
+1. **Справжнє розділення системних інструкцій:**
+   - `PlantChatPrompt.systemInstruction` передається через офіційний параметр Firebase AI Logic `systemInstruction = content { text(sysInstruction) }`.
+   - `PlantChatPrompt.userPrompt` передається окремо через `model.generateContent(userPrompt)`.
+   - Модель отримує динамічну мову (`systemInstructionText`) індивідуально для кожного запиту без зміни глобальної конфігурації інших моделей.
+   - Тестовий генератор `generateChatText: suspend (systemInstruction: String, userPrompt: String) -> String?` верифікує повне розділення преамбули та контексту рослини.
+2. **Виправлення дедуплікації діалогу:**
+   - Вилучено видалення повідомлень за збігом тексту.
+   - Поточна репліка відсікається виключно за станом (`status != MessageStatus.SENT`) або за стабільним ID (`currentMessageId`).
+   - Справжні повторення того самого запитання в різні моменти часу та попередні відповіді ШІ залишаються у діалоговому контексті.
+3. **Захист локальних файлових шляхів у вільному тексті:**
+   - У `PlantChatContextBuilder.sanitizeText()` додано фільтрацію локальних шляхів (`file://`, `content://`, `/storage/emulated/`, `/data/user/`, `/data/data/`, `/sdcard/`, Windows-шляхи на кшталт `C:\...`).
+   - Будь-які шляхи у назвах, описах, нотатках догляду, старих репліках чи новому питанні автоматично замінюються на нейтральний маркер `[локальний_шлях]`, залишаючи решту тексту неушкодженою.
+4. **Підсумкова верифікація:**
+   - JVM Unit Tests: **290 / 290 PASSED** (0 failures, 0 errors, 0 skipped).
+   - Android Instrumented Tests: **46 / 46 PASSED** на емуляторі `small_phone` (`emulator-5554`).
+   - `bundleRelease` на JDK 21: BUILD SUCCESSFUL (AAB 17 642 725 байт).
+
+
 

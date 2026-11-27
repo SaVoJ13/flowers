@@ -34,6 +34,17 @@ object PlantChatContextBuilder {
     const val MAX_TEXT_FIELD_CHARS = 120
     const val MAX_TOTAL_PROMPT_CHARS = 3500
 
+    const val LOCAL_PATH_PLACEHOLDER = "[локальний_шлях]"
+
+    private val LOCAL_PATH_PATTERNS = listOf(
+        // file:// та content:// URI (включно з file:///...)
+        Regex("""\b(?:file|content)://[^\s<>"'\]]+""", RegexOption.IGNORE_CASE),
+        // Android шляхи файлової системи (/storage/emulated/..., /data/user/..., /data/data/..., /sdcard/...)
+        Regex("""/(?:storage/emulated/\d+|data/user/\d+|data/data|sdcard)/[^\s<>"'\]]+""", RegexOption.IGNORE_CASE),
+        // Windows абсолютні шляхи (наприклад C:\... або C:/...)
+        Regex("""\b[a-zA-Z]:[\\/][^\s<>"'\]]+""", RegexOption.IGNORE_CASE)
+    )
+
     private val SUPPORTED_LANGUAGES = mapOf(
         "uk" to "українська",
         "en" to "English",
@@ -50,7 +61,8 @@ object PlantChatContextBuilder {
         careEvents: List<CareEventEntity>,
         chatHistory: List<ChatMessageEntity>,
         userQuestion: String,
-        language: String = "uk"
+        language: String = "uk",
+        currentMessageId: Long? = null
     ): PlantChatPrompt {
         val normalizedLangCode = language.trim().lowercase().split("-", "_")[0].ifBlank { "uk" }
         val targetLanguageName = SUPPORTED_LANGUAGES[normalizedLangCode] ?: SUPPORTED_LANGUAGES["uk"]!!
@@ -63,15 +75,13 @@ object PlantChatContextBuilder {
             .sortedWith(compareByDescending<CareEventEntity> { it.timestamp }.thenByDescending { it.id })
             .take(MAX_CARE_EVENTS)
 
-        // 2. Детермінований відбір завершених повідомлень (тільки поточна рослина, статус SENT, не дублює поточне питання)
-        val rawNormalizedQuestion = userQuestion.trim().lowercase()
-        val sanitizedNormalizedQuestion = sanitizedQuestion.trim().lowercase()
+        // 2. Детермінований відбір завершених повідомлень:
+        // Тільки поточна рослина, тільки завершені повідомлення (status == MessageStatus.SENT).
+        // Поточна репліка виключається за станом (SENDING/ERROR) або за стабільним ID (currentMessageId).
+        // Справжні попередні повторення запитання та відповіді залишаються в історії!
         val validChatHistory = chatHistory
             .filter { it.plantId == plant.id && it.status == MessageStatus.SENT }
-            .filter {
-                val itemContent = it.content.trim().lowercase()
-                itemContent != rawNormalizedQuestion && itemContent != sanitizedNormalizedQuestion
-            }
+            .filter { currentMessageId == null || it.id != currentMessageId }
             .sortedWith(compareBy<ChatMessageEntity> { it.timestamp }.thenBy { it.id })
             .takeLast(MAX_CHAT_MESSAGES)
 
@@ -221,14 +231,20 @@ $userQuestion
      */
     fun sanitizeText(input: String?, maxChars: Int): String {
         if (input.isNullOrBlank()) return ""
-        val escaped = input
+        var cleaned = input
             .replace('<', '[')
             .replace('>', ']')
             .trim()
-        return if (escaped.length > maxChars) {
-            escaped.take(maxChars).trimEnd() + "…"
+
+        for (pattern in LOCAL_PATH_PATTERNS) {
+            cleaned = pattern.replace(cleaned, LOCAL_PATH_PLACEHOLDER)
+        }
+
+        cleaned = cleaned.trim()
+        return if (cleaned.length > maxChars) {
+            cleaned.take(maxChars).trimEnd() + "…"
         } else {
-            escaped
+            cleaned
         }
     }
 }

@@ -55,7 +55,7 @@ class GeminiPlantServiceChatTest {
 
     private fun service(
         isOnline: Boolean = true,
-        chatGenerator: suspend (String) -> String? = { "Порада: поливайте помірно." }
+        chatGenerator: suspend (systemInstruction: String, userPrompt: String) -> String? = { _, _ -> "Порада: поливайте помірно." }
     ): GeminiPlantService {
         val fakeNetwork = object : NetworkChecker {
             override fun isOnline(): Boolean = isOnline
@@ -69,8 +69,37 @@ class GeminiPlantServiceChatTest {
     }
 
     @Test
+    fun `chatSeparatesSystemInstructionAndUserPrompt`() = runBlocking {
+        var capturedSystemInstruction: String? = null
+        var capturedUserPrompt: String? = null
+
+        val s = service(chatGenerator = { sys, user ->
+            capturedSystemInstruction = sys
+            capturedUserPrompt = user
+            "Добре освітлене місце."
+        })
+        val prompt = PlantChatContextBuilder.buildPrompt(testPlant(), emptyList(), emptyList(), "Яке світло потрібне?", "en")
+
+        val result = s.sendPlantChatMessage(prompt, plantId = 1L)
+        assertTrue(result is PlantChatResult.Success)
+
+        // 1. SystemInstruction передається окремо й містить системну роль та динамічну мову
+        assertTrue(capturedSystemInstruction!!.contains("Ти — ботанічний помічник"))
+        assertTrue(capturedSystemInstruction!!.contains("English"))
+        assertFalse(capturedSystemInstruction!!.contains("Фікус Каучуконосний"))
+        assertFalse(capturedSystemInstruction!!.contains("Спальня"))
+        assertFalse(capturedSystemInstruction!!.contains("Яке світло потрібне?"))
+
+        // 2. UserPrompt передається окремо й містить паспорт рослини та запит
+        assertTrue(capturedUserPrompt!!.contains("<plant_passport>"))
+        assertTrue(capturedUserPrompt!!.contains("Фікус Каучуконосний"))
+        assertTrue(capturedUserPrompt!!.contains("Яке світло потрібне?"))
+        assertFalse(capturedUserPrompt!!.contains("Ти — ботанічний помічник"))
+    }
+
+    @Test
     fun `chatSuccess returnsSuccessWithCleanModelReply`() = runBlocking {
-        val s = service(chatGenerator = { "Фікус любить розсіяне світло і регулярне обприскування." })
+        val s = service(chatGenerator = { _, _ -> "Фікус любить розсіяне світло і регулярне обприскування." })
         val prompt = PlantChatContextBuilder.buildPrompt(testPlant(), emptyList(), emptyList(), "Яке світло потрібне?", "uk")
 
         val result = s.sendPlantChatMessage(prompt, plantId = 1L)
@@ -84,7 +113,7 @@ class GeminiPlantServiceChatTest {
     @Test
     fun `offline returnsOffline withoutCallingGemini`() = runBlocking {
         var called = false
-        val s = service(isOnline = false, chatGenerator = {
+        val s = service(isOnline = false, chatGenerator = { _, _ ->
             called = true
             "Відповідь"
         })
@@ -99,23 +128,23 @@ class GeminiPlantServiceChatTest {
 
     @Test
     fun `emptyOrBlankResponse returnsInvalidResponse`() = runBlocking {
-        val s1 = service(chatGenerator = { "" })
+        val s1 = service(chatGenerator = { _, _ -> "" })
         val prompt = PlantChatContextBuilder.buildPrompt(testPlant(), emptyList(), emptyList(), "Питання", "uk")
         val r1 = s1.sendPlantChatMessage(prompt, plantId = 1L)
         assertTrue(r1 is PlantChatResult.InvalidResponse)
 
-        val s2 = service(chatGenerator = { "    \n   " })
+        val s2 = service(chatGenerator = { _, _ -> "    \n   " })
         val r2 = s2.sendPlantChatMessage(prompt, plantId = 1L)
         assertTrue(r2 is PlantChatResult.InvalidResponse)
 
-        val s3 = service(chatGenerator = { null })
+        val s3 = service(chatGenerator = { _, _ -> null })
         val r3 = s3.sendPlantChatMessage(prompt, plantId = 1L)
         assertTrue(r3 is PlantChatResult.InvalidResponse)
     }
 
     @Test
     fun `cancellationException isRethrownAndNotSwallowed`() = runBlocking {
-        val s = service(chatGenerator = {
+        val s = service(chatGenerator = { _, _ ->
             throw kotlinx.coroutines.CancellationException("User left chat screen")
         })
         val prompt = PlantChatContextBuilder.buildPrompt(testPlant(), emptyList(), emptyList(), "Питання", "uk")
@@ -132,7 +161,7 @@ class GeminiPlantServiceChatTest {
 
     @Test
     fun `timeout returnsTimeout`() = runBlocking {
-        val s = service(chatGenerator = {
+        val s = service(chatGenerator = { _, _ ->
             throw SocketTimeoutException("Read timed out")
         })
         val prompt = PlantChatContextBuilder.buildPrompt(testPlant(), emptyList(), emptyList(), "Питання", "uk")
@@ -144,7 +173,7 @@ class GeminiPlantServiceChatTest {
 
     @Test
     fun `timeoutCancellationException returnsTimeout`() = runBlocking {
-        val s = service(chatGenerator = {
+        val s = service(chatGenerator = { _, _ ->
             kotlinx.coroutines.withTimeout(1L) {
                 kotlinx.coroutines.delay(50L)
             }
@@ -158,7 +187,7 @@ class GeminiPlantServiceChatTest {
 
     @Test
     fun `rateLimit429 returnsRateLimited`() = runBlocking {
-        val s = service(chatGenerator = {
+        val s = service(chatGenerator = { _, _ ->
             throw SdkExceptions.quota()
         })
         val prompt = PlantChatContextBuilder.buildPrompt(testPlant(), emptyList(), emptyList(), "Питання", "uk")
@@ -170,7 +199,7 @@ class GeminiPlantServiceChatTest {
 
     @Test
     fun `serviceError500 returnsServiceError`() = runBlocking {
-        val s = service(chatGenerator = {
+        val s = service(chatGenerator = { _, _ ->
             throw SdkExceptions.server()
         })
         val prompt = PlantChatContextBuilder.buildPrompt(testPlant(), emptyList(), emptyList(), "Питання", "uk")
@@ -183,7 +212,7 @@ class GeminiPlantServiceChatTest {
     @Test
     fun `toxicChemicalAdvice isSanitizedByGuardrail`() = runBlocking {
         val toxicReply = "Терміново обробіть листя дихлофосом або розчином актари і додайте мідний купорос."
-        val s = service(chatGenerator = { toxicReply })
+        val s = service(chatGenerator = { _, _ -> toxicReply })
         val prompt = PlantChatContextBuilder.buildPrompt(testPlant(), emptyList(), emptyList(), "Як позбутися комах?", "uk")
 
         val result = s.sendPlantChatMessage(prompt, plantId = 1L)
@@ -200,7 +229,7 @@ class GeminiPlantServiceChatTest {
     @Test
     fun `concurrentCallsForSamePlant rejectsSecondCall`() = runBlocking {
         val gate = CompletableDeferred<Unit>()
-        val s = service(chatGenerator = {
+        val s = service(chatGenerator = { _, _ ->
             gate.await()
             "Відповідь після затримки"
         })

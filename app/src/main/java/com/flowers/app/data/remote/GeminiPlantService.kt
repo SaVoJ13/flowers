@@ -159,8 +159,15 @@ class GeminiPlantService(
         }
         defaultModel.generateContent(inputContent).text
     },
-    /** Текстовий виклик моделі для персонального ШІ-чату (TASK-056 / Крок 2). */
-    private val generateChatText: suspend (String) -> String? = { prompt -> chatModel.generateContent(prompt).text }
+    /** Текстовий виклик моделі для персонального ШІ-чату з передачею systemInstruction окремо (TASK-056 / Крок 2). */
+    private val generateChatText: suspend (systemInstruction: String, userPrompt: String) -> String? = { sysInstruction, userPrompt ->
+        val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+            modelName = GEMINI_MODEL,
+            generationConfig = chatGenerationConfig,
+            systemInstruction = content { text(sysInstruction) }
+        )
+        model.generateContent(userPrompt).text
+    }
 ) {
     private val gson = Gson()
     private val plantChatMutexes = java.util.concurrent.ConcurrentHashMap<Long, kotlinx.coroutines.sync.Mutex>()
@@ -176,15 +183,12 @@ class GeminiPlantService(
             )
         }
 
-        val chatModel by lazy {
-            Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-                modelName = GEMINI_MODEL,
-                generationConfig = generationConfig {
-                    responseMimeType = "text/plain"
-                    temperature = 0.4f
-                    maxOutputTokens = 350
-                }
-            )
+        val chatGenerationConfig by lazy {
+            generationConfig {
+                responseMimeType = "text/plain"
+                temperature = 0.4f
+                maxOutputTokens = 350
+            }
         }
     }
 
@@ -669,7 +673,7 @@ class GeminiPlantService(
 
         try {
             val rawResponse = kotlinx.coroutines.withTimeout(20_000L) {
-                generateChatText(prompt.combinedPrompt)
+                generateChatText(prompt.systemInstruction, prompt.userPrompt)
             }
 
             if (rawResponse.isNullOrBlank()) {

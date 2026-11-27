@@ -135,7 +135,7 @@ class FlowersRepositoryChatTest {
             networkChecker = object : com.flowers.app.data.remote.NetworkChecker {
                 override fun isOnline(): Boolean = true
             },
-            generateChatText = { "Фікус почувається чудово." }
+            generateChatText = { _, _ -> "Фікус почувається чудово." }
         )
 
         val repo = FlowersRepositoryImpl(

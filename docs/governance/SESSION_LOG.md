@@ -412,6 +412,28 @@
   - Зареєстровано завдання безпеки `TASK-056-SAFETY-01`.
   - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався, сторонні сервіси не змінювалися, робоча директорія чиста.
 
+### Сесія 026, реалізація та завершення TASK-056-SAFETY-01 (2026-11-27)
+- **Мета:** усунути ризик каскадного видалення дочірніх таблиць `care_events` та `chat_messages` при повторній вставці рослини шляхом заміни `OnConflictStrategy.REPLACE` на `ABORT` у `PlantDao.insertPlant()`.
+- **Виконані роботи:**
+  1. У `PlantDao.kt` замінено `@Insert(onConflict = OnConflictStrategy.REPLACE)` на `@Insert(onConflict = OnConflictStrategy.ABORT)` для методу `insertPlant()`.
+  2. Перевірено сумісність контракту в усіх місцях виклику: у `PlantsViewModel` метод викликається лише при створенні нової рослини (`id == 0L`), редагування здійснюється через `updatePlant()`.
+  3. Оновлено тест `abortOnDuplicateInsertPlant_preservesCascadeData_andUpdatePlantIsSafe` у `ChatMessageDaoTest.kt`: підтверджено викидання `SQLiteConstraintException` при конфлікті ID, збереження полів батьківської рослини, збереження подій WATER, DELAY, HEALTH_CHECK, збереження повідомлень USER та MODEL, коректність `updatePlant()` та ізоляцію сторонніх рослин.
+  4. Створено картку завдання `docs/tasks/TASK-056-SAFETY-01.md`.
+- **Тестування та верифікація:**
+  - JVM модульні тести: 254/254 PASSED (`testDebugUnitTest`).
+  - Android інструментальні тести: 46/46 PASSED на емуляторі `small_phone` (Android 16 API 36).
+  - Емулятор зупинено (`emu kill`).
+  - Збірка: `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL (AAB 17 629 149 байт).
+  - GitHub Actions CI: run `45937586351` — SUCCESS (1m15s).
+  - Незалежний QA-аудит (модель Pro): `QA Verified`.
+- **Злиття:**
+  - За погодженням Власника PR #39 злито в `main` стандартним merge комітом `7d585f6`.
+  - Локальний `main` синхронізовано з `origin/main`.
+  - Завдання `TASK-056-SAFETY-01` закрито.
+  - Завдання `TASK-056` загалом залишається відкритим (Крок 2 в очікуванні).
+  - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався, сторонні сервіси не змінювалися, робоча директорія чиста.
+
+
 
 
 

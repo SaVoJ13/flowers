@@ -123,6 +123,24 @@
     - Зареєстровано окреме завдання безпеки `TASK-056-SAFETY-01`: заміна `OnConflictStrategy.REPLACE` на `ABORT` у `PlantDao.insertPlant()` з тестами збереження `care_events` та `chat_messages`.
   - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався. Хмарні конфігурації (Firebase, Billing, Google Play Console) не змінювалися. Робоча директорія чиста.
 
+- **Сесія 026 (2026-11-27, TASK-056-SAFETY-01 злиття PR #39):**
+  - За погодженням Власника успішно реалізовано та злито в `main` завдання безпеки `TASK-056-SAFETY-01` (PR #39, коміт злиття `7d585f6`).
+  - **Виконані зміни:**
+    1. У `PlantDao.kt` замінено `@Insert(onConflict = OnConflictStrategy.REPLACE)` на `@Insert(onConflict = OnConflictStrategy.ABORT)`. Запобігає SQLite каскадному видаленню (`DELETE + INSERT`) дочірніх таблиць `care_events` та `chat_messages` при випадковій повторній вставці рослини з існуючим ID.
+    2. Усі місця викликів `insertPlant()` у production-коді (`PlantsViewModel`) перевірено: метод викликається виключно для нових рослин (`id == 0L`), редагування відбувається штатно через `updatePlant()`.
+    3. Оновлено тест `abortOnDuplicateInsertPlant_preservesCascadeData_andUpdatePlantIsSafe` у `ChatMessageDaoTest.kt` з повною перевіркою збереження всіх типів подій догляду та реплік чату.
+  - **Тестування та верифікація:**
+    - 254/254 JVM unit-тести (100% pass).
+    - 46/46 Android інструментальні тести на емуляторі `small_phone` (Android 16 API 36) пройшли успішно.
+    - `bundleRelease` на Adoptium JDK 21 збирається успішно (17.6 МБ).
+    - GitHub Actions CI: run `45937586351` — SUCCESS (`Tests and release bundle`, 1m15s).
+    - Незалежний QA-аудит (модель Pro): `QA Verified`.
+  - **Статус завдань:**
+    - Завдання `TASK-056-SAFETY-01` успішно ЗАВЕРШЕНО.
+    - Завдання `TASK-056` залишається ВІДКРИТИМ (наразі завершено Крок 1 та SAFETY-01; Крок 2 очікує дозволу Власника).
+  - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався. Хмарні конфігурації (Firebase, Billing, Google Play Console) не змінювалися. Робоча директорія чиста.
+
+
 
 
 

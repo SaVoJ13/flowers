@@ -121,7 +121,7 @@
 - [ ] `TASK-057` [А+В] S Наскрізне сімейне тестування на Samsung S24 Ultra та валідація MVP
 
 ### Завдання безпеки даних (Safety Backlog)
-- [ ] `TASK-056-SAFETY-01` [А] S Безпека каскаду: заміна OnConflictStrategy.REPLACE на ABORT у PlantDao.insertPlant() з тестами збереження care_events та chat_messages.
+- [x] `TASK-056-SAFETY-01` (злито PR #39, 2026-11-27; QA Verified, CI зелений) [А] S Безпека каскаду: заміна OnConflictStrategy.REPLACE на ABORT у PlantDao.insertPlant() з тестами збереження care_events та chat_messages.
 
 ### Некритичні завдання перед релізом (Polish / Backlog)
 - [ ] `TASK-054-POLISH` [А] S Оновлення заголовка дати та сезонних порад у TodayScreen при зміні календарного дня на льоту без перезапуску застосунку.
@@ -173,6 +173,16 @@
   6. PR #38 злито в `main` звичайним merge комітом `d931f26` після схвалення Власника, зеленого CI (run `45884401959`) та вердикту `QA Verified`.
   7. Завдання `TASK-056` залишається відкритим для наступних кроків (Gemini сервіс, контекст, ViewModel, UI).
   8. Зареєстровано окреме завдання безпеки `TASK-056-SAFETY-01`: заміна `OnConflictStrategy.REPLACE` на `ABORT` у `PlantDao.insertPlant()` з тестами збереження дочірніх таблиць.
+
+## Оновлення сесії 026 (TASK-056-SAFETY-01 злиття PR #39) — 2026-11-27 (append-only)
+- `TASK-056-SAFETY-01`: захист історії рослин від каскадного видалення успішно реалізовано та злито в `main` (`7d585f6`):
+  1. Замінено `OnConflictStrategy.REPLACE` на `ABORT` у `PlantDao.insertPlant()`.
+  2. Перевірено всі виклики `insertPlant()`: у production-коді (`PlantsViewModel`) метод викликається лише для нових рослин (`id == 0L`), редагування йде виключно через `updatePlant()`.
+  3. Оновлено тест `abortOnDuplicateInsertPlant_preservesCascadeData_andUpdatePlantIsSafe` у `ChatMessageDaoTest.kt` (перевірка захисту від каскадного видалення подій догляду та повідомлень чату).
+  4. Тести: 254/254 JVM unit-тестів успішні, 46/46 Android інструментальних тестів на емуляторі `small_phone` (API 36) успішні, `bundleRelease` на JDK 21 успішний (17.6 МБ).
+  5. PR #39 пройшов GitHub Actions CI (run `45937586351`) та незалежний аудит `QA Verified`, після чого злитий у `main` комітом `7d585f6` за погодженням Власника.
+  6. Завдання `TASK-056-SAFETY-01` закрито. Завдання `TASK-056` загалом залишається відкритим (Крок 2 в очікуванні).
+
 
 
 

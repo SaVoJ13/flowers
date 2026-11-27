@@ -201,35 +201,98 @@ class ChatMessageDaoTest {
     }
 
     /**
-     * Характеризація ризику (рішення Власника потрібне): PlantDao.insertPlant має OnConflictStrategy.REPLACE.
-     * SQLite реалізує REPLACE як DELETE + INSERT, тому при увімкнених foreign keys (Room вмикає їх) повторна
-     * вставка рослини з уже існуючим id каскадно видаляє дочірні care_events і chat_messages.
-     * Тест фіксує фактичну поведінку, а також безпечну альтернативу (updatePlant) без втрат.
-     * Поточний production-код викликає insertPlant лише для НОВИХ рослин (id = 0), редагування йде через updatePlant.
+     * TASK-056-SAFETY-01: PlantDao.insertPlant має OnConflictStrategy.ABORT.
+     * Запобігає каскадному видаленню (DELETE + INSERT) дочірніх care_events та chat_messages
+     * при випадковій повторній вставці рослини з уже наявним ID.
+     *
+     * Перевіряє:
+     * 1. Створення нової рослини успішне (plantId > 0).
+     * 2. Повторна вставка з наявним ID викликає SQLiteConstraintException (ABORT).
+     * 3. Назва та інші поля існуючої рослини залишаються незмінними.
+     * 4. Усі події догляду (WATER, DELAY, HEALTH_CHECK) залишаються незмінними.
+     * 5. Усі повідомлення чату (USER, MODEL) залишаються незмінними.
+     * 6. updatePlant() дозволяє штатно редагувати рослину без втрати дочірніх записів.
+     * 7. Історія та стан інших рослин залишаються повністю недоторканими.
      */
     @Test
-    fun replaceOnInsertPlant_documentsCascadeDataLoss_andUpdatePlantIsSafe() = runBlocking {
-        val p = plant("Оригінал")
-        val dao = db.chatMessageDao()
-        dao.insertMessage(msg(p, "історія", 1))
-        db.careEventDao().insertEvent(CareEventEntity(plantId = p, eventType = "WATER", timestamp = 1))
+    fun abortOnDuplicateInsertPlant_preservesCascadeData_andUpdatePlantIsSafe() = runBlocking {
+        // 1. Створення двох окремих рослин
+        val p1 = plant("Оригінал 1")
+        val p2 = plant("Оригінал 2")
+        assertTrue(p1 > 0)
+        assertTrue(p2 > 0)
 
-        // Безпечний шлях: @Update не чіпає дочірні записи.
-        val original = db.plantDao().getPlantById(p)!!
-        db.plantDao().updatePlant(original.copy(customName = "Оновлено"))
-        assertEquals(1, dao.getMessages(p).size)
-        assertEquals(1, db.careEventDao().getEventsForPlant(p).first().size)
+        val chatDao = db.chatMessageDao()
+        val careDao = db.careEventDao()
+        val plantDao = db.plantDao()
 
-        // Небезпечний шлях: REPLACE з наявним id.
-        db.plantDao().insertPlant(original.copy(customName = "Через REPLACE"))
-        val afterReplace = db.plantDao().getPlantById(p)
-        assertNotNull(afterReplace)
-        assertEquals("Через REPLACE", afterReplace!!.customName)
-        val chatLeft = dao.getMessages(p).size
-        val eventsLeft = db.careEventDao().getEventsForPlant(p).first().size
-        // РИЗИК ПІДТВЕРДЖЕНО: дочірні записи зникли разом із «замінюваним» рядком.
-        assertEquals("REPLACE каскадно видаляє chat_messages", 0, chatLeft)
-        assertEquals("REPLACE каскадно видаляє care_events", 0, eventsLeft)
-        assertFalse(chatLeft > 0 && eventsLeft > 0)
+        // Додаємо повний набір подій та повідомлень для p1
+        careDao.insertEvent(CareEventEntity(plantId = p1, eventType = "WATER", timestamp = 100, notes = "Полив 1"))
+        careDao.insertEvent(CareEventEntity(plantId = p1, eventType = "DELAY", timestamp = 200, daysDelayed = 2))
+        careDao.insertEvent(CareEventEntity(plantId = p1, eventType = "HEALTH_CHECK", timestamp = 300, notes = "Діагностика", photoUri = "file:///tmp/leaf.jpg"))
+        chatDao.insertMessage(msg(p1, "Питання користувача", 150, MessageRole.USER, MessageStatus.SENT))
+        chatDao.insertMessage(msg(p1, "Відповідь моделі", 250, MessageRole.MODEL, MessageStatus.SENT))
+
+        // Додаємо дані для p2 (контрольна рослина)
+        careDao.insertEvent(CareEventEntity(plantId = p2, eventType = "WATER", timestamp = 110, notes = "Полив p2"))
+        chatDao.insertMessage(msg(p2, "Чат рослини 2", 160, MessageRole.USER, MessageStatus.SENT))
+
+        // 6. Штатне редагування через updatePlant() не чіпає дочірні записи
+        val originalP1 = plantDao.getPlantById(p1)!!
+        plantDao.updatePlant(originalP1.copy(customName = "Оновлена назва 1", roomLocation = "Спальня"))
+
+        val p1AfterUpdate = plantDao.getPlantById(p1)!!
+        assertEquals("Оновлена назва 1", p1AfterUpdate.customName)
+        assertEquals("Спальня", p1AfterUpdate.roomLocation)
+        assertEquals(3, careDao.getEventsForPlant(p1).first().size)
+        assertEquals(2, chatDao.getMessages(p1).size)
+
+        // 2. Спроба повторної вставки з наявним ID повинна викликати SQLiteConstraintException (ABORT)
+        try {
+            plantDao.insertPlant(originalP1.copy(customName = "Спроба перезапису"))
+            fail("Очікувалось SQLiteConstraintException через OnConflictStrategy.ABORT")
+        } catch (_: SQLiteConstraintException) {
+            // Очікуваний конфлікт первинного ключа
+        }
+
+        // 3. Назва та інші поля існуючої рослини залишилися незмінними
+        val p1AfterFailedInsert = plantDao.getPlantById(p1)!!
+        assertEquals("Оновлена назва 1", p1AfterFailedInsert.customName)
+        assertEquals("Спальня", p1AfterFailedInsert.roomLocation)
+        assertEquals(originalP1.nextCheckDate, p1AfterFailedInsert.nextCheckDate)
+
+        // 4. Події WATER, DELAY, HEALTH_CHECK залишилися збереженими з усіма полями
+        val eventsP1 = careDao.getEventsForPlant(p1).first()
+        assertEquals(3, eventsP1.size)
+        val waterEvent = eventsP1.first { it.eventType == "WATER" }
+        assertEquals(100L, waterEvent.timestamp)
+        assertEquals("Полив 1", waterEvent.notes)
+
+        val delayEvent = eventsP1.first { it.eventType == "DELAY" }
+        assertEquals(200L, delayEvent.timestamp)
+        assertEquals(2, delayEvent.daysDelayed)
+
+        val healthEvent = eventsP1.first { it.eventType == "HEALTH_CHECK" }
+        assertEquals(300L, healthEvent.timestamp)
+        assertEquals("Діагностика", healthEvent.notes)
+        assertEquals("file:///tmp/leaf.jpg", healthEvent.photoUri)
+
+        // 5. Повідомлення USER та MODEL залишилися збереженими
+        val messagesP1 = chatDao.getMessages(p1)
+        assertEquals(2, messagesP1.size)
+        assertEquals(MessageRole.USER, messagesP1[0].role)
+        assertEquals("Питання користувача", messagesP1[0].content)
+        assertEquals(MessageRole.MODEL, messagesP1[1].role)
+        assertEquals("Відповідь моделі", messagesP1[1].content)
+
+        // 7. Контрольна рослина p2 та її історія повністю недоторкані
+        val plantP2 = plantDao.getPlantById(p2)!!
+        assertEquals("Оригінал 2", plantP2.customName)
+        val eventsP2 = careDao.getEventsForPlant(p2).first()
+        assertEquals(1, eventsP2.size)
+        assertEquals("Полив p2", eventsP2[0].notes)
+        val messagesP2 = chatDao.getMessages(p2)
+        assertEquals(1, messagesP2.size)
+        assertEquals("Чат рослини 2", messagesP2[0].content)
     }
 }

@@ -26,7 +26,7 @@ abstract class PlantDao {
     @Query("SELECT * FROM plants WHERE id = :plantId LIMIT 1")
     abstract fun getPlantFlowById(plantId: Long): Flow<PlantEntity?>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     abstract suspend fun insertPlant(plant: PlantEntity): Long
 
     @Update

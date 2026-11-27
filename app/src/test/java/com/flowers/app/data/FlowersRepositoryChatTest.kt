@@ -369,10 +369,10 @@ class FlowersRepositoryChatTest {
             val entered2 = CompletableDeferred<Unit>()
             val proceed2 = CompletableDeferred<Unit>()
 
-            var pauseSecondRequest = false
+            val pauseSecondRequest = java.util.concurrent.atomic.AtomicBoolean(false)
             val synchronizedPlantDao = object : FakePlantDao() {
                 override suspend fun getPlantById(plantId: Long): PlantEntity? {
-                    if (pauseSecondRequest) {
+                    if (pauseSecondRequest.get()) {
                         entered2.complete(Unit)
                         proceed2.await()
                     }
@@ -418,7 +418,7 @@ class FlowersRepositoryChatTest {
                 assertTrue(repo.isPlantChatSending(1L))
 
                 // Вмикаємо паузу для job2 перед запуском другого запиту
-                pauseSecondRequest = true
+                pauseSecondRequest.set(true)
 
                 // 2. Запускаємо job2
                 val job2 = launch(Dispatchers.IO) {

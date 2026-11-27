@@ -51,6 +51,7 @@ class ChatViewModel(
 
     private var activeJob: Job? = null
     private var clearJob: Job? = null
+    private var recoveryJob: Job? = null
     private var activeRequestToken: Long = 0L
 
     init {
@@ -68,7 +69,7 @@ class ChatViewModel(
         }
 
         // 2. Безпечне відновлення завислих реплік SENDING після перезапуску процесу
-        viewModelScope.launch {
+        recoveryJob = viewModelScope.launch {
             try {
                 repository.recoverStaleSendingMessages(plantId)
             } catch (ce: CancellationException) {
@@ -118,10 +119,16 @@ class ChatViewModel(
         }
         _uiState.update { it.copy(isSending = true, errorMessage = null) }
 
+        val pendingClearJob = clearJob
+        val pendingRecoveryJob = recoveryJob
         val token = ++activeRequestToken
         activeJob = viewModelScope.launch {
             var createdMessageId = -1L
             try {
+                // Серіалізація: очікуємо завершення активного очищення та початкового відновлення
+                pendingClearJob?.join()
+                pendingRecoveryJob?.join()
+
                 // 1. Збереження повідомлення USER зі статусом SENDING у Room
                 val userMessage = ChatMessageEntity(
                     plantId = plantId,
@@ -167,15 +174,28 @@ class ChatViewModel(
      * Використовує наявний id репліки без створення нового запису.
      */
     fun retryMessage(messageId: Long) {
+        if (_uiState.value.plant == null) {
+            _uiState.update {
+                it.copy(errorMessage = "Дані про рослину ще завантажуються або рослину видалено.")
+            }
+            return
+        }
+
         // Синхронне блокування повторного натискання
         if (_uiState.value.isSending) {
             return
         }
         _uiState.update { it.copy(isSending = true, errorMessage = null) }
 
+        val pendingClearJob = clearJob
+        val pendingRecoveryJob = recoveryJob
         val token = ++activeRequestToken
         activeJob = viewModelScope.launch {
             try {
+                // Серіалізація: очікуємо завершення активного очищення та початкового відновлення
+                pendingClearJob?.join()
+                pendingRecoveryJob?.join()
+
                 // Перевіряємо, що повідомлення належить цій рослині, є USER і має статус ERROR
                 val message = repository.getChatMessageById(messageId)
                 if (message == null || message.plantId != plantId || message.role != MessageRole.USER || message.status != MessageStatus.ERROR) {
@@ -271,10 +291,14 @@ class ChatViewModel(
         val token = ++activeRequestToken
         _uiState.update { it.copy(isSending = false) }
         clearJob = viewModelScope.launch {
-            previousJob?.join()
-            previousClearJob?.join()
-            if (activeRequestToken == token) {
+            try {
+                previousJob?.join()
+                previousClearJob?.join()
                 repository.clearChatHistory(plantId)
+            } catch (ce: CancellationException) {
+                throw ce
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message ?: "Помилка очищення історії чату") }
             }
         }
     }

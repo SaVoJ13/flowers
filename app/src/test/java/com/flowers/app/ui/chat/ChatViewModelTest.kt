@@ -74,6 +74,7 @@ class ChatViewModelTest {
         var sendDeferred: CompletableDeferred<Unit>? = null
         var simulateModelSaveError: Boolean = false
         var simulateInsertError: Boolean = false
+        var simulateClearError: Boolean = false
         var sendChatMessageException: Throwable? = null
 
         fun setPlant(plant: PlantEntity) {
@@ -205,6 +206,9 @@ class ChatViewModelTest {
         }
 
         override suspend fun clearChatHistory(plantId: Long): Int {
+            if (simulateClearError) {
+                throw IllegalStateException("Simulated clear error")
+            }
             val count = messagesList.count { it.plantId == plantId }
             messagesList.removeAll { it.plantId == plantId }
             notifyMessagesChanged(plantId)
@@ -804,5 +808,74 @@ class ChatViewModelTest {
         assertEquals(2, vm2.uiState.value.messages.size)
         assertEquals("Початкове питання", vm2.uiState.value.messages[0].content)
         assertEquals("Збережена відповідь", vm2.uiState.value.messages[1].content)
+    }
+
+    // 21. Очищення чату з негайною відправкою нового повідомлення серіалізується коректно
+    @Test
+    fun `clearChat_followedByImmediateSendMessage_clearsOldHistoryAndSendsNewMessage`() = runTest {
+        val repo = FakeChatRepository()
+        repo.setPlant(testPlant)
+        val vm = ChatViewModel(plantId = 1L, repository = repo)
+        advanceUntilIdle()
+
+        repo.chatResult = PlantChatResult.Success("Відповідь 1")
+        vm.sendMessage("Питання 1")
+        advanceUntilIdle()
+        assertEquals(2, vm.uiState.value.messages.size)
+
+        repo.chatResult = PlantChatResult.Success("Відповідь 2")
+        // Очищаємо чат і негайно в тому самому кадрі надсилаємо нове повідомлення
+        vm.clearChat()
+        vm.sendMessage("Питання 2")
+        advanceUntilIdle()
+
+        // Стара історія видалена, присутні лише нові питання та відповідь
+        assertEquals(2, vm.uiState.value.messages.size)
+        assertEquals("Питання 2", vm.uiState.value.messages[0].content)
+        assertEquals("Відповідь 2", vm.uiState.value.messages[1].content)
+    }
+
+    // 22. Очищення чату з негайним ретраєм старого повідомлення не відправляє видалений запит
+    @Test
+    fun `clearChat_followedByImmediateRetry_clearsOldHistoryAndBlocksRetryOfOldMessage`() = runTest {
+        val repo = FakeChatRepository()
+        repo.setPlant(testPlant)
+        val msgId = repo.insertChatMessage(
+            ChatMessageEntity(plantId = 1L, role = MessageRole.USER, content = "Старе помилкове", status = MessageStatus.ERROR)
+        )
+        val vm = ChatViewModel(plantId = 1L, repository = repo)
+        advanceUntilIdle()
+        assertEquals(1, vm.uiState.value.messages.size)
+
+        vm.clearChat()
+        vm.retryMessage(msgId)
+        advanceUntilIdle()
+
+        // Чат очищено, старе повідомлення не воскресає і не надсилається повторно
+        assertTrue(vm.uiState.value.messages.isEmpty())
+        assertEquals(0, repo.sendChatMessageCallCount)
+    }
+
+    // 23. Послідовні виклики clearChat та перехоплення помилок Room
+    @Test
+    fun `multipleSequentialClearChat_andErrorHandling`() = runTest {
+        val repo = FakeChatRepository()
+        repo.setPlant(testPlant)
+        val vm = ChatViewModel(plantId = 1L, repository = repo)
+        advanceUntilIdle()
+
+        // Кілька викликів clearChat поспіль не викликають збоїв
+        vm.clearChat()
+        vm.clearChat()
+        advanceUntilIdle()
+        assertFalse(vm.uiState.value.isSending)
+
+        // Помилка в clearChatHistory перехоплюється і записується в errorMessage
+        repo.simulateClearError = true
+        vm.clearChat()
+        advanceUntilIdle()
+
+        assertNotNull(vm.uiState.value.errorMessage)
+        assertTrue(vm.uiState.value.errorMessage!!.contains("Simulated clear error"))
     }
 }

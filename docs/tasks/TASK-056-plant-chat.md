@@ -1,6 +1,6 @@
 # TASK-056 — Персональний ШІ-чат для кожної рослини з локальною історією
 
-> **Статус:** В РОБОТІ (Крок 1 та Крок 2 завершено, PR #38 і PR #40 злито; Крок 3 очікує дозволу Власника)  
+> **Статус:** В РОБОТІ (Крок 1 та Крок 2 завершено, PR #38 і PR #40 злито; Крок 3 реалізовано, PR #41 відкрито)  
 > **Етап:** Flowers 2.0 MVP (ADR-021, `FLOWERS_2_0_MVP_PLAN.md`)  
 > **Відповідальний:** Агент 0 (Архітектор / Керівник)
 
@@ -434,22 +434,22 @@ SQLite виконує REPLACE як DELETE + INSERT; Room вмикає foreign ke
 3. **`ChatViewModel` (`com.flowers.app.ui.chat`):**
    - Створено `ChatUiState(plant, messages, isSending, isLoading, errorMessage)`.
    - Синхронний дебаунс: прапорець `_uiState.value.isSending` блокує повторні виклики `sendMessage` та `retryMessage` синхронно в тому самому кадрі ще до запуску та перемикання корутин.
-   - Серіалізація та усунення гонки в `clearChat()`: очікування завершення попереднього запиту (`join()`) перед видаленням історії у SQLite, прив'язка очищення статусу `isSending` до монотонного `activeRequestToken`.
+   - Серіалізація та усунення гонки в `clearChat()`: гарантоване виконання `clearChatHistory` після скасування `activeJob` та `previousClearJob`, очікування `clearJob` у `sendMessage()`/`retryMessage()`, прив'язка очищення статусу `isSending` до монотонного `activeRequestToken`.
    - Реактивне оновлення: стан підписується на `getChatMessages(plantId)` та `getPlantFlowById(plantId)`.
    - Перевірка існування рослини перед відправкою (захист від `SQLiteConstraintException` при каскаді).
    - Захист від падінь при винятках SQLite/Room через перехоплення `Exception` із переведенням `USER` у `ERROR`.
-   - Автоматичне відновлення після `process death` для поточної рослини при створенні ViewModel.
+   - Автоматичне відновлення після `process death` для поточної рослини при створенні ViewModel з очікуванням завершення відновлення перед новими запитами.
    - Валідація введення (ігнорування порожніх рядків, ліміт `MAX_QUESTION_LENGTH = 500`).
    - Обробка типів результатів `PlantChatResult` (Success, Offline, RateLimited, Timeout, InvalidResponse, ServiceError).
    - Безпечне прокидання `CancellationException`.
    - Фабрика `ChatViewModel.provideFactory(plantId, repository, language)`.
 
 4. **Тестування:**
-   - `ChatViewModelTest`: 20 вичерпних сценаріїв (синхронний дебаунс `sendMessage` та `retryMessage`, блокування подвійного кліку в одному кадрі, збереження моделі, ретраї, очищення із серіалізацією, обробка помилок результату, відновлення після збою процесу, паралельні одночасні чати двох рослин, перевірка null-рослини, ліміт символів 500, безпечне прокидання `CancellationException`, обробка винятків БД).
+   - `ChatViewModelTest`: 23 вичерпних сценарії (синхронний дебаунс `sendMessage` та `retryMessage`, блокування подвійного кліку в одному кадрі, збереження моделі, ретраї, очищення із серіалізацією та очікуванням `clearJob`, негайний send/retry після `clearChat`, відновлення після збою процесу, паралельні одночасні чати двох рослин, перевірка null-рослини, ліміт символів 500, безпечне прокидання `CancellationException`, обробка винятків БД).
    - `ChatMessageDaoTest`: 3 розширених інструментальних тести (атомарне збереження, відхилення не-USER та не-SENDING реплік, безпечний ретрай з ізоляцією за `plantId`, відновлення незавершених повідомлень).
    - `FlowersRepositoryChatTest`: 6 детальних тестів для всіх методів чату в репозиторії, включно з `activeSendingCounters` та паралельними викликами.
    - Fakes оновлено у `DiagnosisViewModelTest`, `PlantsViewModelTest`, `TodayViewModelTest`.
-   - Усі 314 JVM unit-тестів пройшли успішно (100% pass).
+   - Усі 317 JVM unit-тестів пройшли успішно (100% pass).
    - Інструментальні тести `ChatMessageDaoTest`: 13/13 PASSED на емуляторі `small_phone` (ізольована тестова SQLite БД), загальний набір Room v4 / Chat: 49/49 PASSED.
 
 

@@ -63,7 +63,7 @@ class AddPlantUserScenarioTest {
         testCacheDir = File(context.cacheDir, "test_source_$timestamp").apply { mkdirs() }
 
         db = Room.databaseBuilder(context, FlowersDatabase::class.java, dbName)
-            .addMigrations(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3)
+            .addMigrations(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4, Migrations.MIGRATION_4_5)
             .build()
     }
 

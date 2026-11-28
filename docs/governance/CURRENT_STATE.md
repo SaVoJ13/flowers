@@ -195,6 +195,25 @@
     - Жодного продуктового коду не змінено; реалізація заблокована до наступного погодження.
   - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався. Хмарні конфігурації (Firebase, Billing, Google Play Console) не змінювалися. Робоча директорія чиста.
 
+- **Сесія 028 (2026-11-28, TASK-056: Злиття PR #42 та реалізація PR №43 — Room v5 Schema & Migration):**
+  - **Злиття PR #42:** PR #42 (документ `docs/architecture/PHOTO_ARCHITECTURE_PROPOSAL.md` v1.2) успішно злито в `main` стандартним merge комітом `595601d` після остаточного затвердження Власником та успішного CI.
+  - **Реалізація PR №43 (Room v5):** створено гілку `feat/task-056-photo-room-v5`.
+    1. **Таблиця `chat_attachments`:** створено сутність `ChatAttachmentEntity` (поля: `id`, `messageId`, `filePath`, `mimeType`, `fileSizeBytes`, `width`, `height`, `createdAt`) із зовнішнім ключем `FOREIGN KEY(messageId) REFERENCES chat_messages(id) ON DELETE CASCADE` та обов'язковим індексом `index_chat_attachments_messageId`.
+    2. **Агрегована модель `ChatMessageWithAttachments`:** `@Embedded message: ChatMessageEntity` та `@Relation(parentColumn = "id", entityColumn = "messageId") attachments: List<ChatAttachmentEntity>`, допоміжний гетер `primaryPhoto`.
+    3. **DAO `ChatAttachmentDao`:** методи пакетної та індивідуальної вставки (`OnConflictStrategy.ABORT`), вибірки за `messageId` та списком `messageIds`, вибірки першого вкладення повідомлення `getAttachmentForMessage` (з `ORDER BY id ASC LIMIT 1`), вибірки всіх вкладень рослини `getAttachmentsForPlant`, отримання шляхів дисків для очищення `getAllFilePathsForPlant` та `getAllStoredAttachmentPaths`, видалення `deleteByMessageId`, спостереження `observeAttachmentsForMessage`.
+    4. **Оновлення `ChatMessageDao`:** додано транзакційні методи `@Transaction observeMessagesWithAttachments(plantId)` та `getMessagesWithAttachments(plantId)` із суворим збереженням порядку (`ORDER BY timestamp ASC, id ASC`).
+    5. **Міграція `MIGRATION_4_5`:** суто адитивна SQL-міграція (`CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`), без змін наявних таблиць. Зареєстровано у `FlowersDatabase` v5. Room експортував схему `app/schemas/com.flowers.app.data.local.FlowersDatabase/5.json`.
+  - **Тестування та верифікація:**
+    - 325/325 JVM unit-тестів (100% pass) включно з розширеними тестами `MigrationTest` (міграція 4->5, збереження даних, каскадне видалення при видаленні повідомлення та при видаленні рослини, валідація схеми, foreign keys та індексів проти `5.json`, неруйнівний характер SQL).
+    - 62/62 Android інструментальних тестів на емуляторі `small_phone` (Android 16 API 36, 100% pass) включно з `RoomMigrationV4ToV5Test` (збереження plants, care_events, catalog_plants, care_pods, chat_messages; каскадне видалення окремого повідомлення та видалення рослини) та `ChatAttachmentDaoTest` (відхилення некоректних FK, batch-вставка, plant isolation, живий Flow collector).
+    - `bundleRelease` на Adoptium JDK 21 зібрано успішно (AAB 17.7 МБ).
+  - **Статус завдань:**
+    - `TASK-056 / PHOTO ARCHITECTURE (PR №43 — Room v5)` — РЕАЛІЗОВАНО, CI SUCCESS (run `46109277573`), НЕЗАЛЕЖНИЙ АУДИТ: QA VERIFIED. ОЧІКУЄ ЗАТВЕРДЖЕННЯ ТА ДОЗВОЛУ ВЛАСНИКА НА ЗЛИТТЯ У MAIN.
+    - `PR №44` (`ChatPhotoManager`) — ОЧІКУЄ ЗАТВЕРДЖЕННЯ ТА ДОЗВОЛУ ВЛАСНИКА.
+    - `TASK-056` загалом залишається ВІДКРИТИМ.
+  - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався. Хмарні конфігурації (Firebase, Billing, Google Play Console) не змінювалися. Робоча директорія чиста.
+
+
 
 
 

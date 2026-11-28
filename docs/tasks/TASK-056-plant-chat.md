@@ -1,6 +1,6 @@
 # TASK-056 — Персональний ШІ-чат для кожної рослини з локальною історією
 
-> **Статус:** В РОБОТІ (Кроки 1, 2 та 3 завершено, PR #38, PR #40 та PR #41 злито в main; етап PHOTO ARCHITECTURE очікує погодження Власника)  
+> **Статус:** В РОБОТІ (Кроки 1, 2, 3 та PR #42 завершено й злито в main; PR №43 Room v5 реалізовано й передано на незалежний QA-аудит)  
 > **Етап:** Flowers 2.0 MVP (ADR-021, `FLOWERS_2_0_MVP_PLAN.md`)  
 > **Відповідальний:** Агент 0 (Архітектор / Керівник)
 
@@ -500,9 +500,34 @@ SQLite виконує REPLACE як DELETE + INSERT; Room вмикає foreign ke
 - Зафіксовано емпіричне вимірювання токенів через `countTokens` у тестах Free Tier без платного тарифу та без змін у Firebase/Billing.
 - Сформовано план реалізації у вигляді 5 невеликих PR після поточного PR #42: PR №43 (Room v5), PR №44 (ChatPhotoManager), PR №45 (Gemini), PR №46 (ChatViewModel), PR №47 (STEP 4: UI/Навігація).
 - Рішення зафіксовано у `OWNER_INBOX.md` ([INBOX-015]).
-- Жодного рядка коду не змінено; реалізація очікує дозволу Власника на злиття PR #42 та початок PR №43.
+- PR #42 успішно злито в `main` комітом `595601d`.
 
-> ⚠️ **Обмеження:** До окремого погодження архітектури не створювати `PlantChatScreen`, не змінювати схему Room, не реалізовувати код фотографій чи навігації.
+## 9. Хід робіт: PR №43 — Room v5 Schema & Migration (2026-11-28)
+
+> ⚠️ **Обмеження:** Реалізація PR №43 обмежена виключно базою даних Room v5 (таблиця `chat_attachments`, `MIGRATION_4_5`, схема `5.json`, DAO та тести міграції/каскаду). До окремих рішень Власника заборонено реалізовувати `ChatPhotoManager` (PR №44), змінювати `GeminiPlantService` (PR №45), змінювати `ChatViewModel` (PR №46) чи створювати `PlantChatScreen` (PR №47).
+
+- **Гілка:** `feat/task-056-photo-room-v5`, створена від `main` (`595601d` після злиття PR #42).
+- **Схема бази даних:**
+  - `ChatAttachmentEntity`: сутність таблиці `chat_attachments` (id, messageId, filePath, mimeType, fileSizeBytes, width, height, createdAt; FK на `chat_messages(id)` ON DELETE CASCADE; індекс `index_chat_attachments_messageId`).
+  - `ChatMessageWithAttachments`: агрегована модель із `@Relation` та властивістю `primaryPhoto`.
+  - `ChatAttachmentDao`: методи вставки (ABORT), вибірки по одному (з детермінованим `ORDER BY id ASC LIMIT 1`) та групі повідомлень, вибірки для конкретної рослини, запити шляхів файлів для очищення дисків (`getAllFilePathsForPlant`, `getAllStoredAttachmentPaths`), видалення `deleteByMessageId`, спостереження.
+  - `ChatMessageDao`: додано `@Transaction observeMessagesWithAttachments(plantId)` та `getMessagesWithAttachments(plantId)` із збереженням хронологічного сортування (`ORDER BY timestamp ASC, id ASC`).
+  - `MIGRATION_4_5`: суто адитивна міграція (CREATE TABLE / CREATE INDEX), зареєстрована у `FlowersDatabase` v5. Експортовано Room schema `app/schemas/com.flowers.app.data.local.FlowersDatabase/5.json`.
+- **Тестування та верифікація:**
+  - JVM Unit Tests: **325 / 325 PASSED** (100% успішно) включно з `MigrationTest` (міграція 4->5, відповідність схемі `5.json`, перевірка foreign keys та індексів, перевірка каскадного видалення при видаленні повідомлення та при видаленні рослини).
+  - Android Instrumented Tests: **62 / 62 PASSED** на емуляторі `small_phone` (Android 16 API 36, `emulator-5554`, 0 failed, 0 skipped) включно з `RoomMigrationV4ToV5Test` (збереження plants, care_events, catalog_plants, care_pods, chat_messages; каскадне видалення окремого повідомлення та видалення рослини) та `ChatAttachmentDaoTest` (відхилення некоректних FK, batch-вставка, plant isolation, живий Flow collector).
+  - Релізний бандл: `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL (AAB 17.7 МБ).
+  - GitHub Actions CI: run `46109277573` — SUCCESS.
+  - Незалежний QA-аудит (модель Pro): **QA Verified**.
+- **Статус:** PR #43 повністю верифіковано (HEAD `df4e571`), очікує дозволу Власника на злиття в `main`.
+
+### Запис журналу сесії 028 (за §5.3 Конституції):
+- **Зроблено:** реалізовано схему Room v5 (`ChatAttachmentEntity`, `ChatMessageWithAttachments`, `ChatAttachmentDao`, `ChatMessageDao`, `MIGRATION_4_5`, схема `5.json`), розширено тести міграції (325 JVM unit-тестів та 62 Android instrumented тести на `small_phone`), відкрито PR #43, усунено зауваження первинного QA-аудиту в коміті `df4e571`, пройдено GitHub Actions CI (run `46109277573`), отримано вердикт **QA Verified** від незалежного субагента.
+- **Стан:** тести 100% зелені (325 JVM, 62 instrumented), release bundle зібрано успішно (17.7 МБ), GitHub Actions CI run `46109277573` — SUCCESS, QA Verified.
+- **Зупинився на:** очікування рішення Власника щодо затвердження та злиття PR #43 у `main`.
+- **Наступний крок:** злиття PR #43 у `main` після команди Власника.
+- **Увага:** не зливати PR №43 без явного схвалення Власника; наступні етапи (PR №44..47) залишаються суворо заблокованими.
+
 
 
 

@@ -14,7 +14,6 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.flowers.app.data.local.FlowersDatabase
-import com.flowers.app.data.local.Migrations
 import com.flowers.app.data.local.entity.PlantEntity
 import com.flowers.app.data.repository.FlowersRepositoryImpl
 import com.flowers.app.ui.components.BottomNavBar
@@ -45,7 +44,6 @@ class SoilCheckAndNavigationComposeTest {
 
     private lateinit var context: Context
     private lateinit var db: FlowersDatabase
-    private val dbName = "soil_check_test_db_${System.currentTimeMillis()}.db"
     private lateinit var testOutputDir: File
 
     @Before
@@ -53,15 +51,12 @@ class SoilCheckAndNavigationComposeTest {
         context = ApplicationProvider.getApplicationContext()
         testOutputDir = File(context.cacheDir, "soil_test_plants_${System.currentTimeMillis()}").apply { mkdirs() }
 
-        db = Room.databaseBuilder(context, FlowersDatabase::class.java, dbName)
-            .addMigrations(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3)
-            .build()
+        db = Room.inMemoryDatabaseBuilder(context, FlowersDatabase::class.java).build()
     }
 
     @After
     fun tearDown() {
         db.close()
-        context.deleteDatabase(dbName)
         if (::testOutputDir.isInitialized && testOutputDir.exists()) {
             testOutputDir.deleteRecursively()
         }

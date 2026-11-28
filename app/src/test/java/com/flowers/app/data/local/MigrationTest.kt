@@ -204,4 +204,129 @@ class MigrationTest {
         assertEquals(2, Migrations.MIGRATION_2_3.startVersion)
         assertEquals(3, Migrations.MIGRATION_2_3.endVersion)
     }
+
+    private fun migrateV3ToV4() {
+        conn.createStatement().use { st -> Migrations.MIGRATION_3_4_SQL.forEach { st.execute(it) } }
+    }
+
+    private fun migrateV4ToV5() {
+        conn.createStatement().use { st -> Migrations.MIGRATION_4_5_SQL.forEach { st.execute(it) } }
+    }
+
+    @Test
+    fun `migration 4 to 5 creates chat_attachments and preserves all existing data`() {
+        migrate() // 1 -> 2
+        migrateV2ToV3() // 2 -> 3
+        migrateV3ToV4() // 3 -> 4
+        // Insert a chat message in v4
+        conn.createStatement().use { st ->
+            st.execute("INSERT INTO chat_messages (id, plantId, role, content, status, timestamp) VALUES (1, 1, 'USER', 'Привіт', 'SENT', 1700000000000)")
+        }
+        assertEquals(1, count("SELECT COUNT(*) FROM chat_messages"))
+
+        migrateV4ToV5() // 4 -> 5
+
+        assertEquals(3, count("SELECT COUNT(*) FROM plants"))
+        assertEquals(3, count("SELECT COUNT(*) FROM care_events"))
+        assertEquals(1, count("SELECT COUNT(*) FROM chat_messages"))
+        assertEquals(0, count("SELECT COUNT(*) FROM chat_attachments"))
+
+        // Insert attachment linked to message 1
+        conn.createStatement().use { st ->
+            st.execute("INSERT INTO chat_attachments (id, messageId, filePath, mimeType, fileSizeBytes, width, height, createdAt) VALUES (10, 1, '/data/user/0/com.savoj.flowers/files/chat_photos/plant_1_photo.jpg', 'image/jpeg', 204800, 1536, 1152, 1700000000000)")
+        }
+        assertEquals(1, count("SELECT COUNT(*) FROM chat_attachments"))
+
+        // Cascade delete on message deletion
+        conn.createStatement().use { st ->
+            st.execute("DELETE FROM chat_messages WHERE id = 1")
+        }
+        assertEquals(0, count("SELECT COUNT(*) FROM chat_messages"))
+        assertEquals(0, count("SELECT COUNT(*) FROM chat_attachments"))
+
+        // Cascade delete on plant deletion (plants -> chat_messages -> chat_attachments)
+        conn.createStatement().use { st ->
+            st.execute("INSERT INTO plants VALUES (4,'Фікус','ficus','Спальня','INDIRECT',7,NULL,1700600000000,NULL,0,1690000000000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0)")
+            st.execute("INSERT INTO chat_messages (id, plantId, role, content, status, timestamp) VALUES (200, 4, 'USER', 'Фото фікуса', 'SENT', 1700000000000)")
+            st.execute("INSERT INTO chat_attachments (id, messageId, filePath, mimeType, fileSizeBytes, width, height, createdAt) VALUES (20, 200, '/data/ficus.jpg', 'image/jpeg', 1000, 1536, 1152, 1700000000000)")
+        }
+        assertEquals(1, count("SELECT COUNT(*) FROM chat_messages WHERE plantId = 4"))
+        assertEquals(1, count("SELECT COUNT(*) FROM chat_attachments WHERE id = 20"))
+        conn.createStatement().use { st ->
+            st.execute("DELETE FROM plants WHERE id = 4")
+        }
+        assertEquals(0, count("SELECT COUNT(*) FROM chat_messages WHERE plantId = 4"))
+        assertEquals(0, count("SELECT COUNT(*) FROM chat_attachments WHERE id = 20"))
+    }
+
+    @Test
+    fun `migration 4 to 5 contains no destructive statements`() {
+        val sql = Migrations.MIGRATION_4_5_SQL.joinToString("\n").uppercase()
+            .replace("ON DELETE CASCADE", "")
+            .replace("ON UPDATE NO ACTION", "")
+        listOf("DROP ", "DELETE ", "ALTER ", "UPDATE ").forEach {
+            assertTrue("migration 4 to 5 must not contain $it", !sql.contains(it))
+        }
+    }
+
+    @Test
+    fun `migration 4 to 5 matches exported v5 schema for chat_attachments`() {
+        migrate()
+        migrateV2ToV3()
+        migrateV3ToV4()
+        migrateV4ToV5()
+        val schemaFile = File("schemas/com.flowers.app.data.local.FlowersDatabase/5.json")
+        assertTrue("exported schema 5.json must exist", schemaFile.exists())
+        val entities = JsonParser.parseString(schemaFile.readText()).asJsonObject
+            .getAsJsonObject("database").getAsJsonArray("entities")
+        val attachmentsEntity = entities.map { it.asJsonObject }.first { it.get("tableName").asString == "chat_attachments" }
+        val expected = attachmentsEntity.getAsJsonArray("fields").map { it.asJsonObject }.map {
+            listOf(
+                it.get("columnName").asString,
+                it.get("affinity").asString,
+                it.get("notNull").asBoolean,
+                if (it.has("defaultValue")) it.get("defaultValue").asString else null
+            )
+        }
+        val actual = mutableListOf<List<Any?>>()
+        conn.createStatement().use { st ->
+            st.executeQuery("PRAGMA table_info(`chat_attachments`)").use { rs ->
+                while (rs.next()) {
+                    actual += listOf(rs.getString("name"), rs.getString("type"), rs.getInt("notnull") == 1, rs.getString("dflt_value"))
+                }
+            }
+        }
+        assertEquals(expected, actual)
+
+        // Verify foreign key constraint against 5.json
+        conn.createStatement().use { st ->
+            st.executeQuery("PRAGMA foreign_key_list(`chat_attachments`)").use { rs ->
+                assertTrue("Foreign key to chat_messages must exist", rs.next())
+                assertEquals("chat_messages", rs.getString("table"))
+                assertEquals("messageId", rs.getString("from"))
+                assertEquals("id", rs.getString("to"))
+                assertEquals("CASCADE", rs.getString("on_delete"))
+                assertEquals("NO ACTION", rs.getString("on_update"))
+            }
+        }
+
+        // Verify index index_chat_attachments_messageId against 5.json
+        conn.createStatement().use { st ->
+            st.executeQuery("PRAGMA index_list(`chat_attachments`)").use { rs ->
+                assertTrue("Index on chat_attachments must exist", rs.next())
+                assertEquals("index_chat_attachments_messageId", rs.getString("name"))
+                assertEquals(0, rs.getInt("unique"))
+            }
+            st.executeQuery("PRAGMA index_info(`index_chat_attachments_messageId`)").use { rs ->
+                assertTrue("Index column must be messageId", rs.next())
+                assertEquals("messageId", rs.getString("name"))
+            }
+        }
+    }
+
+    @Test
+    fun `migration 4 to 5 is registered for 4 to 5`() {
+        assertEquals(4, Migrations.MIGRATION_4_5.startVersion)
+        assertEquals(5, Migrations.MIGRATION_4_5.endVersion)
+    }
 }

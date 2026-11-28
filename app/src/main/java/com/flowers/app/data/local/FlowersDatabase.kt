@@ -9,11 +9,13 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.flowers.app.data.local.dao.CareEventDao
 import com.flowers.app.data.local.dao.CarePodDao
 import com.flowers.app.data.local.dao.CatalogDao
+import com.flowers.app.data.local.dao.ChatAttachmentDao
 import com.flowers.app.data.local.dao.ChatMessageDao
 import com.flowers.app.data.local.dao.PlantDao
 import com.flowers.app.data.local.entity.CareEventEntity
 import com.flowers.app.data.local.entity.CarePodEntity
 import com.flowers.app.data.local.entity.CatalogPlantEntity
+import com.flowers.app.data.local.entity.ChatAttachmentEntity
 import com.flowers.app.data.local.entity.ChatMessageEntity
 import com.flowers.app.data.local.entity.PlantEntity
 import com.google.gson.Gson
@@ -28,9 +30,10 @@ import kotlinx.coroutines.launch
         CareEventEntity::class,
         CatalogPlantEntity::class,
         CarePodEntity::class,
-        ChatMessageEntity::class
+        ChatMessageEntity::class,
+        ChatAttachmentEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = true
 )
 @TypeConverters(ChatConverters::class)
@@ -41,6 +44,7 @@ abstract class FlowersDatabase : RoomDatabase() {
     abstract fun catalogDao(): CatalogDao
     abstract fun carePodDao(): CarePodDao
     abstract fun chatMessageDao(): ChatMessageDao
+    abstract fun chatAttachmentDao(): ChatAttachmentDao
 
     companion object {
         @Volatile
@@ -56,7 +60,8 @@ abstract class FlowersDatabase : RoomDatabase() {
                     .addMigrations(
                         Migrations.MIGRATION_1_2,
                         Migrations.MIGRATION_2_3,
-                        Migrations.MIGRATION_3_4
+                        Migrations.MIGRATION_3_4,
+                        Migrations.MIGRATION_4_5
                     )
                     .addCallback(PrepopulateCallback(context.applicationContext))
                     .build()

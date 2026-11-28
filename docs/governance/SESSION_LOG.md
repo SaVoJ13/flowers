@@ -497,6 +497,31 @@
   - `TASK-056` загалом залишається ВІДКРИТИМ.
 - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався, конфігурації Firebase, Billing, Google Play Console не змінювалися, робоча директорія чиста.
 
+### Сесія 028, TASK-056: Злиття PR #42 та реалізація PR №43 — Room v5 Schema & Migration (2026-11-28)
+- **Мета:** злити погоджений архітектурний PR #42 у `main` та реалізувати виключно PR №43 (Room v5 Schema, `ChatAttachmentEntity`, `ChatAttachmentDao`, `ChatMessageWithAttachments`, `MIGRATION_4_5`, юніт- та інструментальні тести міграції та каскадного видалення).
+- **Виконані роботи:**
+  1. Злито PR #42 у `main` (merge-коміт `595601d`).
+  2. Створено гілку `feat/task-056-photo-room-v5`.
+  3. Створено `ChatAttachmentEntity` (Room-таблиця `chat_attachments` із зовнішнім ключем `messageId` на `chat_messages(id)` ON DELETE CASCADE та індексом `index_chat_attachments_messageId`).
+  4. Створено агреговану модель `ChatMessageWithAttachments` із `@Relation` та властивістю `primaryPhoto`.
+  5. Створено `ChatAttachmentDao` із методами вставки (`OnConflictStrategy.ABORT`), вибірки за повідомленням, групою повідомлень, вибірки першого вкладення (`ORDER BY id ASC LIMIT 1`), вибірки для конкретної рослини, запитів шляхів для очищення дисків (`getAllFilePathsForPlant`, `getAllStoredAttachmentPaths`), спостереження.
+  6. Оновлено `ChatMessageDao`: додано `@Transaction observeMessagesWithAttachments(plantId)` та `getMessagesWithAttachments(plantId)` із сортуванням за `timestamp ASC, id ASC`.
+  7. Створено та зареєстровано суто адитивну міграцію `MIGRATION_4_5` у `FlowersDatabase` v5. Експортовано схему Room `5.json`.
+  8. Оновлено `FakeChatMessageDao` у `FlowersRepositoryChatTest.kt`.
+  9. Додано модульні тести міграції 4->5 у `MigrationTest.kt` (збереження даних, каскадне видалення при видаленні повідомлення та при видаленні рослини, валідація schema/foreign keys/indices проти `5.json`).
+  10. Створено інструментальний тест реальної міграції `RoomMigrationV4ToV5Test.kt` (збереження plants, care_events, catalog_plants, care_pods, chat_messages; каскад при видаленні окремого повідомлення та видаленні рослини) та розширений набір тестів цілісності `ChatAttachmentDaoTest.kt` (відхилення некоректних FK, batch-вставка, plant isolation, живий Flow collector).
+- **Тестування та верифікація:**
+  - JVM unit-тести: **325 / 325 PASSED** (100% успішно).
+  - Android інструментальні тести: **62 / 62 PASSED** на емуляторі `small_phone` (Android 16 API 36, `emulator-5554`), 0 failures, 0 skipped. Емулятор зупинено (`emu kill`).
+  - Збірка: `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL (AAB 17.7 МБ).
+  - GitHub Actions CI: run `46109277573` — SUCCESS.
+  - Незалежний QA-аудит (модель Pro): `QA Verified`.
+- **Статус завдань:**
+  - `TASK-056 / PHOTO ARCHITECTURE (PR №43)` — РЕАЛІЗОВАНО, ВЕРИФІКОВАНО (QA Verified), ОЧІКУЄ СХВАЛЕННЯ ВЛАСНИКА ДЛЯ ЗЛИТТЯ У MAIN.
+  - `TASK-056` загалом залишається ВІДКРИТИМ.
+- Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався, конфігурації Firebase, Billing, Google Play Console не змінювалися.
+
+
 
 
 

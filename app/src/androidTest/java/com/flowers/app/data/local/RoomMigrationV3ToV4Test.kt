@@ -106,15 +106,15 @@ class RoomMigrationV3ToV4Test {
         helper.close()
     }
 
-    private fun openV4(): FlowersDatabase =
+    private fun openDb(): FlowersDatabase =
         Room.databaseBuilder(context, FlowersDatabase::class.java, dbName)
-            .addMigrations(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4)
+            .addMigrations(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4, Migrations.MIGRATION_4_5)
             .build()
 
     @Test
     fun migration_3_to_4_preservesAllExistingData_andCreatesEmptyChatTable() = runBlocking {
         createV3DatabaseWithData()
-        val db = openV4()
+        val db = openDb()
         try {
             // Room виконав міграцію та пройшов валідацію схеми (інакше тут було б виключення).
             val plants = db.plantDao().getAllActivePlants().first()
@@ -153,7 +153,7 @@ class RoomMigrationV3ToV4Test {
     @Test
     fun migratedDatabase_isolatesChatsAndCascadesOnlyOwnChat() = runBlocking {
         createV3DatabaseWithData()
-        val db = openV4()
+        val db = openDb()
         try {
             val dao = db.chatMessageDao()
             dao.insertMessage(ChatMessageEntity(plantId = 1L, role = MessageRole.USER, content = "A1", timestamp = 10))

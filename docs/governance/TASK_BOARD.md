@@ -218,6 +218,20 @@
   8. Рішення Власника ([INBOX-015]): погоджено Варіант B, 1536 px / 85% JPEG та 5 PR №43–№47. Внесено 4 обов'язкові уточнення (Backup виключає `chat_photos` + плейсхолдер; атомарний запис через `.tmp` + захист canonical path; м'ютекс `withChatSending` не блокує мережевий виклик Gemini + перелік регресійних тестів; емпіричне вимірювання токенів через `countTokens` у тестах Free Tier без платного тарифу).
   9. Статус: Проєкт архітектури оновлено (v1.2), PR #42 очікує дозволу Власника на злиття. Жодного продуктового коду не реалізовано.
 
+## Оновлення сесії 028 (TASK-056: Реалізація PR №43 — Room v5 Schema & Migration) — 2026-11-28 (append-only)
+- `TASK-056 / PHOTO ARCHITECTURE (PR №43 — Room v5 Schema & Migration)`:
+  1. Злито PR #42 (документ `PHOTO_ARCHITECTURE_PROPOSAL.md` v1.2) у `main` стандартним merge комітом `595601d` за дозволом Власника.
+  2. Створено гілку `feat/task-056-photo-room-v5` від оновленого `main`.
+  3. `ChatAttachmentEntity`: сутність таблиці `chat_attachments` (id, messageId, filePath, mimeType, fileSizeBytes, width, height, createdAt) із зовнішнім ключем на `chat_messages(id)` ON DELETE CASCADE та індексом `index_chat_attachments_messageId`.
+  4. `ChatMessageWithAttachments`: агрегована модель із `@Embedded message: ChatMessageEntity` та `@Relation attachments: List<ChatAttachmentEntity>`, геттер `primaryPhoto`.
+  5. `ChatAttachmentDao`: методи вставки (ABORT), вибірки по одному та групі повідомлень, вибірки першого вкладення (`ORDER BY id ASC LIMIT 1`), вибірки для конкретної рослини, запити шляхів файлів для очищення дисків (`getAllFilePathsForPlant`, `getAllStoredAttachmentPaths`), видалення, спостереження.
+  6. `ChatMessageDao`: додано `@Transaction observeMessagesWithAttachments(plantId)` та `getMessagesWithAttachments(plantId)` із збереженням хронологічного сортування.
+  7. `MIGRATION_4_5`: суто адитивна міграція (CREATE TABLE / CREATE INDEX), зареєстрована у `FlowersDatabase` v5. Експортовано Room schema `app/schemas/com.flowers.app.data.local.FlowersDatabase/5.json`.
+  8. Тестування: 325/325 JVM unit-тестів (100% pass) включно з розширеними тестами `MigrationTest` (міграція 4->5, відповідність схемі `5.json`, foreign keys, індекси, збереження даних та каскадне видалення); 62/62 Android інструментальних тестів на емуляторі `small_phone` (Android 16 API 36, 100% pass) включно з `RoomMigrationV4ToV5Test` (збереження plants, care_events, catalog_plants, care_pods, chat_messages; каскад при прямому видаленні повідомлення та при видаленні рослини) та `ChatAttachmentDaoTest` (відхилення некоректних FK, batch-вставка, plant isolation, живий Flow collector).
+  9. `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL (AAB 17.7 МБ).
+  10. Статус: PR #43 пройшов GitHub Actions CI (run `46109277573`, SUCCESS) та отримав незалежний вердикт QA Verified (модель Pro). Очікує схвалення Власника для злиття у main. Наступні кроки (PR №44: `ChatPhotoManager`) очікують погодження. Завдання `TASK-056` залишається відкритим.
+
+
 
 
 

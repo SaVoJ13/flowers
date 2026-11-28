@@ -132,7 +132,7 @@ class RoomMigrationV2ToV3Test {
 
         // 3. Відкриваємо базу через Room v3 з реєстрацією міграції MIGRATION_2_3
         val roomDb = Room.databaseBuilder(context, FlowersDatabase::class.java, dbName)
-            .addMigrations(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4)
+            .addMigrations(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4, Migrations.MIGRATION_4_5)
             .build()
 
         // 4. Перевіряємо збереження наявних даних

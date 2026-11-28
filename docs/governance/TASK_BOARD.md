@@ -206,17 +206,19 @@
      - `TASK-056 / PHOTO ARCHITECTURE` (персональний мультимодальний чат: погодження архітектури вкладень перед STEP 4) — ОЧІКУЄ ПОГОДЖЕННЯ Власника.
      - `TASK-056` загалом залишається відкритим.
 
-## Оновлення сесії 027 (TASK-056: Проєктування PHOTO ARCHITECTURE) — 2026-11-28 (append-only)
-- `TASK-056 / PHOTO ARCHITECTURE`: завершено етап архітектурного проєктування мультимодального чату рослини.
-  1. Підготовлено комплексний архітектурний документ `docs/architecture/PHOTO_ARCHITECTURE_PROPOSAL.md`.
-  2. Проведено порівняльний аналіз Варіанту A (поля в `ChatMessageEntity`) та Варіанту B (окрема таблиця `chat_attachments` із FK 1-до-багатьох). Рекомендовано Варіант B як найбільш чистий та підготовлений до майбутнього порівняння фотографій («до і після») без необхідності нової міграції Room у майбутньому.
-  3. Спроєктовано суто адитивну міграцію Room v4 → v5 (`MIGRATION_4_5`) без жодних змін наявних таблиць.
-  4. Визначено життєвий цикл фотографій: джерела (камера через `CameraCaptureManager`, системний Photo Picker `PickVisualMedia`), обробка через `ImageProcessor` (до 1536 px, 85% JPEG, нативне видалення EXIF/GPS, захист від OOM), безпечне зберігання у `filesDir/chat_photos/plant_<id>/`, двохфазний протокол запису файлу та бази, очищення сиріт (Orphan Cleanup Service), видалення фотографій при очищенні чату чи видаленні рослини.
-  5. Спроєктовано мультимодальний контракт з Gemini (`gemini-3.5-flash-lite` через Firebase AI Logic): відокремлення `systemInstruction`, відправка 1 фото разом із текстовим контекстом, нульовий оверхед для чисто текстових реплік, заборона автоматичної відправки старих фото з історії, розрахунок витрати токенів за офіційною документацією (1 фото 1536 px = 4 тайли = ~1032–1120 токенів; загальний обсяг запиту ~2000–2120 токенів), ліміти за дією O-1.
-  6. Розроблено матрицю відмовостійкості на 10 сценаріїв із збереженням усіх гарантій STEP 3 (`withChatSending`, м'ютекси, атомарні транзакції, Retry з перевіркою наявності файлу, без тихих фолбеків).
-  7. Сформовано план реалізації у вигляді 5 невеликих PR після поточного PR #42: PR №43 (Room v5), PR №44 (ChatPhotoManager), PR №45 (Gemini), PR №46 (ChatViewModel), PR №47 (STEP 4: UI/Навігація).
-  8. Рішення Власника ([INBOX-015]): погоджено Варіант B, 1536 px / 85% JPEG та 5 PR №43–№47. Внесено 4 обов'язкові уточнення (Backup виключає `chat_photos` + плейсхолдер; атомарний запис через `.tmp` + захист canonical path; м'ютекс `withChatSending` не блокує мережевий виклик Gemini + перелік регресійних тестів; емпіричне вимірювання токенів через `countTokens` у тестах Free Tier без платного тарифу).
-  9. Статус: Проєкт архітектури оновлено (v1.2), PR #42 очікує дозволу Власника на злиття. Жодного продуктового коду не реалізовано.
+## Оновлення сесії 027 (TASK-056: Реалізація PR №43 — Room v5 Schema & Migration) — 2026-11-28 (append-only)
+- `TASK-056 / PHOTO ARCHITECTURE (PR №43 — Room v5 Schema & Migration)`:
+  1. Злито PR #42 (документ `PHOTO_ARCHITECTURE_PROPOSAL.md` v1.2) у `main` стандартним merge комітом `595601d` за дозволом Власника.
+  2. Створено гілку `feat/task-056-photo-room-v5` від оновленого `main`.
+  3. `ChatAttachmentEntity`: сутність таблиці `chat_attachments` (id, messageId, filePath, mimeType, fileSizeBytes, width, height, createdAt) із зовнішнім ключем на `chat_messages(id)` ON DELETE CASCADE та індексом `index_chat_attachments_messageId`.
+  4. `ChatMessageWithAttachments`: агрегована модель із `@Embedded message: ChatMessageEntity` та `@Relation attachments: List<ChatAttachmentEntity>`, геттер `primaryPhoto`.
+  5. `ChatAttachmentDao`: методи вставки (ABORT), вибірки по одному та групі повідомлень, вибірки для конкретної рослини, запити шляхів файлів для очищення дисків (`getAllFilePathsForPlant`, `getAllStoredAttachmentPaths`), видалення, спостереження.
+  6. `ChatMessageDao`: додано `@Transaction observeMessagesWithAttachments(plantId)` та `getMessagesWithAttachments(plantId)` із збереженням хронологічного сортування.
+  7. `MIGRATION_4_5`: суто адитивна міграція (CREATE TABLE / CREATE INDEX), зареєстрована у `FlowersDatabase` v5. Експортовано Room schema `app/schemas/com.flowers.app.data.local.FlowersDatabase/5.json`.
+  8. Тестування: 325/325 JVM unit-тестів (100% pass) включно з розширеними тестами `MigrationTest` (міграція 4->5, відповідність схемі `5.json`, цілісність даних); 60/60 Android інструментальних тестів на емуляторі `small_phone` (Android 16 API 36, 100% pass) включно з `RoomMigrationV4ToV5Test` та `ChatAttachmentDaoTest` (перевірка FK, plant isolation, CASCADE на видалення повідомлення та рослини, Flow observation).
+  9. `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL (AAB 17 670 330 байт).
+  10. Статус: PR №43 підготовлено та верифіковано. Наступні кроки (PR №44: `ChatPhotoManager`) очікують погодження. Завдання `TASK-056` залишається відкритим.
+
 
 
 

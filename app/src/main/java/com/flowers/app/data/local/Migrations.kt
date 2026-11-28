@@ -70,4 +70,31 @@ object Migrations {
             MIGRATION_3_4_SQL.forEach { db.execSQL(it) }
         }
     }
+
+    /**
+     * Міграція Room 4 → 5 (TASK-056 / PHOTO ARCHITECTURE, PR №43): таблиця графічних вкладень персонального чату.
+     * Суто адитивна: лише CREATE TABLE / CREATE INDEX. Таблиці `plants`, `care_events`,
+     * `catalog_plants`, `care_pods`, `chat_messages` не змінюються (жодних DROP/DELETE/ALTER), тож усі наявні дані
+     * зберігаються на 100%.
+     */
+    val MIGRATION_4_5_SQL: List<String> = listOf(
+        "CREATE TABLE IF NOT EXISTS `chat_attachments` (" +
+            "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+            "`messageId` INTEGER NOT NULL, " +
+            "`filePath` TEXT NOT NULL, " +
+            "`mimeType` TEXT NOT NULL, " +
+            "`fileSizeBytes` INTEGER NOT NULL, " +
+            "`width` INTEGER NOT NULL, " +
+            "`height` INTEGER NOT NULL, " +
+            "`createdAt` INTEGER NOT NULL, " +
+            "FOREIGN KEY(`messageId`) REFERENCES `chat_messages`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "CREATE INDEX IF NOT EXISTS `index_chat_attachments_messageId` " +
+            "ON `chat_attachments` (`messageId`)"
+    )
+
+    val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            MIGRATION_4_5_SQL.forEach { db.execSQL(it) }
+        }
+    }
 }

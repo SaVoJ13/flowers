@@ -480,22 +480,28 @@
     - `TASK-056` загалом залишається відкритим.
   - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався, конфігурації Firebase, Billing, Google Play Console не змінювалися, робоча директорія чиста.
 
-### Сесія 027, TASK-056: Проєктування PHOTO ARCHITECTURE (2026-11-28)
-- **Мета:** розробити комплексну архітектуру персонального мультимодального ШІ-чату для рослин (збереження файлів, прив'язка до повідомлень, контракт Gemini, безпека даних, план міграції Room v4 → v5 та план реалізації поетапними PR).
+### Сесія 027, TASK-056: Злиття PR #42 та реалізація PR №43 — Room v5 Schema & Migration (2026-11-28)
+- **Мета:** злити погоджений архітектурний PR #42 у `main` та реалізувати виключно PR №43 (Room v5 Schema, `ChatAttachmentEntity`, `ChatAttachmentDao`, `ChatMessageWithAttachments`, `MIGRATION_4_5`, юніт- та інструментальні тести міграції та каскадного видалення).
 - **Виконані роботи:**
-  1. Створено архітектурний документ `docs/architecture/PHOTO_ARCHITECTURE_PROPOSAL.md`.
-  2. Проведено порівняльний аналіз моделей зберігання: Варіант A (розширення `ChatMessageEntity`) проти Варіанту B (окрема таблиця `chat_attachments` із FK 1-до-багатьох). Рекомендовано Варіант B як найбільш масштабований та чистий, який забезпечує готовність до майбутнього порівняння фотографій («до і після») без повторних міграцій Room.
-  3. Спроєктовано безпечну адитивну міграцію Room v4 → v5 (`MIGRATION_4_5`) без жодних змін наявних таблиць (`plants`, `care_events`, `catalog_plants`, `care_pods`, `chat_messages`).
-  4. Визначено життєвий цикл фото: джерела (системний Photo Picker `PickVisualMedia` та камера через `CameraCaptureManager`), обробка через `ImageProcessor` (макс. 1536 px, 85% JPEG, нативне видалення EXIF/GPS, захист від OOM), безпечне зберігання у `filesDir/chat_photos/plant_<id>/`, двохфазний протокол запису файлу та бази, служба очищення сиріт (Orphan Cleanup Service), видалення фотографій при очищенні чату чи видаленні рослини.
-  5. Спроєктовано мультимодальний контракт з Gemini (`gemini-3.5-flash-lite` через Firebase AI Logic): відокремлення `systemInstruction`, відправка 1 фото разом із текстовим контекстом, нульовий оверхед для чисто текстових реплік, заборона автоматичної відправки старих фото з історії, розрахунок витрати токенів за офіційною документацією (1 фото 1536 px = 4 тайли = ~1032–1120 токенів; загальний обсяг запиту ~2000–2120 токенів), ліміти за дією O-1.
-  6. Розроблено матрицю відмовостійкості на 10 сценаріїв із збереженням усіх гарантій STEP 3 (`withChatSending`, м'ютекси, атомарні транзакції, Retry з перевіркою файлу).
-  7. Сформовано план реалізації у вигляді 5 невеликих PR після поточного PR #42: PR №43 (Room v5), PR №44 (ChatPhotoManager), PR №45 (Gemini), PR №46 (ChatViewModel), PR №47 (STEP 4: UI/Навігація).
-  8. Рішення Власника ([INBOX-015]): погоджено Варіант B, 1536 px / 85% JPEG та 5 PR №43–№47. Внесено 4 обов'язкові уточнення (Backup виключає `chat_photos` + плейсхолдер; атомарний запис через `.tmp` + захист canonical path; м'ютекс `withChatSending` не блокує мережевий виклик Gemini + перелік регресійних тестів; емпіричне вимірювання токенів через `countTokens` у тестах Free Tier без платного тарифу).
-  9. Жодного продуктового коду не змінювалося; реалізація суворо заблокована до затвердження архітектури Власником.
+  1. Злито PR #42 у `main` (merge-коміт `595601d`).
+  2. Створено гілку `feat/task-056-photo-room-v5`.
+  3. Створено `ChatAttachmentEntity` (Room-таблиця `chat_attachments` із зовнішнім ключем `messageId` на `chat_messages(id)` ON DELETE CASCADE та індексом `index_chat_attachments_messageId`).
+  4. Створено агреговану модель `ChatMessageWithAttachments` із `@Relation` та властивістю `primaryPhoto`.
+  5. Створено `ChatAttachmentDao` із методами вставки (`OnConflictStrategy.ABORT`), вибірки, пакетних запитів, вибірки шляхів для очищення дисків (`getAllFilePathsForPlant`, `getAllStoredAttachmentPaths`), спостереження.
+  6. Оновлено `ChatMessageDao`: додано `@Transaction observeMessagesWithAttachments(plantId)` та `getMessagesWithAttachments(plantId)` із сортуванням за `timestamp ASC, id ASC`.
+  7. Створено та зареєстровано суто адитивну міграцію `MIGRATION_4_5` у `FlowersDatabase` v5. Експортовано схему Room `5.json`.
+  8. Оновлено `FakeChatMessageDao` у `FlowersRepositoryChatTest.kt`.
+  9. Додано модульні тести міграції 4->5 у `MigrationTest.kt` (збереження даних, каскадне видалення, відповідність `5.json`).
+  10. Створено інструментальний тест реальної міграції `RoomMigrationV4ToV5Test.kt` та набір тестів цілісності `ChatAttachmentDaoTest.kt`.
+- **Тестування та верифікація:**
+  - JVM unit-тести: **325 / 325 PASSED** (100% успішно).
+  - Android інструментальні тести: **60 / 60 PASSED** на емуляторі `small_phone` (Android 16 API 36, `emulator-5554`), 0 failures, 0 skipped. Емулятор зупинено (`emu kill`).
+  - Збірка: `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL (AAB 17 670 330 байт).
 - **Статус завдань:**
-  - `TASK-056 / PHOTO ARCHITECTURE` — ПРОЄКТ ОНОВЛЕНО (v1.2), PR #42 ОЧІКУЄ ЗАТВЕРДЖЕННЯ ВЛАСНИКОМ ДЛЯ ЗЛИТТЯ.
+  - `TASK-056 / PHOTO ARCHITECTURE (PR №43)` — РЕАЛІЗОВАНО, ПЕРЕВІРЕНО.
   - `TASK-056` загалом залишається ВІДКРИТИМ.
-- Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався, конфігурації Firebase, Billing, Google Play Console не змінювалися, робоча директорія чиста.
+- Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався, конфігурації Firebase, Billing, Google Play Console не змінювалися.
+
 
 
 

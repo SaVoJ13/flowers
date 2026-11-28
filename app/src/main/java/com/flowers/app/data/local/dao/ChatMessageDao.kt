@@ -21,6 +21,16 @@ abstract class ChatMessageDao {
     @Query("SELECT * FROM chat_messages WHERE plantId = :plantId ORDER BY timestamp ASC, id ASC")
     abstract fun observeMessages(plantId: Long): Flow<List<ChatMessageEntity>>
 
+    /** Повна історія реплік однієї рослини разом із графічними вкладеннями в хронологічному порядку (Room v5). */
+    @Transaction
+    @Query("SELECT * FROM chat_messages WHERE plantId = :plantId ORDER BY timestamp ASC, id ASC")
+    abstract fun observeMessagesWithAttachments(plantId: Long): Flow<List<com.flowers.app.data.local.entity.ChatMessageWithAttachments>>
+
+    /** Отримання списку реплік із вкладеннями без реактивного спостереження. */
+    @Transaction
+    @Query("SELECT * FROM chat_messages WHERE plantId = :plantId ORDER BY timestamp ASC, id ASC")
+    abstract suspend fun getMessagesWithAttachments(plantId: Long): List<com.flowers.app.data.local.entity.ChatMessageWithAttachments>
+
     @Query("SELECT * FROM chat_messages WHERE plantId = :plantId ORDER BY timestamp ASC, id ASC")
     abstract suspend fun getMessages(plantId: Long): List<ChatMessageEntity>
 

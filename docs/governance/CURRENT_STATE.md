@@ -179,21 +179,24 @@
     - `TASK-056` загалом залишається ВІДКРИТИМ.
   - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався. Хмарні конфігурації (Firebase, Billing, Google Play Console) не змінювалися. Робоча директорія чиста.
 
-- **Сесія 027 (2026-11-28, TASK-056: Проєктування PHOTO ARCHITECTURE):**
-  - За погодженням Власника проведено комплексне архітектурне проєктування персонального мультимодального чату рослини та підготовлено документ `docs/architecture/PHOTO_ARCHITECTURE_PROPOSAL.md`.
-  - **Ключові архітектурні рішення:**
-    1. **Модель зберігання:** порівняно Варіант A (розширення `ChatMessageEntity`) та Варіант B (окрема таблиця `chat_attachments` із FK 1-до-багатьох). Рекомендовано Варіант B, який гарантує незмінність таблиці `chat_messages` та закладає підтримку майбутнього порівняння фото без додаткових міграцій Room.
-    2. **Схема бази даних:** розроблено суто адитивну міграцію Room v4 → v5 (`MIGRATION_4_5`) для створення таблиці `chat_attachments` та індексу `index_chat_attachments_messageId`. Усі наявні дані збережено на 100%.
-    3. **Життєвий цикл фото:** вибір через системний Photo Picker (`PickVisualMedia`) та камеру (`CameraCaptureManager`), оптимізація через `ImageProcessor` (макс. 1536 px, 85% JPEG, нативне видалення EXIF/GPS, захист від OOM), безпечне зберігання у `filesDir/chat_photos/plant_<id>/`, двохфазний протокол запису файлу та бази, служба очищення сиріт (Orphan Cleanup Service), видалення фотографій при очищенні чату чи видаленні рослини.
-    4. **Контракт Gemini:** модель `gemini-3.5-flash-lite` (Firebase AI Logic). Повне відокремлення `systemInstruction`, відправка 1 фото разом із текстовим запитом, збереження чинної поведінки текстових чатів, заборона автоматичної відправки попередніх фотографій з історії. Розраховано витрату токенів за офіційною документацією Gemini (1 фото 1536 px = 4 тайли = ~1032–1120 токенів; загальний обсяг запиту ~2000–2120 токенів), ліміти за дією O-1.
-    5. **Відмовостійкість:** опрацьовано 10 критичних сценаріїв збоїв (офлайн, 429, подвійні кліки, збій процесу, видалення чату/рослини, битий JPEG, Retry без тихих фолбеків). Збережено всі гарантії STEP 3 (`withChatSending`, м'ютекси, атомарні транзакції Room, Retry з перевіркою файлу).
-    6. **План поетапних PR:** впровадження після поточного PR #42 розбито на 5 ізольованих PR: PR №43 (Room v5), PR №44 (ChatPhotoManager), PR №45 (Gemini), PR №46 (ChatViewModel), PR №47 (STEP 4: UI/Навігація).
-    7. **Умовне погодження Власника та фіналізація v1.2 ([INBOX-015]):** Власник погодив Варіант B, параметри 1536 px / 85% JPEG та 5 PR №43–№47. Внесено 4 уточнення: (1) зафіксовано виключення `chat_photos` з Android Auto Backup (`backup_rules.xml`), плейсхолдер при перенесенні на інший пристрій; (2) атомарний запис через `.tmp`, захист canonical path, повтор видалення; (3) м'ютекс `withChatSending` не утримується протягом мережевого запиту Gemini, сформовано перелік обов'язкових регресійних тестів; (4) емпіричне вимірювання токенів через `countTokens` у тестах Free Tier без платного тарифу та без змін у Firebase/Billing.
+- **Сесія 027 (2026-11-28, TASK-056: Злиття PR #42 та реалізація PR №43 — Room v5 Schema & Migration):**
+  - **Злиття PR #42:** PR #42 (документ `docs/architecture/PHOTO_ARCHITECTURE_PROPOSAL.md` v1.2) успішно злито в `main` стандартним merge комітом `595601d` після погодження Власника, перевірки SHA `0c5af9c` та успішного проходження CI.
+  - **Реалізація PR №43 (Room v5):** створено гілку `feat/task-056-photo-room-v5`.
+    1. **Таблиця `chat_attachments`:** створено сутність `ChatAttachmentEntity` (поля: `id`, `messageId`, `filePath`, `mimeType`, `fileSizeBytes`, `width`, `height`, `createdAt`) із зовнішнім ключем `FOREIGN KEY(messageId) REFERENCES chat_messages(id) ON DELETE CASCADE` та обов'язковим індексом `index_chat_attachments_messageId`.
+    2. **Агрегована модель `ChatMessageWithAttachments`:** `@Embedded message: ChatMessageEntity` та `@Relation(parentColumn = "id", entityColumn = "messageId") attachments: List<ChatAttachmentEntity>`, допоміжний гетер `primaryPhoto`.
+    3. **DAO `ChatAttachmentDao`:** методи пакетної та індивідуальної вставки (`OnConflictStrategy.ABORT`), вибірки за `messageId` та списком `messageIds`, вибірки всіх вкладень рослини `getAttachmentsForPlant`, отримання шляхів дисків для очищення `getAllFilePathsForPlant` та `getAllStoredAttachmentPaths`, видалення `deleteByMessageId`, спостереження `observeAttachmentsForMessage`.
+    4. **Оновлення `ChatMessageDao`:** додано транзакційні методи `@Transaction observeMessagesWithAttachments(plantId)` та `getMessagesWithAttachments(plantId)` із суворим збереженням порядку (`ORDER BY timestamp ASC, id ASC`).
+    5. **Міграція `MIGRATION_4_5`:** суто адитивна SQL-міграція (`CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`), без змін наявних таблиць. Зареєстровано у `FlowersDatabase` v5. Room експортував перевірену схему `app/schemas/com.flowers.app.data.local.FlowersDatabase/5.json`.
+  - **Тестування та верифікація:**
+    - 325/325 JVM unit-тестів (100% pass) включно з розширеними тестами `MigrationTest` (міграція 4->5, перевірка збереження даних, каскадне видалення, валідація схеми проти `5.json`, неруйнівний характер SQL).
+    - 60/60 Android інструментальних тестів на емуляторі `small_phone` (Android 16 API 36, 100% pass) включно з `RoomMigrationV4ToV5Test` та `ChatAttachmentDaoTest` (перевірка відхилення некоректних FK, plant isolation, CASCADE на видалення повідомлення та рослини, Flow observation).
+    - `bundleRelease` на Adoptium JDK 21 зібрано успішно (AAB 17 670 330 байт).
   - **Статус завдань:**
-    - `TASK-056 / PHOTO ARCHITECTURE` — ПРОЄКТ ПІДГОТОВЛЕНО (v1.2), PR #42 ВІДКРИТО, ОЧІКУЄ ЗАТВЕРДЖЕННЯ ВЛАСНИКОМ ДЛЯ ЗЛИТТЯ.
+    - `TASK-056 / PHOTO ARCHITECTURE (PR №43 — Room v5)` — РЕАЛІЗОВАНО, ПЕРЕВІРЕНО.
+    - `PR №44` (`ChatPhotoManager`) — ОЧІКУЄ ЗАТВЕРДЖЕННЯ ТА ДОЗВОЛУ ВЛАСНИКА.
     - `TASK-056` загалом залишається ВІДКРИТИМ.
-    - Жодного продуктового коду не змінено; реалізація заблокована до наступного погодження.
   - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався. Хмарні конфігурації (Firebase, Billing, Google Play Console) не змінювалися. Робоча директорія чиста.
+
 
 
 

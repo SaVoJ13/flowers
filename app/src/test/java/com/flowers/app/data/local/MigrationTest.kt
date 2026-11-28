@@ -204,4 +204,90 @@ class MigrationTest {
         assertEquals(2, Migrations.MIGRATION_2_3.startVersion)
         assertEquals(3, Migrations.MIGRATION_2_3.endVersion)
     }
+
+    private fun migrateV3ToV4() {
+        conn.createStatement().use { st -> Migrations.MIGRATION_3_4_SQL.forEach { st.execute(it) } }
+    }
+
+    private fun migrateV4ToV5() {
+        conn.createStatement().use { st -> Migrations.MIGRATION_4_5_SQL.forEach { st.execute(it) } }
+    }
+
+    @Test
+    fun `migration 4 to 5 creates chat_attachments and preserves all existing data`() {
+        migrate() // 1 -> 2
+        migrateV2ToV3() // 2 -> 3
+        migrateV3ToV4() // 3 -> 4
+        // Insert a chat message in v4
+        conn.createStatement().use { st ->
+            st.execute("INSERT INTO chat_messages (id, plantId, role, content, status, timestamp) VALUES (1, 1, 'USER', 'Привіт', 'SENT', 1700000000000)")
+        }
+        assertEquals(1, count("SELECT COUNT(*) FROM chat_messages"))
+
+        migrateV4ToV5() // 4 -> 5
+
+        assertEquals(3, count("SELECT COUNT(*) FROM plants"))
+        assertEquals(3, count("SELECT COUNT(*) FROM care_events"))
+        assertEquals(1, count("SELECT COUNT(*) FROM chat_messages"))
+        assertEquals(0, count("SELECT COUNT(*) FROM chat_attachments"))
+
+        // Insert attachment linked to message 1
+        conn.createStatement().use { st ->
+            st.execute("INSERT INTO chat_attachments (id, messageId, filePath, mimeType, fileSizeBytes, width, height, createdAt) VALUES (10, 1, '/data/user/0/com.savoj.flowers/files/chat_photos/plant_1_photo.jpg', 'image/jpeg', 204800, 1536, 1152, 1700000000000)")
+        }
+        assertEquals(1, count("SELECT COUNT(*) FROM chat_attachments"))
+
+        // Cascade delete on message deletion
+        conn.createStatement().use { st ->
+            st.execute("DELETE FROM chat_messages WHERE id = 1")
+        }
+        assertEquals(0, count("SELECT COUNT(*) FROM chat_messages"))
+        assertEquals(0, count("SELECT COUNT(*) FROM chat_attachments"))
+    }
+
+    @Test
+    fun `migration 4 to 5 contains no destructive statements`() {
+        val sql = Migrations.MIGRATION_4_5_SQL.joinToString("\n").uppercase()
+            .replace("ON DELETE CASCADE", "")
+            .replace("ON UPDATE NO ACTION", "")
+        listOf("DROP ", "DELETE ", "ALTER ", "UPDATE ").forEach {
+            assertTrue("migration 4 to 5 must not contain $it", !sql.contains(it))
+        }
+    }
+
+    @Test
+    fun `migration 4 to 5 matches exported v5 schema for chat_attachments`() {
+        migrate()
+        migrateV2ToV3()
+        migrateV3ToV4()
+        migrateV4ToV5()
+        val schemaFile = File("schemas/com.flowers.app.data.local.FlowersDatabase/5.json")
+        assertTrue("exported schema 5.json must exist", schemaFile.exists())
+        val entities = JsonParser.parseString(schemaFile.readText()).asJsonObject
+            .getAsJsonObject("database").getAsJsonArray("entities")
+        val attachmentsEntity = entities.map { it.asJsonObject }.first { it.get("tableName").asString == "chat_attachments" }
+        val expected = attachmentsEntity.getAsJsonArray("fields").map { it.asJsonObject }.map {
+            listOf(
+                it.get("columnName").asString,
+                it.get("affinity").asString,
+                it.get("notNull").asBoolean,
+                if (it.has("defaultValue")) it.get("defaultValue").asString else null
+            )
+        }
+        val actual = mutableListOf<List<Any?>>()
+        conn.createStatement().use { st ->
+            st.executeQuery("PRAGMA table_info(`chat_attachments`)").use { rs ->
+                while (rs.next()) {
+                    actual += listOf(rs.getString("name"), rs.getString("type"), rs.getInt("notnull") == 1, rs.getString("dflt_value"))
+                }
+            }
+        }
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `migration 4 to 5 is registered for 4 to 5`() {
+        assertEquals(4, Migrations.MIGRATION_4_5.startVersion)
+        assertEquals(5, Migrations.MIGRATION_4_5.endVersion)
+    }
 }

@@ -108,7 +108,7 @@ class RoomMigrationV3ToV4Test {
 
     private fun openV4(): FlowersDatabase =
         Room.databaseBuilder(context, FlowersDatabase::class.java, dbName)
-            .addMigrations(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4)
+            .addMigrations(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4, Migrations.MIGRATION_4_5)
             .build()
 
     @Test

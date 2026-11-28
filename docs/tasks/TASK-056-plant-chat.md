@@ -502,7 +502,21 @@ SQLite виконує REPLACE як DELETE + INSERT; Room вмикає foreign ke
 - Рішення зафіксовано у `OWNER_INBOX.md` ([INBOX-015]).
 - Жодного рядка коду не змінено; реалізація очікує дозволу Власника на злиття PR #42 та початок PR №43.
 
-> ⚠️ **Обмеження:** До окремого погодження архітектури не створювати `PlantChatScreen`, не змінювати схему Room, не реалізовувати код фотографій чи навігації.
+## 10. Хід робіт: PR №43 — Room v5 Schema & Migration (2026-11-28)
+
+- **Гілка:** `feat/task-056-photo-room-v5`, створена від `main` (`595601d` після злиття PR #42).
+- **Схема бази даних:**
+  - `ChatAttachmentEntity`: сутність таблиці `chat_attachments` (id, messageId, filePath, mimeType, fileSizeBytes, width, height, createdAt; FK на `chat_messages(id)` ON DELETE CASCADE; індекс `index_chat_attachments_messageId`).
+  - `ChatMessageWithAttachments`: агрегована модель із `@Relation` та властивістю `primaryPhoto`.
+  - `ChatAttachmentDao`: методи вставки (ABORT), вибірки по одному та групі повідомлень, вибірки для конкретної рослини, запити шляхів файлів для очищення дисків (`getAllFilePathsForPlant`, `getAllStoredAttachmentPaths`), видалення `deleteByMessageId`, спостереження.
+  - `ChatMessageDao`: додано `@Transaction observeMessagesWithAttachments(plantId)` та `getMessagesWithAttachments(plantId)` із збереженням хронологічного сортування (`ORDER BY timestamp ASC, id ASC`).
+  - `MIGRATION_4_5`: суто адитивна міграція (CREATE TABLE / CREATE INDEX), зареєстрована у `FlowersDatabase` v5. Експортовано Room schema `app/schemas/com.flowers.app.data.local.FlowersDatabase/5.json`.
+- **Тестування та верифікація:**
+  - JVM Unit Tests: **325 / 325 PASSED** (100% успішно) включно з `MigrationTest` (міграція 4->5, відповідність схемі `5.json`, цілісність даних).
+  - Android Instrumented Tests: **60 / 60 PASSED** на емуляторі `small_phone` (Android 16 API 36, `emulator-5554`, 0 failed, 0 skipped) включно з `RoomMigrationV4ToV5Test` та `ChatAttachmentDaoTest` (перевірка FK, plant isolation, CASCADE на видалення повідомлення та рослини, Flow observation).
+  - Релізний бандл: `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL (AAB 17 670 330 байт).
+- **Статус:** PR №43 готовий до відкриття та незалежного аудиту.
+
 
 
 

@@ -9,6 +9,7 @@ import com.flowers.app.data.local.dao.ChatMessageDao
 import com.flowers.app.data.local.dao.PlantDao
 import com.flowers.app.data.local.entity.CareEventEntity
 import com.flowers.app.data.local.entity.ChatMessageEntity
+import com.flowers.app.data.local.entity.ChatMessageWithAttachments
 import com.flowers.app.data.local.entity.MessageStatus
 import com.flowers.app.data.local.entity.PlantEntity
 import com.flowers.app.data.remote.GeminiPlantService
@@ -62,6 +63,9 @@ class FlowersRepositoryChatTest {
         val messagesMap = mutableMapOf<Long, ChatMessageEntity>()
 
         override fun observeMessages(plantId: Long): Flow<List<ChatMessageEntity>> = emptyFlow()
+        override fun observeMessagesWithAttachments(plantId: Long): Flow<List<ChatMessageWithAttachments>> = emptyFlow()
+        override suspend fun getMessagesWithAttachments(plantId: Long): List<ChatMessageWithAttachments> =
+            messagesMap.values.filter { it.plantId == plantId }.map { ChatMessageWithAttachments(it, emptyList()) }
         override suspend fun getMessages(plantId: Long): List<ChatMessageEntity> = messagesMap.values.filter { it.plantId == plantId }
         override suspend fun getLastMessages(plantId: Long, limit: Int): List<ChatMessageEntity> = emptyList()
         override suspend fun getLastSentMessages(plantId: Long, limit: Int): List<ChatMessageEntity> = lastSentMessagesToReturn

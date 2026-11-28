@@ -230,12 +230,15 @@
   - **Тестування та верифікація:**
     - 346/346 JVM unit-тестів (100% pass, включно з 21 тестом у `ChatPhotoManagerTest`: детермінована конкурентність `clearChatHistory` + нове фото через `CompletableDeferred`, збереження старої історії при збої транзакції та скасуванні корутини, Retry після помилки).
     - 65/65 Android інструментальних тестів на ізольованому емуляторі `small_phone` (`emulator-5554`, Android 16 API 36, 100% pass, включно з 3 тестами в `AndroidChatPhotoManagerTest`).
-    - `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL.
+    - `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL (~17.7 МБ).
+    - GitHub Actions CI: run `46167667476` — SUCCESS (1m17s).
+    - Повторний незалежний QA-аудит (модель Flash): `QA Verified`.
   - **Статус завдань:**
-    - `TASK-056 / PR №44 (ChatPhotoManager)` — ОНОВЛЕНО ПІСЛЯ ВИПРАВЛЕНЬ, ПЕРЕДАНО НА CI ТА ПОВТОРНИЙ НЕЗАЛЕЖНИЙ QA-АУДИТ.
-    - `PR №45..47` — ЗАБЛОКОВАНО ДО ОКРЕМОГО ПОГОДЖЕННЯ ВЛАСНИКА.
+    - `PR №44 (Chat Photo Storage & Lifecycle Service)` — ЗАВЕРШЕНО (злито в `main` стандартним merge комітом `c0f4c9b`).
+    - `ChatPhotoManager` та `ImageProfile.ChatConsultation` — ІНТЕГРОВАНО в `main`.
+    - `PR №45 (Gemini Multimodal Service)` — ОЧІКУЄ ДОЗВОЛУ ВЛАСНИКА.
     - `TASK-056` загалом залишається ВІДКРИТИМ.
-  - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався. Схема Room v5 (`5.json`), `GeminiPlantService`, `ChatViewModel` та Compose UI не змінювалися.
+  - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався. Схема Room v5 (`5.json`), `GeminiPlantService`, `ChatViewModel` та Compose UI не змінювалися. Робоча директорія чиста.
 
 
 

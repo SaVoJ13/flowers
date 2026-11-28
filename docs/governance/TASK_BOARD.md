@@ -243,7 +243,12 @@
   3. Реалізовано `ChatPhotoManager`: ізольований каталог `filesDir/chat_photos/plant_<plantId>/`, атомарний запис через тимчасовий файл у тій самій файловій системі (`StandardCopyOption.ATOMIC_MOVE`) з перевіркою цілісності та забороною перезапису, канонічна валідація шляхів (`canonicalFile.toPath().startsWith(...)`), блокування Path Traversal (`..`), нульових байтів та символічних посилань (`Files.isSymbolicLink`), перевірка доступності файлів після бекапу (`ChatPhotoAvailability`), захист активних файлів (`withPhotoInUse`), черга повторного видалення (`pendingDeletionPaths`) та служба `cleanupOrphanFiles` (видалення сиріт, старших за 24 години, із повторною перевіркою Room перед видаленням).
   4. Інтегровано двофазне збереження `saveUserMessageWithPhoto` (з обов'язковою транзакцією Room через `transactionRunner`, без масового видалення `deleteAllForPlant` при відкаті та зі збереженням усієї попередньої історії й старих JPEG у разі збою транзакції чи скасування корутини), точкове очищення фото при `clearChatHistory` (видаляються лише файли очищених записів із повторною перевіркою Room без безумовного `deleteAllPhotosForPlant`, щоб не зачепити паралельно створені нові повідомлення та їхні JPEG) і повне очищення при `deletePlant` у `FlowersRepository` / `FlowersRepositoryImpl` під короткими критичними секціями `plantMutex`, а також фоновий запуск `cleanupOrphanChatPhotos()` у `FlowersApplication` на `Dispatchers.IO`.
   5. Тестування: 346/346 JVM unit-тестів (100% pass, включно з 21 тестом у `ChatPhotoManagerTest`: детермінована конкурентність `clearChatHistory` + нове фото через `CompletableDeferred`, збереження старої історії при збої вставки вкладення та скасуванні корутини, перевірка Retry), 65/65 Android інструментальних тестів на емуляторі `small_phone` (API 36, 100% pass, включно з `AndroidChatPhotoManagerTest`), `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL.
-  6. Статус: PR №44 оновлено після усунення двох ризиків втрати даних і передано на CI та повторний незалежний QA-аудит. Наступні етапи (PR №45..47) заблоковані до окремих рішень Власника.
+  6. **Злиття PR #44 та інтеграція ChatPhotoManager (2026-11-28):**
+     - PR #44 (HEAD `d1f088e`) пройшов GitHub Actions CI (run `46167667476`, SUCCESS) та повторний незалежний аудит `QA Verified` (модель Flash).
+     - Затверджено Власником та злито в `main` стандартним merge комітом `c0f4c9b`.
+     - **PR №44 (`ChatPhotoManager`) — ЗАВЕРШЕНО, ІНТЕГРОВАНО В MAIN.**
+     - **PR №45 (`Gemini Multimodal Service`) — ОЧІКУЄ ДОЗВОЛУ ВЛАСНИКА.**
+     - Завдання `TASK-056` загалом залишається відкритим.
 
 
 

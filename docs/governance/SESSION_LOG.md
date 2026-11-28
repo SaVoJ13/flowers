@@ -542,11 +542,15 @@
 - **Тестування та верифікація:**
   - JVM unit-тести: **346 / 346 PASSED** (100% успішно).
   - Android інструментальні тести: **65 / 65 PASSED** на ізольованому емуляторі `small_phone` (`emulator-5554`, Android 16 API 36, 0 failures, 0 skipped). Емулятор зупинено (`emu kill`).
-  - Збірка: `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL.
-- **Статус завдань:**
-  - `TASK-056 / PR №44 (ChatPhotoManager)` — ОНОВЛЕНО ПІСЛЯ ВИПРАВЛЕНЬ, ПЕРЕДАНО НА CI ТА ПОВТОРНИЙ НЕЗАЛЕЖНИЙ QA-АУДИТ.
+  - Збірка: `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL (~17.7 МБ).
+  - GitHub Actions CI: run `46167667476` — SUCCESS (1m17s).
+  - Повторний незалежний QA-аудит (модель Flash): `QA Verified`.
+- **Злиття та статус завдань:**
+  - За дозволом Власника PR #44 злито в `main` стандартним merge комітом `c0f4c9b`.
+  - `PR №44 (ChatPhotoManager)` — ЗАВЕРШЕНО, ІНТЕГРОВАНО В MAIN.
+  - `PR №45 (Gemini Multimodal Service)` — ОЧІКУЄ ДОЗВОЛУ ВЛАСНИКА.
   - `TASK-056` загалом залишається ВІДКРИТИМ.
-- Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався (ізольовано через `ANDROID_SERIAL=emulator-5554`), конфігурації Firebase, Billing, Google Play Console, схема Room v5 (`5.json`), `GeminiPlantService`, `ChatViewModel` та Compose UI не змінювалися.
+- Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався (ізольовано через `ANDROID_SERIAL=emulator-5554`), конфігурації Firebase, Billing, Google Play Console, схема Room v5 (`5.json`), `GeminiPlantService`, `ChatViewModel` та Compose UI не змінювалися. Робоча директорія чиста.
 
 
 

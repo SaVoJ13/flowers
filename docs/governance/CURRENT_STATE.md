@@ -214,6 +214,29 @@
     - `TASK-056` загалом залишається ВІДКРИТИМ.
   - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався. Хмарні конфігурації (Firebase, Billing, Google Play Console) не змінювалися. Робоча директорія чиста.
 
+- **Сесія 029 (2026-11-28, TASK-056: Реалізація PR №44 — Chat Photo Storage & Lifecycle Service):**
+  - За дозволом Власника створено гілку `feat/task-056-chat-photo-manager` від `main` (`5da5def`) та реалізовано сервіс локального зберігання й життєвого циклу фотографій персонального чату:
+    1. **Обробка зображень (`ImageProfile.ChatConsultation` & `ImageProcessor`):** 1536 px по довшій стороні, JPEG 85%, нормалізація EXIF-орієнтації, повне очищення EXIF/GPS, обмеження RAM через `inSampleSize`, перевірка цілісності записаного тимчасового файла перед переміщенням. Профілі `SpeciesIdentification` та `DiseaseDiagnosis` залишилися без змін.
+    2. **Менеджер фотографій чату (`ChatPhotoManager`):**
+       - Постійний каталог `filesDir/chat_photos/plant_<plantId>/` з унікальними іменами файлів.
+       - Атомарне збереження: запис у тимчасовий файл, перевірка запису, атомарне переміщення `StandardCopyOption.ATOMIC_MOVE` у межах тієї самої файлової системи без перезапису існуючих файлів та з явною помилкою `AtomicMoveFailed`, якщо атомарне переміщення не підтримується.
+       - Захист файлової системи: перевірка canonical path через `Path.startsWith()`, прив'язка до папки `plant_<plantId>`, блокування Path Traversal (`..`), нульових байтів та символічних посилань (`Files.isSymbolicLink`), захист кореневого `filesDir` та `filesDir/plants`.
+       - Перевірка доступності (`ChatPhotoAvailability.Available`, `Missing` після відновлення з Google Auto Backup, `InvalidPath`).
+       - Служба `cleanupOrphanFiles`: сканує лише `filesDir/chat_photos`, видаляє сироти, старші за 24 години, зберігає молодші за 24 години та активні файли (`withPhotoInUse`, `inFlightSavingFiles`), перед кожним видаленням повторно перевіряє актуальний стан Room.
+    3. **Інтеграція з `FlowersRepositoryImpl` та `FlowersApplication`:**
+       - Двофазне збереження `saveUserMessageWithPhoto` із транзакцією Room та негайним очищенням створеного JPEG у разі збою транзакції Room або видалення рослини.
+       - Очищення фотографій при `clearChatHistory(plantId)` та `deletePlant(plant)` з короткими критичними секціями під `getPlantMutex(plantId)` без утримання м'ютексу під час мережевих запитів і з чергою повторного видалення (`retryPendingChatPhotoDeletions`).
+       - Фоновий запуск `cleanupOrphanChatPhotos()` після перезапуску застосунку на `Dispatchers.IO`.
+  - **Тестування та верифікація:**
+    - 343/343 JVM unit-тестів (100% pass, включно з 18 обов'язковими сценаріями в `ChatPhotoManagerTest`).
+    - 64/64 Android інструментальних тестів на ізольованому емуляторі `small_phone` (`emulator-5554`, Android 16 API 36, 100% pass, включно з `AndroidChatPhotoManagerTest`).
+    - `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL.
+  - **Статус завдань:**
+    - `TASK-056 / PR №44 (ChatPhotoManager)` — РЕАЛІЗОВАНО, ПЕРЕДАНО НА CI ТА НЕЗАЛЕЖНИЙ QA-АУДИТ.
+    - `PR №45..47` — ЗАБЛОКОВАНО ДО ОКРЕМОГО ПОГОДЖЕННЯ ВЛАСНИКА.
+    - `TASK-056` загалом залишається ВІДКРИТИМ.
+  - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався. Схема Room v5 (`5.json`), `GeminiPlantService`, `ChatViewModel` та Compose UI не змінювалися.
+
 
 
 

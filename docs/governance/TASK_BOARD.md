@@ -236,6 +236,15 @@
       - **PR №44 (`ChatPhotoManager`) — ОЧІКУЄ ДОЗВОЛУ ВЛАСНИКА.**
       - Завдання `TASK-056` загалом залишається відкритим.
 
+## Оновлення сесії 029 (TASK-056: Реалізація PR №44 — Chat Photo Storage & Lifecycle Service) — 2026-11-28 (append-only)
+- `TASK-056 / PHOTO ARCHITECTURE (PR №44 — ChatPhotoManager)`:
+  1. Створено гілку `feat/task-056-chat-photo-manager` від `main` (`5da5def`).
+  2. Додано профіль `ImageProfile.ChatConsultation` (1536 px, JPEG 85%) без зміни існуючих профілів `SpeciesIdentification` та `DiseaseDiagnosis`.
+  3. Реалізовано `ChatPhotoManager`: ізольований каталог `filesDir/chat_photos/plant_<plantId>/`, атомарний запис через тимчасовий файл у тій самій файловій системі (`StandardCopyOption.ATOMIC_MOVE`) з перевіркою цілісності та забороною перезапису, канонічна валідація шляхів (`canonicalFile.toPath().startsWith(...)`), блокування Path Traversal (`..`), нульових байтів та символічних посилань (`Files.isSymbolicLink`), перевірка доступності файлів після бекапу (`ChatPhotoAvailability`), захист активних файлів (`withPhotoInUse`), черга повторного видалення (`pendingDeletionPaths`) та служба `cleanupOrphanFiles` (видалення сиріт, старших за 24 години, із повторною перевіркою Room перед видаленням).
+  4. Інтегровано двофазне збереження `saveUserMessageWithPhoto`, очищення фото при `clearChatHistory` та `deletePlant` у `FlowersRepository` / `FlowersRepositoryImpl` під короткими критичними секціями `plantMutex` та фоновий запуск `cleanupOrphanChatPhotos()` у `FlowersApplication` на `Dispatchers.IO`.
+  5. Тестування: 343/343 JVM unit-тестів (100% pass, включно з 18 сценаріями у `ChatPhotoManagerTest`), 64/64 Android інструментальних тестів на емуляторі `small_phone` (API 36, 100% pass, включно з `AndroidChatPhotoManagerTest`), `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL.
+  6. Статус: PR №44 відкрито для проходження CI та незалежного QA-аудиту. Наступні етапи (PR №45..47) заблоковані до окремих рішень Власника.
+
 
 
 

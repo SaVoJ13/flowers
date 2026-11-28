@@ -532,6 +532,40 @@ SQLite виконує REPLACE як DELETE + INSERT; Room вмикає foreign ke
 - **Наступний крок:** початок PR №44 після окремого погодження Власника.
 - **Увага:** не починати PR №44, не створювати `ChatPhotoManager`, файлові операції чи фонове очищення сиріт без явного дозволу Власника. Наступні етапи (PR №44..47) залишаються заблокованими.
 
+---
+
+## 10. Хід робіт: PR №44 — Chat Photo Storage & Lifecycle Service (2026-11-28)
+
+> ⚠️ **Обмеження:** Реалізація PR №44 обмежена виключно файловим менеджером `ChatPhotoManager`, профілем обробки `ImageProfile.ChatConsultation`, інтеграцією з `FlowersRepository` / `FlowersRepositoryImpl` та `FlowersApplication`, а також автоматичними тестами. До окремих рішень Власника заборонено змінювати схему Room v5, `GeminiPlantService` (PR №45), `ChatViewModel` (PR №46) чи створювати `PlantChatScreen` (PR №47).
+
+- **Гілка:** `feat/task-056-chat-photo-manager`, створена від `main` (`5da5def`).
+- **Реалізовані компоненти:**
+  - `ImageProfile.ChatConsultation`: профіль 1536 px по довшій стороні, JPEG 85% без зміни поведінки `SpeciesIdentification` та `DiseaseDiagnosis`.
+  - `ImageProcessor`: додано перевірку цілісності записаного тимчасового файла (`decodeBounds`) перед переміщенням та підтримку інжектованого `fileMover` для атомарного переміщення з обробкою `AtomicMoveNotSupportedException`.
+  - `ChatPhotoManager`:
+    - Ізольоване постійне сховище `filesDir/chat_photos/plant_<plantId>/` з унікальними іменами `chat_<timestamp>_<token>.jpg`.
+    - Суворий захист файлової системи: перевірка canonical path (`Path.startsWith()`), блокування `..`, нульових байтів, неперевірених шляхів, символічних посилань (`Files.isSymbolicLink`), заборона доступу до чужих рослин, `filesDir/plants` чи кореневого `filesDir`.
+    - Атомарне збереження через тимчасовий файл у тій самій директорії та `StandardCopyOption.ATOMIC_MOVE` без перезапису існуючих фотографій і без тихого фолбеку на неатомарне копіювання.
+    - Перевірка доступності (`ChatPhotoAvailability`: `Available`, `Missing` для відновлення з Google Auto Backup, `InvalidPath`).
+    - Захист активних операцій (`withPhotoInUse`, `inFlightSavingFiles`) з автоматичним відкладеним видаленням після завершення активного читання та чергою повторного видалення (`pendingDeletionPaths`, `retryPendingDeletions`).
+    - Служба `cleanupOrphanFiles`: сканує лише `filesDir/chat_photos`, видаляє непідтверджені файли, старші за 24 години, зберігає молодші за 24 години та активні файли, перед кожним видаленням повторно опитує Room.
+  - `FlowersRepository` та `FlowersRepositoryImpl`:
+    - Двофазне атомарне збереження `saveUserMessageWithPhoto` (Фаза 1: JPEG на диск -> Фаза 2: транзакція Room для `ChatMessageEntity` + `ChatAttachmentEntity`; негайне очищення JPEG при помилці транзакції Room або видаленні рослини).
+    - Інтеграція очищення фотографій у `clearChatHistory(plantId)` та `deletePlant(plant)` під короткими критичними секціями `getPlantMutex(plantId)` зі збереженням усіх гарантій `withChatSending` та блокуванням повторного створення повідомлень для видаленої рослини.
+  - `FlowersApplication`: фоновий запуск `cleanupOrphanChatPhotos()` після старту застосунку на `Dispatchers.IO` без блокування головного UI-потоку.
+- **Тестування та верифікація:**
+  - JVM Unit Tests: **343 / 343 PASSED** (100% успішно, включно з 18 обов'язковими сценаріями в `ChatPhotoManagerTest`).
+  - Android Instrumented Tests: **64 / 64 PASSED** на емуляторі `small_phone` (Android 16 API 36, `emulator-5554`, 0 failed, 0 skipped, включно з `AndroidChatPhotoManagerTest`).
+  - Релізний бандл: `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL.
+- **Статус:** PR №44 підготовлено для проходження GitHub Actions CI та незалежного QA-аудиту.
+
+### Запис журналу сесії 029 (за §5.3 Конституції):
+- **Зроблено:** реалізовано `ChatPhotoManager`, профіль `ImageProfile.ChatConsultation`, інтеграцію двофазного збереження та очищення фото в `FlowersRepositoryImpl` і фоновий запуск Orphan Cleanup у `FlowersApplication`; створено `ChatPhotoManagerTest` (18 сценаріїв) та `AndroidChatPhotoManagerTest`.
+- **Стан:** тести 100% зелені (343 JVM unit, 64 Android instrumented на `small_phone`), `bundleRelease` зібрано успішно.
+- **Зупинився на:** відкриття PR №44, перевірка GitHub Actions CI та передача на незалежний QA-аудит іншою моделлю.
+- **Наступний крок:** проходження CI та отримання вердикту незалежного QA для PR №44.
+- **Увага:** не зливати PR №44 без `QA Verified` та явного дозволу Власника; наступні етапи (PR №45..47) залишаються заблокованими.
+
 
 
 

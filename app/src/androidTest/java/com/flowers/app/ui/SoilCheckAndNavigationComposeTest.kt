@@ -14,7 +14,6 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.flowers.app.data.local.FlowersDatabase
-import com.flowers.app.data.local.Migrations
 import com.flowers.app.data.local.entity.PlantEntity
 import com.flowers.app.data.repository.FlowersRepositoryImpl
 import com.flowers.app.ui.components.BottomNavBar

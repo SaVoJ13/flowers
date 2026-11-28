@@ -10,7 +10,9 @@ import com.flowers.app.data.local.entity.ChatMessageEntity
 import com.flowers.app.data.local.entity.MessageRole
 import com.flowers.app.data.local.entity.MessageStatus
 import com.flowers.app.data.local.entity.PlantEntity
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -187,29 +189,89 @@ class ChatAttachmentDaoTest {
         val chatDao = db.chatMessageDao()
         val attDao = db.chatAttachmentDao()
 
-        // Спочатку порожньо
-        var initial = chatDao.observeMessagesWithAttachments(plantId).first()
-        assertTrue(initial.isEmpty())
+        val emissions = mutableListOf<List<com.flowers.app.data.local.entity.ChatMessageWithAttachments>>()
+        val job = launch {
+            chatDao.observeMessagesWithAttachments(plantId).collect {
+                emissions.add(it)
+            }
+        }
+
+        while (emissions.isEmpty()) delay(10)
+        assertTrue(emissions.last().isEmpty())
 
         // Додаємо повідомлення без вкладення
         val m1 = createMessage(plantId, content = "Текст без фото", timestamp = 100)
-        var list = chatDao.observeMessagesWithAttachments(plantId).first()
-        assertEquals(1, list.size)
-        assertEquals("Текст без фото", list[0].message.content)
-        assertTrue(list[0].attachments.isEmpty())
-        assertNull(list[0].primaryPhoto)
+        while (emissions.size < 2) delay(10)
+        val second = emissions.last()
+        assertEquals(1, second.size)
+        assertEquals("Текст без фото", second[0].message.content)
+        assertTrue(second[0].attachments.isEmpty())
+        assertNull(second[0].primaryPhoto)
 
         // Додаємо вкладення
         attDao.insertAttachment(attachment(m1, "/photos/attached.jpg", createdAt = 100))
-        list = chatDao.observeMessagesWithAttachments(plantId).first()
-        assertEquals(1, list.size)
-        assertEquals(1, list[0].attachments.size)
-        assertEquals("/photos/attached.jpg", list[0].primaryPhoto?.filePath)
+        while (emissions.size < 3) delay(10)
+        val third = emissions.last()
+        assertEquals(1, third.size)
+        assertEquals(1, third[0].attachments.size)
+        assertEquals("/photos/attached.jpg", third[0].primaryPhoto?.filePath)
 
         // getMessagesWithAttachments також повертає вкладення
         val nonReactive = chatDao.getMessagesWithAttachments(plantId)
         assertEquals(1, nonReactive.size)
         assertEquals("/photos/attached.jpg", nonReactive[0].primaryPhoto?.filePath)
+
+        job.cancel()
+    }
+
+    @Test
+    fun insertAttachmentsBatch_andGetAttachmentForMessage() = runBlocking {
+        val plantId = createPlant()
+        val msgId = createMessage(plantId)
+        val dao = db.chatAttachmentDao()
+
+        val ids = dao.insertAttachments(
+            listOf(
+                attachment(msgId, "/photos/first.jpg", createdAt = 100L),
+                attachment(msgId, "/photos/second.jpg", createdAt = 200L)
+            )
+        )
+        assertEquals(2, ids.size)
+        assertEquals(2, dao.count())
+
+        val first = dao.getAttachmentForMessage(msgId)
+        assertNotNull(first)
+        assertEquals("/photos/first.jpg", first?.filePath)
+
+        val byId = dao.getById(ids[0])
+        assertNotNull(byId)
+        assertEquals(ids[0], byId?.id)
+
+        // Порожній список ID не викликає SQL-помилки
+        val emptyResult = dao.getAttachmentsForMessages(emptyList())
+        assertTrue(emptyResult.isEmpty())
+    }
+
+    @Test
+    fun observeAttachmentsForMessageEmitsList() = runBlocking {
+        val plantId = createPlant()
+        val msgId = createMessage(plantId)
+        val dao = db.chatAttachmentDao()
+
+        val emissions = mutableListOf<List<ChatAttachmentEntity>>()
+        val job = launch {
+            dao.observeAttachmentsForMessage(msgId).collect { emissions.add(it) }
+        }
+
+        while (emissions.isEmpty()) delay(10)
+        assertTrue(emissions.last().isEmpty())
+
+        dao.insertAttachment(attachment(msgId, "/photos/stream.jpg"))
+        while (emissions.size < 2) delay(10)
+        assertEquals(1, emissions.last().size)
+        assertEquals("/photos/stream.jpg", emissions.last()[0].filePath)
+
+        job.cancel()
     }
 
     @Test

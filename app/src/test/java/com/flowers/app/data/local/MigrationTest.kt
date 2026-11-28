@@ -243,6 +243,20 @@ class MigrationTest {
         }
         assertEquals(0, count("SELECT COUNT(*) FROM chat_messages"))
         assertEquals(0, count("SELECT COUNT(*) FROM chat_attachments"))
+
+        // Cascade delete on plant deletion (plants -> chat_messages -> chat_attachments)
+        conn.createStatement().use { st ->
+            st.execute("INSERT INTO plants VALUES (4,'Фікус','ficus','Спальня','INDIRECT',7,NULL,1700600000000,NULL,0,1690000000000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0)")
+            st.execute("INSERT INTO chat_messages (id, plantId, role, content, status, timestamp) VALUES (200, 4, 'USER', 'Фото фікуса', 'SENT', 1700000000000)")
+            st.execute("INSERT INTO chat_attachments (id, messageId, filePath, mimeType, fileSizeBytes, width, height, createdAt) VALUES (20, 200, '/data/ficus.jpg', 'image/jpeg', 1000, 1536, 1152, 1700000000000)")
+        }
+        assertEquals(1, count("SELECT COUNT(*) FROM chat_messages WHERE plantId = 4"))
+        assertEquals(1, count("SELECT COUNT(*) FROM chat_attachments WHERE id = 20"))
+        conn.createStatement().use { st ->
+            st.execute("DELETE FROM plants WHERE id = 4")
+        }
+        assertEquals(0, count("SELECT COUNT(*) FROM chat_messages WHERE plantId = 4"))
+        assertEquals(0, count("SELECT COUNT(*) FROM chat_attachments WHERE id = 20"))
     }
 
     @Test
@@ -283,6 +297,31 @@ class MigrationTest {
             }
         }
         assertEquals(expected, actual)
+
+        // Verify foreign key constraint against 5.json
+        conn.createStatement().use { st ->
+            st.executeQuery("PRAGMA foreign_key_list(`chat_attachments`)").use { rs ->
+                assertTrue("Foreign key to chat_messages must exist", rs.next())
+                assertEquals("chat_messages", rs.getString("table"))
+                assertEquals("messageId", rs.getString("from"))
+                assertEquals("id", rs.getString("to"))
+                assertEquals("CASCADE", rs.getString("on_delete"))
+                assertEquals("NO ACTION", rs.getString("on_update"))
+            }
+        }
+
+        // Verify index index_chat_attachments_messageId against 5.json
+        conn.createStatement().use { st ->
+            st.executeQuery("PRAGMA index_list(`chat_attachments`)").use { rs ->
+                assertTrue("Index on chat_attachments must exist", rs.next())
+                assertEquals("index_chat_attachments_messageId", rs.getString("name"))
+                assertEquals(0, rs.getInt("unique"))
+            }
+            st.executeQuery("PRAGMA index_info(`index_chat_attachments_messageId`)").use { rs ->
+                assertTrue("Index column must be messageId", rs.next())
+                assertEquals("messageId", rs.getString("name"))
+            }
+        }
     }
 
     @Test

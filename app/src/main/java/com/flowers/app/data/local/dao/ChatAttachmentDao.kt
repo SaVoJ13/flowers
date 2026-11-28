@@ -22,7 +22,7 @@ abstract class ChatAttachmentDao {
     abstract suspend fun insertAttachments(attachments: List<ChatAttachmentEntity>): List<Long>
 
     /** Отримання першого вкладення конкретного повідомлення. */
-    @Query("SELECT * FROM chat_attachments WHERE messageId = :messageId LIMIT 1")
+    @Query("SELECT * FROM chat_attachments WHERE messageId = :messageId ORDER BY id ASC LIMIT 1")
     abstract suspend fun getAttachmentForMessage(messageId: Long): ChatAttachmentEntity?
 
     /** Отримання всіх вкладень конкретного повідомлення. */

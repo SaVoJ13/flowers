@@ -108,6 +108,14 @@ class RoomMigrationV4ToV5Test {
         v4.execSQL("INSERT INTO chat_messages (id, plantId, role, content, status, errorMessage, timestamp) VALUES (101, 1, 'USER', 'Жовтіє листок', 'SENT', NULL, 1700100000000)")
         v4.execSQL("INSERT INTO chat_messages (id, plantId, role, content, status, errorMessage, timestamp) VALUES (102, 1, 'MODEL', 'Перевірте вологість', 'SENT', NULL, 1700100005000)")
         v4.execSQL("INSERT INTO chat_messages (id, plantId, role, content, status, errorMessage, timestamp) VALUES (201, 2, 'USER', 'Коли поливати?', 'SENT', NULL, 1700200000000)")
+        v4.execSQL(
+            "INSERT INTO catalog_plants (id, nameUk, nameLatin, popularName, difficulty, light, defaultCheckIntervalDays, soilType, toxicToPets, isAiGenerated) VALUES " +
+                "('monstera_deliciosa', 'Монстера делікатесна', 'Monstera deliciosa', 'Монстера', 'MEDIUM', 'INDIRECT', 7, 'Пухкий', 1, 0)"
+        )
+        v4.execSQL(
+            "INSERT INTO care_pods (id, plantSpeciesId, category, titleUk, contentUk, icon) VALUES " +
+                "('pod_1', 'monstera_deliciosa', 'WATERING', 'Полив', 'Поливайте помірно', 'water_drop')"
+        )
         helper.close()
     }
 
@@ -144,6 +152,17 @@ class RoomMigrationV4ToV5Test {
             val msgs2 = db.chatMessageDao().getMessages(2L)
             assertEquals(1, msgs2.size)
             assertEquals("Коли поливати?", msgs2[0].content)
+
+            // Перевіряємо збереження catalog_plants та care_pods
+            val catalog = db.catalogDao().getCatalogPlantById("monstera_deliciosa")
+            assertNotNull(catalog)
+            assertEquals("Монстера делікатесна", catalog!!.nameUk)
+            assertEquals(true, catalog.toxicToPets)
+
+            val pods = db.carePodDao().getPodsForSpecies("monstera_deliciosa").first()
+            assertEquals(1, pods.size)
+            assertEquals("pod_1", pods[0].id)
+            assertEquals("Полив", pods[0].titleUk)
 
             // Перевіряємо, що chat_attachments створена і спочатку порожня
             val attachmentsDao = db.chatAttachmentDao()
@@ -208,14 +227,24 @@ class RoomMigrationV4ToV5Test {
             assertEquals(1, attachmentsDao.getAttachmentsForPlant(1L).size)
             assertEquals(1, attachmentsDao.getAttachmentsForPlant(2L).size)
 
-            // Видалення рослини 1 повинно каскадно видалити її повідомлення та вкладення
-            db.plantDao().deletePlantById(1L)
-            assertTrue(db.chatMessageDao().getMessages(1L).isEmpty())
+            // 1. Пряме видалення конкретного повідомлення (messageId = 101L) каскадно видаляє його вкладення,
+            // але зберігає саму рослину 1 та інше її повідомлення (messageId = 102L)
+            db.openHelper.writableDatabase.execSQL("DELETE FROM chat_messages WHERE id = 101")
+            assertEquals(1, db.chatMessageDao().getMessages(1L).size)
+            assertEquals(102L, db.chatMessageDao().getMessages(1L)[0].id)
+            assertTrue(attachmentsDao.getAttachmentsForMessage(101L).isEmpty())
             assertTrue(attachmentsDao.getAttachmentsForPlant(1L).isEmpty())
+            assertNotNull(db.plantDao().getPlantById(1L))
 
-            // Рослина 2 та її вкладення мають залишитися недоторканими
+            // Повідомлення рослини 2 та його вкладення залишаються недоторканими
             assertEquals(1, db.chatMessageDao().getMessages(2L).size)
             assertEquals(1, attachmentsDao.getAttachmentsForPlant(2L).size)
+
+            // 2. Видалення рослини 2 повинно каскадно видалити її повідомлення (201) та вкладення (p2.jpg)
+            db.plantDao().deletePlantById(2L)
+            assertTrue(db.chatMessageDao().getMessages(2L).isEmpty())
+            assertTrue(attachmentsDao.getAttachmentsForPlant(2L).isEmpty())
+            assertTrue(attachmentsDao.getAllStoredAttachmentPaths().isEmpty())
         } finally {
             db.close()
         }

@@ -502,7 +502,7 @@ SQLite виконує REPLACE як DELETE + INSERT; Room вмикає foreign ke
 - Рішення зафіксовано у `OWNER_INBOX.md` ([INBOX-015]).
 - PR #42 успішно злито в `main` комітом `595601d`.
 
-## 8. Хід робіт: PR №43 — Room v5 Schema & Migration (2026-11-28)
+## 9. Хід робіт: PR №43 — Room v5 Schema & Migration (2026-11-28)
 
 > ⚠️ **Обмеження:** Реалізація PR №43 обмежена виключно базою даних Room v5 (таблиця `chat_attachments`, `MIGRATION_4_5`, схема `5.json`, DAO та тести міграції/каскаду). До окремих рішень Власника заборонено реалізовувати `ChatPhotoManager` (PR №44), змінювати `GeminiPlantService` (PR №45), змінювати `ChatViewModel` (PR №46) чи створювати `PlantChatScreen` (PR №47).
 
@@ -517,14 +517,16 @@ SQLite виконує REPLACE як DELETE + INSERT; Room вмикає foreign ke
   - JVM Unit Tests: **325 / 325 PASSED** (100% успішно) включно з `MigrationTest` (міграція 4->5, відповідність схемі `5.json`, перевірка foreign keys та індексів, перевірка каскадного видалення при видаленні повідомлення та при видаленні рослини).
   - Android Instrumented Tests: **62 / 62 PASSED** на емуляторі `small_phone` (Android 16 API 36, `emulator-5554`, 0 failed, 0 skipped) включно з `RoomMigrationV4ToV5Test` (збереження plants, care_events, catalog_plants, care_pods, chat_messages; каскадне видалення окремого повідомлення та видалення рослини) та `ChatAttachmentDaoTest` (відхилення некоректних FK, batch-вставка, plant isolation, живий Flow collector).
   - Релізний бандл: `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL (AAB 17.7 МБ).
-- **Статус:** PR №43 підготовлено та передано на незалежний QA-аудит.
+  - GitHub Actions CI: run `46109277573` — SUCCESS.
+  - Незалежний QA-аудит (модель Pro): **QA Verified**.
+- **Статус:** PR #43 повністю верифіковано (HEAD `df4e571`), очікує дозволу Власника на злиття в `main`.
 
 ### Запис журналу сесії 028 (за §5.3 Конституції):
-- **Зроблено:** реалізовано схему Room v5 (`ChatAttachmentEntity`, `ChatMessageWithAttachments`, `ChatAttachmentDao`, `ChatMessageDao`, `MIGRATION_4_5`, схема `5.json`), розширено тести міграції (JVM та Android instrumented на `small_phone`), відкрито PR #43.
-- **Стан:** тести 100% зелені (325 JVM, 60 instrumented), release bundle зібрано успішно (17.7 МБ), GitHub Actions CI run `46107085480` — SUCCESS.
-- **Зупинився на:** усунення зауважень незалежного QA аудиту для PR #43.
-- **Наступний крок:** отримання фінального вердикту `QA Verified` від незалежного субагента.
-- **Увага:** не зливати PR №43 без `QA Verified` та явного схвалення Власника; наступні етапи (PR №44..47) залишаються суворо заблокованими.
+- **Зроблено:** реалізовано схему Room v5 (`ChatAttachmentEntity`, `ChatMessageWithAttachments`, `ChatAttachmentDao`, `ChatMessageDao`, `MIGRATION_4_5`, схема `5.json`), розширено тести міграції (325 JVM unit-тестів та 62 Android instrumented тести на `small_phone`), відкрито PR #43, усунено зауваження первинного QA-аудиту в коміті `df4e571`, пройдено GitHub Actions CI (run `46109277573`), отримано вердикт **QA Verified** від незалежного субагента.
+- **Стан:** тести 100% зелені (325 JVM, 62 instrumented), release bundle зібрано успішно (17.7 МБ), GitHub Actions CI run `46109277573` — SUCCESS, QA Verified.
+- **Зупинився на:** очікування рішення Власника щодо затвердження та злиття PR #43 у `main`.
+- **Наступний крок:** злиття PR #43 у `main` після команди Власника.
+- **Увага:** не зливати PR №43 без явного схвалення Власника; наступні етапи (PR №44..47) залишаються суворо заблокованими.
 
 
 

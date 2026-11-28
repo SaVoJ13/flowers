@@ -229,7 +229,7 @@
   7. `MIGRATION_4_5`: суто адитивна міграція (CREATE TABLE / CREATE INDEX), зареєстрована у `FlowersDatabase` v5. Експортовано Room schema `app/schemas/com.flowers.app.data.local.FlowersDatabase/5.json`.
   8. Тестування: 325/325 JVM unit-тестів (100% pass) включно з розширеними тестами `MigrationTest` (міграція 4->5, відповідність схемі `5.json`, foreign keys, індекси, збереження даних та каскадне видалення); 62/62 Android інструментальних тестів на емуляторі `small_phone` (Android 16 API 36, 100% pass) включно з `RoomMigrationV4ToV5Test` (збереження plants, care_events, catalog_plants, care_pods, chat_messages; каскад при прямому видаленні повідомлення та при видаленні рослини) та `ChatAttachmentDaoTest` (відхилення некоректних FK, batch-вставка, plant isolation, живий Flow collector).
   9. `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL (AAB 17.7 МБ).
-  10. Статус: PR №43 підготовлено та передано на незалежний QA-аудит. Наступні кроки (PR №44: `ChatPhotoManager`) очікують погодження. Завдання `TASK-056` залишається відкритим.
+  10. Статус: PR #43 пройшов GitHub Actions CI (run `46109277573`, SUCCESS) та отримав незалежний вердикт QA Verified (модель Pro). Очікує схвалення Власника для злиття у main. Наступні кроки (PR №44: `ChatPhotoManager`) очікують погодження. Завдання `TASK-056` залишається відкритим.
 
 
 

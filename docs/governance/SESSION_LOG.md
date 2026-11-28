@@ -517,9 +517,11 @@
   - GitHub Actions CI: run `46109277573` — SUCCESS.
   - Незалежний QA-аудит (модель Pro): `QA Verified`.
 - **Статус завдань:**
-  - `TASK-056 / PHOTO ARCHITECTURE (PR №43)` — РЕАЛІЗОВАНО, ВЕРИФІКОВАНО (QA Verified), ОЧІКУЄ СХВАЛЕННЯ ВЛАСНИКА ДЛЯ ЗЛИТТЯ У MAIN.
+  - `PR №43 (Room v5 Schema & Migration)` — ЗАВЕРШЕНО. Злито в `main` стандартним merge комітом `dd9ac58` за дозволом Власника.
+  - `Room v5` — ІНТЕГРОВАНО (`FlowersDatabase` v5, `MIGRATION_4_5`, `5.json`, `ChatAttachmentEntity`, `ChatMessageWithAttachments`, `ChatAttachmentDao`).
+  - `PR №44 (ChatPhotoManager)` — ОЧІКУЄ ДОЗВОЛУ ВЛАСНИКА.
   - `TASK-056` загалом залишається ВІДКРИТИМ.
-- Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався, конфігурації Firebase, Billing, Google Play Console не змінювалися.
+- Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався, конфігурації Firebase, Billing, Google Play Console не змінювалися. Робоча директорія чиста.
 
 
 

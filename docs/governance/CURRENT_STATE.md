@@ -208,8 +208,9 @@
     - 62/62 Android інструментальних тестів на емуляторі `small_phone` (Android 16 API 36, 100% pass) включно з `RoomMigrationV4ToV5Test` (збереження plants, care_events, catalog_plants, care_pods, chat_messages; каскадне видалення окремого повідомлення та видалення рослини) та `ChatAttachmentDaoTest` (відхилення некоректних FK, batch-вставка, plant isolation, живий Flow collector).
     - `bundleRelease` на Adoptium JDK 21 зібрано успішно (AAB 17.7 МБ).
   - **Статус завдань:**
-    - `TASK-056 / PHOTO ARCHITECTURE (PR №43 — Room v5)` — РЕАЛІЗОВАНО, CI SUCCESS (run `46109277573`), НЕЗАЛЕЖНИЙ АУДИТ: QA VERIFIED. ОЧІКУЄ ЗАТВЕРДЖЕННЯ ТА ДОЗВОЛУ ВЛАСНИКА НА ЗЛИТТЯ У MAIN.
-    - `PR №44` (`ChatPhotoManager`) — ОЧІКУЄ ЗАТВЕРДЖЕННЯ ТА ДОЗВОЛУ ВЛАСНИКА.
+    - `PR №43 (Room v5 Schema & Migration)` — ЗАВЕРШЕНО (злито в `main` standard merge комітом `dd9ac58`).
+    - `Room v5` — ІНТЕГРОВАНО в `main` (`version = 5`, `MIGRATION_4_5`, `5.json`, `ChatAttachmentEntity`, `ChatMessageWithAttachments`, `ChatAttachmentDao`).
+    - `PR №44 (ChatPhotoManager)` — ОЧІКУЄ ДОЗВОЛУ ВЛАСНИКА.
     - `TASK-056` загалом залишається ВІДКРИТИМ.
   - Фізичний пристрій Samsung Galaxy S24 Ultra (`RZCX326349A`) не використовувався. Хмарні конфігурації (Firebase, Billing, Google Play Console) не змінювалися. Робоча директорія чиста.
 

@@ -32,7 +32,13 @@ enum class ImageProfile(
         * Профіль для фото-діагностики захворювань: до 1536 px по довшій стороні, якість ~85%.
      * Зберігає високу чіткість мікротекстур листя, плям і шкідників.
      */
-    DiseaseDiagnosis(maxDimension = 1536, quality = 85, format = ImageFormat.JPEG)
+    DiseaseDiagnosis(maxDimension = 1536, quality = 85, format = ImageFormat.JPEG),
+
+    /**
+     * Профіль для фотографій персонального чату рослини (TASK-056 / PR №44):
+     * до 1536 px по довшій стороні, JPEG якість 85%.
+     */
+    ChatConsultation(maxDimension = 1536, quality = 85, format = ImageFormat.JPEG)
 }
 
 /**
@@ -66,6 +72,7 @@ sealed class ImageProcessingException(message: String, cause: Throwable? = null)
     class OutOfMemory(message: String, cause: Throwable? = null) : ImageProcessingException(message, cause)
     class IoFailure(message: String, cause: Throwable? = null) : ImageProcessingException(message, cause)
     class SaveFailed(message: String, cause: Throwable? = null) : ImageProcessingException(message, cause)
+    class AtomicMoveNotSupported(message: String, cause: Throwable? = null) : ImageProcessingException(message, cause)
     class FileAlreadyExists(message: String) : ImageProcessingException(message)
     class InvalidFileName(message: String) : ImageProcessingException(message)
 }

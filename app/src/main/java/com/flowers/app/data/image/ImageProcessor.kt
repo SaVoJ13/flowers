@@ -10,8 +10,10 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
+import java.nio.file.AtomicMoveNotSupportedException
 import java.nio.file.FileAlreadyExistsException
 import java.nio.file.Files
+import java.nio.file.Path
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
@@ -31,7 +33,9 @@ class ImageProcessor(
     private val context: Context? = null,
     private val outputDirectory: File? = null,
     private val engine: ImageDecoderEngine = AndroidImageDecoderEngine(),
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val clock: () -> Long = { System.currentTimeMillis() },
+    private val fileMover: (Path, Path) -> Unit = { src, dst -> Files.move(src, dst) }
 ) {
 
     companion object {
@@ -45,7 +49,7 @@ class ImageProcessor(
     fun sanitizeAndValidateFileName(rawName: String?, prefix: String, format: ImageFormat): String {
         if (rawName == null) {
             val randomToken = UUID.randomUUID().toString().replace("-", "").take(12)
-            return "${prefix}_${System.currentTimeMillis()}_${randomToken}.${format.extension}"
+            return "${prefix}_${clock()}_${randomToken}.${format.extension}"
         }
         val trimmed = rawName.trim()
         if (trimmed.isEmpty()) {
@@ -73,14 +77,15 @@ class ImageProcessor(
     suspend fun processImage(
         uri: Uri,
         profile: ImageProfile = ImageProfile.SpeciesIdentification,
-        customFileName: String? = null
+        customFileName: String? = null,
+        targetDirectory: File? = null
     ): Result<ImageProcessResult> {
         val appContext = context?.applicationContext
             ?: return Result.failure(IllegalStateException("Context необхідний для обробки Android Content URI"))
         val source = ImageSource.ContentUri(uri) { targetUri ->
             appContext.contentResolver.openInputStream(targetUri)
         }
-        return process(source, profile, customFileName)
+        return process(source, profile, customFileName, targetDirectory)
     }
 
     /**
@@ -89,9 +94,10 @@ class ImageProcessor(
     suspend fun processFile(
         file: File,
         profile: ImageProfile = ImageProfile.SpeciesIdentification,
-        customFileName: String? = null
+        customFileName: String? = null,
+        targetDirectory: File? = null
     ): Result<ImageProcessResult> {
-        return process(ImageSource.FromFile(file), profile, customFileName)
+        return process(ImageSource.FromFile(file), profile, customFileName, targetDirectory)
     }
 
     /**
@@ -100,9 +106,11 @@ class ImageProcessor(
     suspend fun process(
         source: ImageSource,
         profile: ImageProfile = ImageProfile.SpeciesIdentification,
-        customFileName: String? = null
+        customFileName: String? = null,
+        targetDirectory: File? = null
     ): Result<ImageProcessResult> = withContext(dispatcher) {
-        val targetDir = outputDirectory
+        val targetDir = targetDirectory
+            ?: outputDirectory
             ?: context?.let { File(it.filesDir, "plants") }
             ?: File(System.getProperty("java.io.tmpdir"), "flowers_plants")
 
@@ -113,7 +121,11 @@ class ImageProcessor(
         }
 
         // 1. Валідація та захист імені файлу від Path Traversal
-        val prefix = if (profile == ImageProfile.SpeciesIdentification) "species" else "diagnosis"
+        val prefix = when (profile) {
+            ImageProfile.SpeciesIdentification -> "species"
+            ImageProfile.DiseaseDiagnosis -> "diagnosis"
+            ImageProfile.ChatConsultation -> "chat"
+        }
         val safeFileName = try {
             sanitizeAndValidateFileName(customFileName, prefix, profile.format)
         } catch (e: ImageProcessingException.InvalidFileName) {
@@ -231,6 +243,14 @@ class ImageProcessor(
                             ImageProcessingException.SaveFailed("Не вдалося записати стиснене зображення у тимчасовий файл")
                         )
                     }
+
+                    // Перевірка цілісності записаного тимчасового файла перед атомарним переміщенням
+                    val verifiedBounds = runCatching { engine.decodeBounds { tempFile.inputStream() } }.getOrNull()
+                    if (verifiedBounds == null || verifiedBounds.width <= 0 || verifiedBounds.height <= 0) {
+                        return@withContext Result.failure(
+                            ImageProcessingException.SaveFailed("Записаний тимчасовий файл пошкоджений або неповний")
+                        )
+                    }
                 }
 
                 // Захист від перезаписування: перевірка перед переміщенням
@@ -244,10 +264,17 @@ class ImageProcessor(
                 // у разі наявності цільового файлу. StandardCopyOption.ATOMIC_MOVE не використовується,
                 // оскільки на POSIX/Linux (зокрема Android) він безумовно замінює цільовий файл через rename(2).
                 try {
-                    Files.move(tempFile.toPath(), targetFile.toPath())
+                    fileMover(tempFile.toPath(), targetFile.toPath())
                 } catch (e: FileAlreadyExistsException) {
                     return@withContext Result.failure(
                         ImageProcessingException.FileAlreadyExists("Цільовий файл уже існує: ${targetFile.name}")
+                    )
+                } catch (e: AtomicMoveNotSupportedException) {
+                    return@withContext Result.failure(
+                        ImageProcessingException.AtomicMoveNotSupported(
+                            "Атомарне переміщення файлу не підтримується файловою системою: ${e.message}",
+                            e
+                        )
                     )
                 }
             } catch (e: CancellationException) {

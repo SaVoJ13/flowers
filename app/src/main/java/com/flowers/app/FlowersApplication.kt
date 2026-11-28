@@ -1,9 +1,11 @@
 package com.flowers.app
 
 import android.app.Application
+import androidx.room.withTransaction
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.flowers.app.data.image.ChatPhotoManager
 import com.flowers.app.data.local.FlowersDatabase
 import com.flowers.app.data.remote.AndroidNetworkChecker
 import com.flowers.app.data.report.AiReportRepository
@@ -14,12 +16,19 @@ import com.flowers.app.data.worker.DailyReminderWorker
 import com.flowers.app.data.worker.NotificationHelper
 import com.google.firebase.Firebase
 import com.google.firebase.initialize
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 class FlowersApplication : Application() {
 
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     val database by lazy { FlowersDatabase.getInstance(this) }
+    val chatPhotoManager by lazy { ChatPhotoManager(this) }
     val repository by lazy {
         FlowersRepositoryImpl(
             plantDao = database.plantDao(),
@@ -27,7 +36,10 @@ class FlowersApplication : Application() {
             catalogDao = database.catalogDao(),
             carePodDao = database.carePodDao(),
             context = this,
-            chatMessageDao = database.chatMessageDao()
+            chatMessageDao = database.chatMessageDao(),
+            chatAttachmentDao = database.chatAttachmentDao(),
+            chatPhotoManager = chatPhotoManager,
+            transactionRunner = { block -> database.withTransaction { block() } }
         )
     }
 
@@ -40,6 +52,17 @@ class FlowersApplication : Application() {
         AppCheckHelper.initAppCheck()
         NotificationHelper.createNotificationChannel(this)
         scheduleDailyReminder()
+        scheduleBackgroundOrphanChatPhotoCleanup()
+    }
+
+    private fun scheduleBackgroundOrphanChatPhotoCleanup() {
+        applicationScope.launch {
+            runCatching {
+                repository.cleanupOrphanChatPhotos()
+            }.onFailure { e ->
+                android.util.Log.w("FlowersApplication", "Orphan chat photo cleanup failed", e)
+            }
+        }
     }
 
     private fun scheduleDailyReminder() {

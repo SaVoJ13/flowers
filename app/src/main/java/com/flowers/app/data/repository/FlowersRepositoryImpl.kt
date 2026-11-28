@@ -1,13 +1,25 @@
 package com.flowers.app.data.repository
 
 import android.content.Context
+import com.flowers.app.data.image.ChatPhotoAvailability
+import com.flowers.app.data.image.ChatPhotoException
+import com.flowers.app.data.image.ChatPhotoManager
+import com.flowers.app.data.image.ImageSource
+import com.flowers.app.data.image.OrphanCleanupReport
 import com.flowers.app.data.local.dao.CareEventDao
 import com.flowers.app.data.local.dao.CarePodDao
 import com.flowers.app.data.local.dao.CatalogDao
+import com.flowers.app.data.local.dao.ChatAttachmentDao
+import com.flowers.app.data.local.dao.ChatMessageDao
 import com.flowers.app.data.local.dao.PlantDao
 import com.flowers.app.data.local.entity.CareEventEntity
 import com.flowers.app.data.local.entity.CarePodEntity
 import com.flowers.app.data.local.entity.CatalogPlantEntity
+import com.flowers.app.data.local.entity.ChatAttachmentEntity
+import com.flowers.app.data.local.entity.ChatMessageEntity
+import com.flowers.app.data.local.entity.ChatMessageWithAttachments
+import com.flowers.app.data.local.entity.MessageRole
+import com.flowers.app.data.local.entity.MessageStatus
 import com.flowers.app.data.local.entity.PlantEntity
 import com.flowers.app.data.model.SymptomTreeRoot
 import com.flowers.app.data.preferences.UserPreferences
@@ -19,10 +31,12 @@ import com.flowers.app.data.remote.IdentifyPlantResult
 import com.flowers.app.domain.ReminderCalculator
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -36,8 +50,14 @@ class FlowersRepositoryImpl(
     private val catalogDao: CatalogDao,
     private val carePodDao: CarePodDao,
     private val context: Context,
-    private val chatMessageDao: com.flowers.app.data.local.dao.ChatMessageDao? = null,
-    private val geminiPlantService: GeminiPlantService = GeminiPlantService(catalogDao, carePodDao, AndroidNetworkChecker(context))
+    private val chatMessageDao: ChatMessageDao? = null,
+    private val geminiPlantService: GeminiPlantService = GeminiPlantService(catalogDao, carePodDao, AndroidNetworkChecker(context)),
+    private val chatAttachmentDao: ChatAttachmentDao? = null,
+    private val chatPhotoManager: ChatPhotoManager = ChatPhotoManager(
+        filesDir = runCatching { context.applicationContext?.filesDir ?: context.filesDir }.getOrNull()
+            ?: File(System.getProperty("java.io.tmpdir"), "flowers_fallback_files")
+    ),
+    private val transactionRunner: (suspend (suspend () -> Unit) -> Unit)? = null
 ) : FlowersRepository {
 
     override val userPreferences: UserPreferences by lazy { UserPreferences(context) }
@@ -79,11 +99,32 @@ class FlowersRepositoryImpl(
 
     override fun getPlantFlowById(plantId: Long): Flow<PlantEntity?> = plantDao.getPlantFlowById(plantId)
 
-    override suspend fun insertPlant(plant: PlantEntity): Long = plantDao.insertPlant(plant)
+    override suspend fun insertPlant(plant: PlantEntity): Long {
+        val id = plantDao.insertPlant(plant)
+        if (id > 0L) {
+            deletedPlantIds.remove(id)
+        }
+        return id
+    }
 
     override suspend fun updatePlant(plant: PlantEntity) = plantDao.updatePlant(plant)
 
-    override suspend fun deletePlant(plant: PlantEntity) = plantDao.deletePlant(plant)
+    override suspend fun deletePlant(plant: PlantEntity) = withContext(Dispatchers.IO) {
+        val plantId = plant.id
+        val mutex = getPlantMutex(plantId)
+        val filePaths = mutex.withLock {
+            deletedPlantIds.add(plantId)
+            val paths = runCatching { chatAttachmentDao?.getAllFilePathsForPlant(plantId) }.getOrNull().orEmpty()
+            chatMessageDao?.deleteAllForPlant(plantId)
+            plantDao.deletePlant(plant)
+            paths
+        }
+        for (path in filePaths) {
+            chatPhotoManager.deletePhotoForPlant(plantId, path)
+        }
+        chatPhotoManager.deleteAllPhotosForPlant(plantId)
+        Unit
+    }
 
     override fun getEventsForPlant(plantId: Long): Flow<List<CareEventEntity>> =
         careEventDao.getEventsForPlant(plantId)
@@ -155,9 +196,20 @@ class FlowersRepositoryImpl(
 
     private val activeSendingCounters = java.util.concurrent.ConcurrentHashMap<Long, java.util.concurrent.atomic.AtomicInteger>()
     private val plantMutexes = java.util.concurrent.ConcurrentHashMap<Long, Mutex>()
+    private val deletedPlantIds = java.util.concurrent.ConcurrentHashMap.newKeySet<Long>()
+
+    /** Тестовий хук для детермінованої перевірки конкурентності між очищенням Room та видаленням файлів у clearChatHistory. */
+    internal var onAfterClearDbBeforeFileDelete: (suspend (Long) -> Unit)? = null
 
     private fun getPlantMutex(plantId: Long): Mutex {
         return plantMutexes.computeIfAbsent(plantId) { Mutex() }
+    }
+
+    private fun pathsReferToSameFile(pathA: String, pathB: String): Boolean {
+        if (pathA == pathB) return true
+        val canonicalA = runCatching { File(pathA).canonicalPath }.getOrNull() ?: pathA
+        val canonicalB = runCatching { File(pathB).canonicalPath }.getOrNull() ?: pathB
+        return canonicalA == canonicalB
     }
 
     override fun isPlantChatSending(plantId: Long): Boolean {
@@ -184,21 +236,226 @@ class FlowersRepositoryImpl(
         }
     }
 
-    override fun getChatMessages(plantId: Long): Flow<List<com.flowers.app.data.local.entity.ChatMessageEntity>> {
-        return chatMessageDao?.observeMessages(plantId) ?: kotlinx.coroutines.flow.flowOf(emptyList())
+    override fun getChatMessages(plantId: Long): Flow<List<ChatMessageEntity>> {
+        return chatMessageDao?.observeMessages(plantId) ?: flowOf(emptyList())
     }
 
-    override suspend fun getChatMessageById(messageId: Long): com.flowers.app.data.local.entity.ChatMessageEntity? {
+    override fun getChatMessagesWithAttachments(plantId: Long): Flow<List<ChatMessageWithAttachments>> {
+        return chatMessageDao?.observeMessagesWithAttachments(plantId) ?: flowOf(emptyList())
+    }
+
+    override suspend fun getChatMessageById(messageId: Long): ChatMessageEntity? {
         return chatMessageDao?.getById(messageId)
     }
 
-    override suspend fun insertChatMessage(message: com.flowers.app.data.local.entity.ChatMessageEntity): Long {
-        return chatMessageDao?.insertMessage(message) ?: -1L
+    override suspend fun getChatAttachmentForMessage(messageId: Long): ChatAttachmentEntity? {
+        return chatAttachmentDao?.getAttachmentForMessage(messageId)
+    }
+
+    override suspend fun insertChatMessage(message: ChatMessageEntity): Long {
+        val mutex = getPlantMutex(message.plantId)
+        return mutex.withLock {
+            if (deletedPlantIds.contains(message.plantId)) {
+                return@withLock -1L
+            }
+            chatMessageDao?.insertMessage(message) ?: -1L
+        }
+    }
+
+    /**
+     * Двофазне атомарне збереження повідомлення користувача з фотографією (TASK-056 / PR №44):
+     * 1. Вимагає наявності справжнього транзакційного механізму [transactionRunner] (у production — `database.withTransaction`).
+     *    Якщо транзакційний механізм недоступний, повертає контрольовану помилку без модифікації існуючих повідомлень чи файлів.
+     * 2. Фаза 1: обробка та атомарне збереження JPEG через [ChatPhotoManager] у `filesDir/chat_photos/plant_<plantId>/`
+     *    із негайною реєстрацією в `inFlightSavingFiles`.
+     * 3. Фаза 2: створення записів [ChatMessageEntity] та [ChatAttachmentEntity] у транзакції Room.
+     * 4. Якщо транзакція Room завершується помилкою, скасовується або рослину було видалено — транзакція БД
+     *    відкочує лише поточну вставку (зберігаючи всю попередню історію чату), а щойно створений JPEG негайно видаляється.
+     */
+    override suspend fun saveUserMessageWithPhoto(
+        plantId: Long,
+        content: String,
+        photoSource: ImageSource,
+        timestamp: Long
+    ): Result<ChatMessageWithAttachments> = withContext(Dispatchers.IO) {
+        if (plantId <= 0L) {
+            return@withContext Result.failure(
+                ChatPhotoException.SecurityViolation("Некоректний ідентифікатор рослини: $plantId")
+            )
+        }
+
+        val runner = transactionRunner
+            ?: return@withContext Result.failure(
+                ChatPhotoException.DatabaseFailure(
+                    "Транзакційний механізм Room недоступний: збереження фото-повідомлення відхилено для захисту історії чату"
+                )
+            )
+
+        val msgDao = chatMessageDao
+        val attDao = chatAttachmentDao
+        if (msgDao == null || attDao == null) {
+            return@withContext Result.failure(
+                ChatPhotoException.DatabaseFailure("DAO чату або вкладень не ініціалізовано")
+            )
+        }
+
+        val mutex = getPlantMutex(plantId)
+        val plantExistsInitially = mutex.withLock {
+            !deletedPlantIds.contains(plantId) && plantDao.getPlantById(plantId) != null
+        }
+        if (!plantExistsInitially) {
+            return@withContext Result.failure(
+                ChatPhotoException.PlantNotFound("Рослину з ID $plantId не знайдено або вона була видалена")
+            )
+        }
+
+        // Фаза 1: обробка зображення та атомарне збереження постійного JPEG з миттєвою позначкою in-flight
+        val savedPhoto = chatPhotoManager.saveChatPhoto(
+            plantId = plantId,
+            source = photoSource,
+            registerInFlight = true
+        ).getOrElse { err ->
+            return@withContext Result.failure(err)
+        }
+
+        try {
+            // Фаза 2: короткочасна критична секція під м'ютексом рослини та транзакція Room
+            mutex.withLock {
+                if (deletedPlantIds.contains(plantId) || plantDao.getPlantById(plantId) == null) {
+                    chatPhotoManager.markInFlightSaveEnd(savedPhoto.canonicalPath)
+                    chatPhotoManager.deletePhotoForPlant(plantId, savedPhoto.canonicalPath)
+                    return@withContext Result.failure(
+                        ChatPhotoException.PlantNotFound("Рослину з ID $plantId було видалено під час збереження фото")
+                    )
+                }
+
+                // Не створюємо запис про вкладення, якщо постійний файл не збережений або недоступний
+                if (!chatPhotoManager.isPhotoAvailable(savedPhoto.canonicalPath, expectedPlantId = plantId)) {
+                    chatPhotoManager.markInFlightSaveEnd(savedPhoto.canonicalPath)
+                    return@withContext Result.failure(
+                        ChatPhotoException.PhotoMissing("Постійний файл фотографії відсутній на диску перед записом у Room")
+                    )
+                }
+
+                var createdMessage: ChatMessageEntity? = null
+                var createdAttachment: ChatAttachmentEntity? = null
+
+                runner {
+                    val userMsg = ChatMessageEntity(
+                        plantId = plantId,
+                        role = MessageRole.USER,
+                        content = content,
+                        status = MessageStatus.SENDING,
+                        timestamp = timestamp
+                    )
+                    val msgId = msgDao.insertMessage(userMsg)
+                    if (msgId <= 0L) {
+                        throw ChatPhotoException.DatabaseFailure("Не вдалося створити повідомлення в Room")
+                    }
+                    createdMessage = userMsg.copy(id = msgId)
+
+                    val attachment = ChatAttachmentEntity(
+                        messageId = msgId,
+                        filePath = savedPhoto.canonicalPath,
+                        mimeType = savedPhoto.mimeType,
+                        fileSizeBytes = savedPhoto.fileSizeBytes,
+                        width = savedPhoto.width,
+                        height = savedPhoto.height,
+                        createdAt = savedPhoto.createdAt
+                    )
+                    val attId = attDao.insertAttachment(attachment)
+                    if (attId <= 0L) {
+                        throw ChatPhotoException.DatabaseFailure("Не вдалося створити запис вкладення в Room")
+                    }
+                    createdAttachment = attachment.copy(id = attId)
+                }
+
+                Result.success(
+                    ChatMessageWithAttachments(
+                        message = createdMessage!!,
+                        attachments = listOf(createdAttachment!!)
+                    )
+                )
+            }
+        } catch (e: CancellationException) {
+            withContext(NonCancellable) {
+                chatPhotoManager.markInFlightSaveEnd(savedPhoto.canonicalPath)
+                chatPhotoManager.deletePhotoForPlant(plantId, savedPhoto.canonicalPath)
+            }
+            throw e
+        } catch (t: Throwable) {
+            // При помилці транзакції Room негайно видаляємо ЛИШЕ щойно створений файл без жодного впливу на стару історію
+            withContext(NonCancellable) {
+                chatPhotoManager.markInFlightSaveEnd(savedPhoto.canonicalPath)
+                chatPhotoManager.deletePhotoForPlant(plantId, savedPhoto.canonicalPath)
+            }
+            val mapped = if (t is ChatPhotoException) {
+                t
+            } else {
+                ChatPhotoException.DatabaseFailure(
+                    "Помилка транзакції Room після запису JPEG: ${t.message}",
+                    t
+                )
+            }
+            Result.failure(mapped)
+        } finally {
+            chatPhotoManager.markInFlightSaveEnd(savedPhoto.canonicalPath)
+        }
+    }
+
+    override suspend fun saveUserMessageWithPhoto(
+        plantId: Long,
+        content: String,
+        sourceFile: File,
+        timestamp: Long
+    ): Result<ChatMessageWithAttachments> {
+        return saveUserMessageWithPhoto(plantId, content, ImageSource.FromFile(sourceFile), timestamp)
+    }
+
+    override fun checkChatPhotoAvailability(
+        filePath: String,
+        expectedPlantId: Long?
+    ): ChatPhotoAvailability {
+        return chatPhotoManager.checkPhotoAvailability(filePath, expectedPlantId)
+    }
+
+    override fun getSavedChatPhotoFile(
+        filePath: String,
+        expectedPlantId: Long?
+    ): Result<File> {
+        return chatPhotoManager.getSavedPhotoFile(filePath, expectedPlantId)
+    }
+
+    override suspend fun <T> withChatPhotoInUse(
+        filePath: String,
+        expectedPlantId: Long?,
+        block: suspend (File) -> T
+    ): T {
+        return chatPhotoManager.withPhotoInUse(filePath, expectedPlantId, block)
+    }
+
+    override suspend fun cleanupOrphanChatPhotos(): OrphanCleanupReport = withContext(Dispatchers.IO) {
+        chatPhotoManager.cleanupOrphanFiles(
+            fetchStoredPaths = {
+                chatAttachmentDao?.getAllStoredAttachmentPaths()?.toSet() ?: emptySet()
+            },
+            isPlantActive = { plantId ->
+                isPlantChatSending(plantId)
+            }
+        )
+    }
+
+    override suspend fun retryPendingChatPhotoDeletions(): Int = withContext(Dispatchers.IO) {
+        chatPhotoManager.retryPendingDeletions(
+            fetchStoredPaths = {
+                chatAttachmentDao?.getAllStoredAttachmentPaths()?.toSet() ?: emptySet()
+            }
+        )
     }
 
     override suspend fun updateChatMessageStatus(
         messageId: Long,
-        status: com.flowers.app.data.local.entity.MessageStatus,
+        status: MessageStatus,
         errorMessage: String?
     ): Boolean {
         val rows = chatMessageDao?.updateStatus(messageId, status, errorMessage) ?: 0
@@ -207,9 +464,15 @@ class FlowersRepositoryImpl(
 
     override suspend fun saveAssistantResponse(
         userMessageId: Long,
-        modelMessage: com.flowers.app.data.local.entity.ChatMessageEntity
+        modelMessage: ChatMessageEntity
     ): Long {
-        return chatMessageDao?.saveAssistantResponse(userMessageId, modelMessage) ?: -1L
+        val mutex = getPlantMutex(modelMessage.plantId)
+        return mutex.withLock {
+            if (deletedPlantIds.contains(modelMessage.plantId)) {
+                return@withLock -1L
+            }
+            chatMessageDao?.saveAssistantResponse(userMessageId, modelMessage) ?: -1L
+        }
     }
 
     override suspend fun beginChatMessageRetry(messageId: Long, plantId: Long): Boolean {
@@ -217,8 +480,34 @@ class FlowersRepositoryImpl(
         return rows > 0
     }
 
-    override suspend fun clearChatHistory(plantId: Long): Int {
-        return chatMessageDao?.deleteAllForPlant(plantId) ?: 0
+    override suspend fun clearChatHistory(plantId: Long): Int = withContext(Dispatchers.IO) {
+        val mutex = getPlantMutex(plantId)
+        val (deletedRows, filePathsToDelete) = mutex.withLock {
+            val paths = runCatching { chatAttachmentDao?.getAllFilePathsForPlant(plantId) }
+                .getOrNull()
+                .orEmpty()
+                .distinct()
+            val rows = chatMessageDao?.deleteAllForPlant(plantId) ?: 0
+            Pair(rows, paths)
+        }
+
+        onAfterClearDbBeforeFileDelete?.invoke(plantId)
+
+        // Видаляємо ВИКЛЮЧНО ті файли, які належали очищеним записам історії і не прив'язані до нових повідомлень у Room.
+        // Безумовний deleteAllPhotosForPlant тут НЕ викликається, щоб не видалити фото нових повідомлень,
+        // створених після завершення транзакції очищення Room.
+        for (path in filePathsToDelete) {
+            val isReferencedByNewRecord = mutex.withLock {
+                val activePaths = runCatching { chatAttachmentDao?.getAllFilePathsForPlant(plantId) }
+                    .getOrNull()
+                    .orEmpty()
+                activePaths.any { activePath -> pathsReferToSameFile(activePath, path) }
+            }
+            if (!isReferencedByNewRecord) {
+                chatPhotoManager.deletePhotoForPlant(plantId, path)
+            }
+        }
+        deletedRows
     }
 
     override suspend fun recoverStaleSendingMessages(plantId: Long): Int {

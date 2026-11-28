@@ -103,7 +103,7 @@ class ChatPhotoManagerTest {
         private val stateFlow = MutableStateFlow<List<ChatMessageEntity>>(emptyList())
         var failOnInsert: Boolean = false
 
-        private fun refreshFlow() {
+        fun refreshFlow() {
             stateFlow.value = messages.values.sortedWith(compareBy({ it.timestamp }, { it.id }))
         }
 
@@ -324,8 +324,32 @@ class ChatPhotoManagerTest {
             chatMessageDao = chatMessageDao,
             geminiPlantService = geminiService,
             chatAttachmentDao = chatAttachmentDao,
-            chatPhotoManager = photoManager
+            chatPhotoManager = photoManager,
+            transactionRunner = { block -> runAtomicFakeTransaction(block) }
         )
+    }
+
+    /**
+     * Імітує атомарну транзакцію Room (`database.withTransaction`) для in-memory Fake DAO:
+     * робить знімок таблиць `chat_messages` та `chat_attachments` перед транзакцією і у разі будь-якого
+     * винятку або скасування корутини відновлює точний попередній стан без втрати існуючої історії.
+     */
+    private val transactionHookBeforeCommit = java.util.concurrent.atomic.AtomicReference<(suspend () -> Unit)?>(null)
+
+    private suspend fun runAtomicFakeTransaction(block: suspend () -> Unit) {
+        val messagesSnapshot = HashMap(chatMessageDao.messages)
+        val attachmentsSnapshot = HashMap(chatAttachmentDao.attachments)
+        try {
+            block()
+            transactionHookBeforeCommit.get()?.invoke()
+        } catch (t: Throwable) {
+            chatMessageDao.messages.clear()
+            chatMessageDao.messages.putAll(messagesSnapshot)
+            chatAttachmentDao.attachments.clear()
+            chatAttachmentDao.attachments.putAll(attachmentsSnapshot)
+            chatMessageDao.refreshFlow()
+            throw t
+        }
     }
 
     @After
@@ -534,22 +558,130 @@ class ChatPhotoManagerTest {
         )
     }
 
-    // 7. Помилка транзакції Room після запису JPEG
+    // 7. Помилка транзакції Room після запису JPEG (із перевіркою збереження існуючої історії та фото!)
     @Test
-    fun `scenario 7 - Room transaction failure after JPEG write rolls back message and cleans up JPEG file`() = runBlocking {
-        val sourceFile = createSourceJpeg("tx_rollback.jpg", width = 1400, height = 1000)
+    fun `scenario 7 - Room transaction failure preserves existing messages and JPEGs while rolling back failed operation`() = runBlocking {
+        // 1. Створюємо попередню історію чату для рослини 1: два повідомлення з фото та відповідь асистента
+        val existingSource1 = createSourceJpeg("existing_1.jpg", width = 1200, height = 900)
+        val existingSource2 = createSourceJpeg("existing_2.jpg", width = 1000, height = 800)
+
+        val existingMsg1 = repository.saveUserMessageWithPhoto(1L, "Перше старе фото-питання", existingSource1).getOrThrow()
+        val assistantReplyId = repository.saveAssistantResponse(
+            userMessageId = existingMsg1.message.id,
+            modelMessage = ChatMessageEntity(
+                plantId = 1L,
+                role = MessageRole.MODEL,
+                content = "Перша відповідь асистента",
+                status = MessageStatus.SENT
+            )
+        )
+        assertTrue(assistantReplyId > 0L)
+
+        val existingMsg2 = repository.saveUserMessageWithPhoto(1L, "Друге старе фото-питання", existingSource2).getOrThrow()
+
+        val existingFile1 = File(existingMsg1.primaryPhoto!!.filePath)
+        val existingFile2 = File(existingMsg2.primaryPhoto!!.filePath)
+        val md5Existing1 = calculateMd5(existingFile1)
+        val md5Existing2 = calculateMd5(existingFile2)
+
+        assertEquals(3, chatMessageDao.getMessages(1L).size)
+        assertEquals(2, chatAttachmentDao.getAttachmentsForPlant(1L).size)
+
+        // 2. Симулюємо помилку вставки нового вкладення в транзакції Room
+        val newSource = createSourceJpeg("tx_rollback_new.jpg", width = 1400, height = 1000)
         chatAttachmentDao.failOnInsertAttachment = true
 
-        val result = repository.saveUserMessageWithPhoto(1L, "Тест помилки БД", sourceFile)
+        val result = repository.saveUserMessageWithPhoto(1L, "Нове повідомлення з помилкою вкладення", newSource)
         assertTrue("Must fail when Room transaction throws", result.isFailure)
         assertTrue(result.exceptionOrNull() is ChatPhotoException.DatabaseFailure)
 
-        // Перевіряємо відкат повідомлення та негайне видалення створеного JPEG файла
-        assertEquals("Message must be rolled back", 0, chatMessageDao.messages.size)
-        assertEquals("Attachment must not exist", 0, chatAttachmentDao.count())
+        // 3. Перевіряємо, що вся попередня історія (3 повідомлення і 2 вкладення) збережена на 100%,
+        // а невдала операція не залишила часткового повідомлення!
+        val remainingMessages = chatMessageDao.getMessages(1L)
+        assertEquals("Existing 3 messages must be preserved without partial records", 3, remainingMessages.size)
+        assertEquals(
+            listOf("Перше старе фото-питання", "Перша відповідь асистента", "Друге старе фото-питання"),
+            remainingMessages.map { it.content }
+        )
 
-        val plant1Files = File(filesDir, "chat_photos/plant_1").listFiles() ?: emptyArray()
-        assertEquals("Newly written JPEG must be immediately cleaned up on Room failure", 0, plant1Files.size)
+        val remainingAttachments = chatAttachmentDao.getAttachmentsForPlant(1L)
+        assertEquals("Existing 2 attachments must be preserved", 2, remainingAttachments.size)
+
+        // 4. Старі фізичні JPEG файли цілі та непошкоджені, а новий JPEG невдалої операції видалений
+        assertTrue("Existing JPEG 1 must still exist", existingFile1.exists())
+        assertTrue("Existing JPEG 2 must still exist", existingFile2.exists())
+        assertEquals(md5Existing1, calculateMd5(existingFile1))
+        assertEquals(md5Existing2, calculateMd5(existingFile2))
+
+        val plant1FilesOnDisk = File(filesDir, "chat_photos/plant_1").listFiles()?.map { it.canonicalPath }?.toSet() ?: emptySet()
+        assertEquals(
+            "Only the 2 pre-existing JPEGs must remain on disk",
+            setOf(existingFile1.canonicalPath, existingFile2.canonicalPath),
+            plant1FilesOnDisk
+        )
+    }
+
+    // 7B. Відсутність транзакційного механізму та скасування корутини посеред транзакції
+    @Test
+    fun `scenario 7B - missing transactionRunner fails safely and coroutine cancellation rolls back without losing existing history`() = runBlocking {
+        // Підготовка існуючого повідомлення з фото
+        val existingSource = createSourceJpeg("existing_before_cancel.jpg", width = 1000, height = 800)
+        val existingSaved = repository.saveUserMessageWithPhoto(1L, "Існуюче повідомлення", existingSource).getOrThrow()
+        val existingFile = File(existingSaved.primaryPhoto!!.filePath)
+
+        // 1. Якщо transactionRunner == null (транзакційний механізм недоступний):
+        // повертається контрольована помилка без модифікації існуючих повідомлень чи файлів
+        val repoWithoutTx = FlowersRepositoryImpl(
+            plantDao = plantDao,
+            careEventDao = stubProxy(),
+            catalogDao = stubProxy(),
+            carePodDao = stubProxy(),
+            context = object : ContextWrapper(null) {},
+            chatMessageDao = chatMessageDao,
+            geminiPlantService = GeminiPlantService(stubProxy(), stubProxy(), object : NetworkChecker {
+                override fun isOnline(): Boolean = true
+            }),
+            chatAttachmentDao = chatAttachmentDao,
+            chatPhotoManager = photoManager,
+            transactionRunner = null
+        )
+        val noTxResult = repoWithoutTx.saveUserMessageWithPhoto(1L, "Спроба без транзакції", existingSource)
+        assertTrue(noTxResult.isFailure)
+        assertTrue(noTxResult.exceptionOrNull() is ChatPhotoException.DatabaseFailure)
+        assertEquals(1, chatMessageDao.getMessages(1L).size)
+        assertTrue(existingFile.exists())
+
+        // 2. Детерміноване скасування корутини посеред транзакції (після вставки повідомлення та вкладення, до коміту)
+        val enteredTxBeforeCommit = CompletableDeferred<Unit>()
+        val awaitCancellation = CompletableDeferred<Unit>()
+        transactionHookBeforeCommit.set {
+            enteredTxBeforeCommit.complete(Unit)
+            awaitCancellation.await()
+        }
+
+        val cancelSource = createSourceJpeg("to_be_cancelled.jpg", width = 1200, height = 900)
+        var cancellationPropagated = false
+        val job = launch(Dispatchers.IO) {
+            try {
+                repository.saveUserMessageWithPhoto(1L, "Повідомлення під час скасування", cancelSource)
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                cancellationPropagated = true
+                throw e
+            }
+        }
+
+        enteredTxBeforeCommit.await()
+        job.cancel()
+        job.join()
+        transactionHookBeforeCommit.set(null)
+
+        assertTrue("CancellationException must propagate properly", cancellationPropagated)
+        assertEquals("Pre-existing message must be preserved and cancelled message rolled back", 1, chatMessageDao.getMessages(1L).size)
+        assertEquals("Pre-existing attachment must be preserved", 1, chatAttachmentDao.getAttachmentsForPlant(1L).size)
+        assertTrue("Pre-existing JPEG must remain intact", existingFile.exists())
+
+        val filesInPlant1 = File(filesDir, "chat_photos/plant_1").listFiles()?.map { it.canonicalPath }?.toSet() ?: emptySet()
+        assertEquals("Cancelled operation's new JPEG must be cleaned up", setOf(existingFile.canonicalPath), filesInPlant1)
     }
 
     // 8. Збій посеред запису тимчасового файла
@@ -810,7 +942,8 @@ class ChatPhotoManagerTest {
                 override fun isOnline(): Boolean = true
             }),
             chatAttachmentDao = chatAttachmentDao,
-            chatPhotoManager = flakyPhotoManager
+            chatPhotoManager = flakyPhotoManager,
+            transactionRunner = { block -> runAtomicFakeTransaction(block) }
         )
 
         val src = createSourceJpeg("flaky_delete.jpg", 800, 600)
@@ -1019,5 +1152,128 @@ class ChatPhotoManagerTest {
         assertTrue("Overwrite must be forbidden", duplicateSave.isFailure)
         assertTrue(duplicateSave.exceptionOrNull() is ChatPhotoException.FileAlreadyExists)
         assertTrue("Existing file bytes must remain unchanged", originalBytes.contentEquals(firstSave.getOrThrow().file.readBytes()))
+    }
+
+    // 19. Детермінований тест конкурентності: clearChatHistory паралельно зі створенням нового повідомлення з фото тієї самої рослини
+    @Test
+    fun `scenario 19 - deterministic concurrency between clearChatHistory and parallel new photo message on same plant preserves new message and JPEG`() = runBlocking {
+        withTimeout(5_000L) {
+            // 1. Створюємо стару історію для рослини 1 (2 повідомлення з фото) та історію для рослини 2
+            val oldSrc1 = createSourceJpeg("old_p1_1.jpg", 900, 700)
+            val oldSrc2 = createSourceJpeg("old_p1_2.jpg", 900, 700)
+            val p2Src = createSourceJpeg("p2_untouched.jpg", 900, 700)
+
+            val oldMsg1 = repository.saveUserMessageWithPhoto(1L, "Старе питання 1", oldSrc1).getOrThrow()
+            val oldMsg2 = repository.saveUserMessageWithPhoto(1L, "Старе питання 2", oldSrc2).getOrThrow()
+            val plant2Msg = repository.saveUserMessageWithPhoto(2L, "Питання рослини 2", p2Src).getOrThrow()
+
+            val oldFile1 = File(oldMsg1.primaryPhoto!!.filePath)
+            val oldFile2 = File(oldMsg2.primaryPhoto!!.filePath)
+            val plant2File = File(plant2Msg.primaryPhoto!!.filePath)
+
+            assertTrue(oldFile1.exists())
+            assertTrue(oldFile2.exists())
+            assertTrue(plant2File.exists())
+
+            // 2. Налаштовуємо детермінований бар'єр у clearChatHistory:
+            // Одразу після очищення старих записів у Room і звільнення plantMutex (але ДО видалення фізичних файлів)
+            // паралельно створюється нове повідомлення з фото для тієї самої рослини 1!
+            val clearDbCompletedBarrier = CompletableDeferred<Unit>()
+            val resumeClearFileDeletionBarrier = CompletableDeferred<Unit>()
+
+            repository.onAfterClearDbBeforeFileDelete = { clearedPlantId ->
+                if (clearedPlantId == 1L) {
+                    clearDbCompletedBarrier.complete(Unit)
+                    resumeClearFileDeletionBarrier.await()
+                }
+            }
+
+            val clearJob = async(Dispatchers.IO) {
+                repository.clearChatHistory(1L)
+            }
+
+            // Очікуємо точного моменту завершення транзакції очищення Room у clearChatHistory
+            clearDbCompletedBarrier.await()
+
+            // У цей момент паралельно створюємо нове фото-повідомлення для тієї самої рослини 1
+            val newSrc = createSourceJpeg("new_concurrent_p1.jpg", 1200, 900)
+            val newMsgResult = repository.saveUserMessageWithPhoto(
+                plantId = 1L,
+                content = "Нове питання з фото після очищення",
+                sourceFile = newSrc
+            )
+            assertTrue("Concurrent new photo message save must succeed", newMsgResult.isSuccess)
+            val newMsg = newMsgResult.getOrThrow()
+            val newPhotoFile = File(newMsg.primaryPhoto!!.filePath)
+            assertTrue("New JPEG file must exist right after save", newPhotoFile.exists())
+
+            // Відпускаємо бар'єр, щоб clearChatHistory завершив фізичне видалення старих файлів
+            resumeClearFileDeletionBarrier.complete(Unit)
+            val clearedRows = clearJob.await()
+            repository.onAfterClearDbBeforeFileDelete = null
+
+            assertEquals("Exactly 2 old messages must have been cleared", 2, clearedRows)
+
+            // 3. Перевіряємо: старі JPEG видалені, але НОВИЙ Room-запис і його JPEG у тій самій папці plant_1 НЕДОТОРКАНІ!
+            assertFalse("Old photo 1 must be deleted", oldFile1.exists())
+            assertFalse("Old photo 2 must be deleted", oldFile2.exists())
+
+            assertTrue("New photo created concurrently for plant 1 MUST NOT be deleted by clearChatHistory", newPhotoFile.exists())
+            val availability = repository.checkChatPhotoAvailability(newPhotoFile.absolutePath, expectedPlantId = 1L)
+            assertTrue("New photo must be Available", availability is ChatPhotoAvailability.Available)
+
+            val currentMessagesPlant1 = repository.getChatMessagesWithAttachments(1L).first()
+            assertEquals("New message must remain in Room", 1, currentMessagesPlant1.size)
+            assertEquals("Нове питання з фото після очищення", currentMessagesPlant1[0].message.content)
+            assertEquals(newPhotoFile.canonicalPath, currentMessagesPlant1[0].primaryPhoto?.filePath)
+
+            // Рослина 2 повністю ізольована і не зачеплена
+            assertTrue("Plant 2 photo must remain untouched", plant2File.exists())
+            assertEquals(1, repository.getChatMessagesWithAttachments(2L).first().size)
+        }
+    }
+
+    // 20. Регресійний тест Retry для повідомлення з фотографією після помилки мережі
+    @Test
+    fun `scenario 20 - retry after network error reuses existing saved photo and transitions status to SENT`() = runBlocking {
+        val src = createSourceJpeg("retry_photo.jpg", 1600, 1200)
+        val saved = repository.saveUserMessageWithPhoto(1L, "Чому сохнуть кінчики?", src).getOrThrow()
+        val msgId = saved.message.id
+        val photoPath = saved.primaryPhoto!!.filePath
+        val photoFile = File(photoPath)
+        val initialMd5 = calculateMd5(photoFile)
+
+        // 1. Початковий запит завершився помилкою мережі -> статус переходить у ERROR
+        assertTrue(repository.updateChatMessageStatus(msgId, MessageStatus.ERROR, "Відсутнє інтернет-з'єднання"))
+        assertEquals(MessageStatus.ERROR, repository.getChatMessageById(msgId)?.status)
+        assertTrue("Photo file must remain on disk in ERROR state", photoFile.exists())
+
+        // 2. Користувач натискає Retry: beginChatMessageRetry переводить повідомлення в SENDING без створення дублікатів
+        assertTrue(repository.beginChatMessageRetry(msgId, 1L))
+        assertEquals(MessageStatus.SENDING, repository.getChatMessageById(msgId)?.status)
+
+        val attachment = repository.getChatAttachmentForMessage(msgId)
+        assertNotNull("Attachment record must remain linked to messageId", attachment)
+        assertEquals(photoPath, attachment?.filePath)
+        assertTrue(repository.checkChatPhotoAvailability(photoPath, expectedPlantId = 1L) is ChatPhotoAvailability.Available)
+        assertEquals("Photo file must not be re-encoded or modified on retry", initialMd5, calculateMd5(photoFile))
+
+        // 3. Відповідь від асистента успішно зберігається
+        val modelId = repository.saveAssistantResponse(
+            userMessageId = msgId,
+            modelMessage = ChatMessageEntity(
+                plantId = 1L,
+                role = MessageRole.MODEL,
+                content = "Підвищте вологість повітря.",
+                status = MessageStatus.SENT
+            )
+        )
+        assertTrue(modelId > 0L)
+
+        val finalHistory = repository.getChatMessagesWithAttachments(1L).first()
+        assertEquals(2, finalHistory.size)
+        assertEquals(MessageStatus.SENT, finalHistory[0].message.status)
+        assertEquals(photoPath, finalHistory[0].primaryPhoto?.filePath)
+        assertEquals(MessageStatus.SENT, finalHistory[1].message.status)
     }
 }

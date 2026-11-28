@@ -346,11 +346,15 @@ class ChatPhotoManager(
      *
      * Використовує профіль [ImageProfile.ChatConsultation] (макс. 1536 px, JPEG 85%, очищення EXIF/GPS,
      * нормалізація орієнтації, обмеження пам'яті через inSampleSize).
+     *
+     * @param registerInFlight Якщо `true`, атомарно реєструє створений файл у [inFlightSavingFiles]
+     *        ще до повернення результату, щоб жодна паралельна операція очищення не видалила його до завершення транзакції Room.
      */
     suspend fun saveChatPhoto(
         plantId: Long,
         source: ImageSource,
-        customFileName: String? = null
+        customFileName: String? = null,
+        registerInFlight: Boolean = false
     ): Result<SavedChatPhoto> = withContext(dispatcher) {
         val plantDir = try {
             getValidatedPlantDirectory(plantId, createIfMissing = true)
@@ -380,10 +384,14 @@ class ChatPhotoManager(
                             ChatPhotoException.IoFailure("Збережений файл фотографії відсутній або порожній")
                         )
                     }
+                    val canonicalPath = validatedFile.canonicalPath
+                    if (registerInFlight) {
+                        inFlightSavingFiles.add(canonicalPath)
+                    }
                     Result.success(
                         SavedChatPhoto(
                             file = validatedFile,
-                            canonicalPath = validatedFile.canonicalPath,
+                            canonicalPath = canonicalPath,
                             plantId = plantId,
                             width = res.processedDimensions.width,
                             height = res.processedDimensions.height,
@@ -863,8 +871,12 @@ class ChatPhotoManager(
         if (canonicalDir.parent != canonicalRoot) return false
         if (!PLANT_DIR_REGEX.matches(canonicalDir.fileName?.toString() ?: "")) return false
 
-        val hasInFlightInDir = inFlightSavingFiles.any { it.startsWith(canonicalDir.toString()) }
-        val hasActiveInDir = activeFileLocks.keys.any { it.startsWith(canonicalDir.toString()) }
+        val hasInFlightInDir = inFlightSavingFiles.any { pathStr ->
+            runCatching { File(pathStr).canonicalFile.toPath().startsWith(canonicalDir) }.getOrDefault(false)
+        }
+        val hasActiveInDir = activeFileLocks.keys.any { pathStr ->
+            runCatching { File(pathStr).canonicalFile.toPath().startsWith(canonicalDir) }.getOrDefault(false)
+        }
         if (hasInFlightInDir || hasActiveInDir) return false
 
         val remaining = dir.listFiles()

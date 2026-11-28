@@ -550,20 +550,20 @@ SQLite виконує REPLACE як DELETE + INSERT; Room вмикає foreign ke
     - Захист активних операцій (`withPhotoInUse`, `inFlightSavingFiles`) з автоматичним відкладеним видаленням після завершення активного читання та чергою повторного видалення (`pendingDeletionPaths`, `retryPendingDeletions`).
     - Служба `cleanupOrphanFiles`: сканує лише `filesDir/chat_photos`, видаляє непідтверджені файли, старші за 24 години, зберігає молодші за 24 години та активні файли, перед кожним видаленням повторно опитує Room.
   - `FlowersRepository` та `FlowersRepositoryImpl`:
-    - Двофазне атомарне збереження `saveUserMessageWithPhoto` (Фаза 1: JPEG на диск -> Фаза 2: транзакція Room для `ChatMessageEntity` + `ChatAttachmentEntity`; негайне очищення JPEG при помилці транзакції Room або видаленні рослини).
-    - Інтеграція очищення фотографій у `clearChatHistory(plantId)` та `deletePlant(plant)` під короткими критичними секціями `getPlantMutex(plantId)` зі збереженням усіх гарантій `withChatSending` та блокуванням повторного створення повідомлень для видаленої рослини.
+    - Двофазне атомарне збереження `saveUserMessageWithPhoto` (Фаза 1: JPEG на диск із негайною реєстрацією в `inFlightSavingFiles` -> Фаза 2: обов'язкова транзакція Room через `transactionRunner` для `ChatMessageEntity` + `ChatAttachmentEntity`; якщо транзакційний механізм недоступний, повертається контрольована помилка без модифікації існуючих повідомлень чи файлів; жодного масового видалення `deleteAllForPlant` як фолбеку відкату; при помилці транзакції або скасуванні корутини існуюча історія та старі JPEG зберігаються на 100%, а новий JPEG негайно видаляється).
+    - Інтеграція очищення фотографій у `clearChatHistory(plantId)` та `deletePlant(plant)` під короткими критичними секціями `getPlantMutex(plantId)`: `clearChatHistory` видаляє виключно файли, прив'язані до очищених записів історії (з повторною перевіркою актуального стану Room перед видаленням кожного файла і без безумовного `deleteAllPhotosForPlant`), тому паралельно створені нові повідомлення та їхні JPEG залишаються недоторканими.
   - `FlowersApplication`: фоновий запуск `cleanupOrphanChatPhotos()` після старту застосунку на `Dispatchers.IO` без блокування головного UI-потоку.
 - **Тестування та верифікація:**
-  - JVM Unit Tests: **343 / 343 PASSED** (100% успішно, включно з 18 обов'язковими сценаріями в `ChatPhotoManagerTest`).
-  - Android Instrumented Tests: **64 / 64 PASSED** на емуляторі `small_phone` (Android 16 API 36, `emulator-5554`, 0 failed, 0 skipped, включно з `AndroidChatPhotoManagerTest`).
+  - JVM Unit Tests: **346 / 346 PASSED** (100% успішно, включно з 21 тестом у `ChatPhotoManagerTest`: детермінована конкурентність `clearChatHistory` + нове фото-повідомлення через `CompletableDeferred`, збереження існуючої історії та старих JPEG при збої транзакції Room та скасуванні корутини, перевірка відсутності `transactionRunner`, регресія Retry з фото).
+  - Android Instrumented Tests: **65 / 65 PASSED** на емуляторі `small_phone` (Android 16 API 36, `emulator-5554`, 0 failed, 0 skipped, включно з 3 тестами в `AndroidChatPhotoManagerTest` із реальним відкатом транзакції SQLite Room).
   - Релізний бандл: `bundleRelease` на Adoptium JDK 21 — BUILD SUCCESSFUL.
-- **Статус:** PR №44 підготовлено для проходження GitHub Actions CI та незалежного QA-аудиту.
+- **Статус:** PR №44 оновлено після усунення двох ризиків втрати даних та передано на CI і повторний незалежний QA-аудит.
 
 ### Запис журналу сесії 029 (за §5.3 Конституції):
-- **Зроблено:** реалізовано `ChatPhotoManager`, профіль `ImageProfile.ChatConsultation`, інтеграцію двофазного збереження та очищення фото в `FlowersRepositoryImpl` і фоновий запуск Orphan Cleanup у `FlowersApplication`; створено `ChatPhotoManagerTest` (18 сценаріїв) та `AndroidChatPhotoManagerTest`.
-- **Стан:** тести 100% зелені (343 JVM unit, 64 Android instrumented на `small_phone`), `bundleRelease` зібрано успішно.
-- **Зупинився на:** відкриття PR №44, перевірка GitHub Actions CI та передача на незалежний QA-аудит іншою моделлю.
-- **Наступний крок:** проходження CI та отримання вердикту незалежного QA для PR №44.
+- **Зроблено:** реалізовано `ChatPhotoManager`, профіль `ImageProfile.ChatConsultation`, інтеграцію двофазного збереження та очищення фото в `FlowersRepositoryImpl` і фоновий запуск Orphan Cleanup у `FlowersApplication`; усунено два ризики втрати даних за вказівкою Власника (прибрано безумовний `deleteAllPhotosForPlant` із `clearChatHistory` та фолбек `deleteAllForPlant` із `saveUserMessageWithPhoto`); створено розширений тест-сьют `ChatPhotoManagerTest` (21 тест) та `AndroidChatPhotoManagerTest` (3 тести).
+- **Стан:** тести 100% зелені (346 JVM unit, 65 Android instrumented на `small_phone`), `bundleRelease` зібрано успішно.
+- **Зупинився на:** оновлення PR №44, перевірка GitHub Actions CI та повторний незалежний QA-аудит іншою моделлю.
+- **Наступний крок:** проходження CI та отримання вердикту незалежного QA для оновленого PR №44.
 - **Увага:** не зливати PR №44 без `QA Verified` та явного дозволу Власника; наступні етапи (PR №45..47) залишаються заблокованими.
 
 

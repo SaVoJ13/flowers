@@ -218,4 +218,55 @@ class AndroidChatPhotoManagerTest {
         val availability = repository.checkChatPhotoAvailability(missingPath, expectedPlantId = plantId)
         assertTrue(availability is ChatPhotoAvailability.Missing)
     }
+
+    @Test
+    fun realRoomTransactionFailure_preservesExistingHistoryAndJpegFiles() = runBlocking {
+        val plantId = repository.insertPlant(
+            PlantEntity(customName = "Заміокулькас", roomLocation = "Спальня", checkIntervalDays = 10)
+        )
+        val existingSrc = createRealAndroidJpeg("existing_real.jpg", 1200, 900)
+        val existingSaved = repository.saveUserMessageWithPhoto(plantId, "Існуюче повідомлення з фото", existingSrc).getOrThrow()
+        val existingFile = File(existingSaved.primaryPhoto!!.filePath)
+        assertTrue(existingFile.exists())
+
+        // Створюємо репозиторій, де транзакція Room симулює збій після вставки повідомлення
+        val failingTxRepo = FlowersRepositoryImpl(
+            plantDao = database.plantDao(),
+            careEventDao = database.careEventDao(),
+            catalogDao = database.catalogDao(),
+            carePodDao = database.carePodDao(),
+            context = context,
+            chatMessageDao = database.chatMessageDao(),
+            geminiPlantService = GeminiPlantService(
+                catalogDao = database.catalogDao(),
+                carePodDao = database.carePodDao(),
+                networkChecker = object : NetworkChecker {
+                    override fun isOnline(): Boolean = true
+                },
+                generateChatText = { _, _ -> "Відповідь" }
+            ),
+            chatAttachmentDao = database.chatAttachmentDao(),
+            chatPhotoManager = photoManager,
+            transactionRunner = { block ->
+                database.withTransaction {
+                    block()
+                    throw IllegalStateException("Simulated SQLite transaction abort after inserts")
+                }
+            }
+        )
+
+        val newSrc = createRealAndroidJpeg("new_failing_real.jpg", 1200, 900)
+        val failedResult = failingTxRepo.saveUserMessageWithPhoto(plantId, "Нове повідомлення, що впаде", newSrc)
+        assertTrue(failedResult.isFailure)
+
+        // Справжня транзакція SQLite Room відкотила нове повідомлення і нове вкладення, але зберегла стару історію та старий JPEG!
+        val messagesInRoom = repository.getChatMessagesWithAttachments(plantId).first()
+        assertEquals(1, messagesInRoom.size)
+        assertEquals("Існуюче повідомлення з фото", messagesInRoom[0].message.content)
+        assertEquals(existingFile.canonicalPath, messagesInRoom[0].primaryPhoto?.filePath)
+        assertTrue("Existing JPEG must remain untouched", existingFile.exists())
+
+        val plantFiles = existingFile.parentFile?.listFiles()?.map { it.canonicalPath } ?: emptyList()
+        assertEquals("Failed operation's JPEG must be cleaned up", listOf(existingFile.canonicalPath), plantFiles)
+    }
 }

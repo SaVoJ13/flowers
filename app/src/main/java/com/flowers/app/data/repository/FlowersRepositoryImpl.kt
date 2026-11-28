@@ -198,17 +198,18 @@ class FlowersRepositoryImpl(
     private val plantMutexes = java.util.concurrent.ConcurrentHashMap<Long, Mutex>()
     private val deletedPlantIds = java.util.concurrent.ConcurrentHashMap.newKeySet<Long>()
 
+    /** Тестовий хук для детермінованої перевірки конкурентності між очищенням Room та видаленням файлів у clearChatHistory. */
+    internal var onAfterClearDbBeforeFileDelete: (suspend (Long) -> Unit)? = null
+
     private fun getPlantMutex(plantId: Long): Mutex {
         return plantMutexes.computeIfAbsent(plantId) { Mutex() }
     }
 
-    private suspend fun executeInTransaction(block: suspend () -> Unit) {
-        val runner = transactionRunner
-        if (runner != null) {
-            runner(block)
-        } else {
-            block()
-        }
+    private fun pathsReferToSameFile(pathA: String, pathB: String): Boolean {
+        if (pathA == pathB) return true
+        val canonicalA = runCatching { File(pathA).canonicalPath }.getOrNull() ?: pathA
+        val canonicalB = runCatching { File(pathB).canonicalPath }.getOrNull() ?: pathB
+        return canonicalA == canonicalB
     }
 
     override fun isPlantChatSending(plantId: Long): Boolean {
@@ -263,10 +264,13 @@ class FlowersRepositoryImpl(
 
     /**
      * Двофазне атомарне збереження повідомлення користувача з фотографією (TASK-056 / PR №44):
-     * 1. Фаза 1: обробка та атомарне збереження JPEG через [ChatPhotoManager] у `filesDir/chat_photos/plant_<plantId>/`.
-     * 2. Фаза 2: створення записів [ChatMessageEntity] та [ChatAttachmentEntity] у транзакції Room.
-     * 3. Якщо транзакція Room завершується помилкою або рослину було видалено — щойно створений JPEG негайно
-     *    видаляється (або стає на облік для Orphan Cleanup).
+     * 1. Вимагає наявності справжнього транзакційного механізму [transactionRunner] (у production — `database.withTransaction`).
+     *    Якщо транзакційний механізм недоступний, повертає контрольовану помилку без модифікації існуючих повідомлень чи файлів.
+     * 2. Фаза 1: обробка та атомарне збереження JPEG через [ChatPhotoManager] у `filesDir/chat_photos/plant_<plantId>/`
+     *    із негайною реєстрацією в `inFlightSavingFiles`.
+     * 3. Фаза 2: створення записів [ChatMessageEntity] та [ChatAttachmentEntity] у транзакції Room.
+     * 4. Якщо транзакція Room завершується помилкою, скасовується або рослину було видалено — транзакція БД
+     *    відкочує лише поточну вставку (зберігаючи всю попередню історію чату), а щойно створений JPEG негайно видаляється.
      */
     override suspend fun saveUserMessageWithPhoto(
         plantId: Long,
@@ -280,6 +284,21 @@ class FlowersRepositoryImpl(
             )
         }
 
+        val runner = transactionRunner
+            ?: return@withContext Result.failure(
+                ChatPhotoException.DatabaseFailure(
+                    "Транзакційний механізм Room недоступний: збереження фото-повідомлення відхилено для захисту історії чату"
+                )
+            )
+
+        val msgDao = chatMessageDao
+        val attDao = chatAttachmentDao
+        if (msgDao == null || attDao == null) {
+            return@withContext Result.failure(
+                ChatPhotoException.DatabaseFailure("DAO чату або вкладень не ініціалізовано")
+            )
+        }
+
         val mutex = getPlantMutex(plantId)
         val plantExistsInitially = mutex.withLock {
             !deletedPlantIds.contains(plantId) && plantDao.getPlantById(plantId) != null
@@ -290,20 +309,15 @@ class FlowersRepositoryImpl(
             )
         }
 
-        val msgDao = chatMessageDao
-        val attDao = chatAttachmentDao
-        if (msgDao == null || attDao == null) {
-            return@withContext Result.failure(
-                ChatPhotoException.DatabaseFailure("DAO чату або вкладень не ініціалізовано")
-            )
-        }
-
-        // Фаза 1: обробка зображення та атомарне збереження постійного JPEG
-        val savedPhoto = chatPhotoManager.saveChatPhoto(plantId, photoSource).getOrElse { err ->
+        // Фаза 1: обробка зображення та атомарне збереження постійного JPEG з миттєвою позначкою in-flight
+        val savedPhoto = chatPhotoManager.saveChatPhoto(
+            plantId = plantId,
+            source = photoSource,
+            registerInFlight = true
+        ).getOrElse { err ->
             return@withContext Result.failure(err)
         }
 
-        chatPhotoManager.markInFlightSaveStart(savedPhoto.canonicalPath)
         try {
             // Фаза 2: короткочасна критична секція під м'ютексом рослини та транзакція Room
             mutex.withLock {
@@ -326,44 +340,34 @@ class FlowersRepositoryImpl(
                 var createdMessage: ChatMessageEntity? = null
                 var createdAttachment: ChatAttachmentEntity? = null
 
-                try {
-                    executeInTransaction {
-                        val userMsg = ChatMessageEntity(
-                            plantId = plantId,
-                            role = MessageRole.USER,
-                            content = content,
-                            status = MessageStatus.SENDING,
-                            timestamp = timestamp
-                        )
-                        val msgId = msgDao.insertMessage(userMsg)
-                        if (msgId <= 0L) {
-                            throw ChatPhotoException.DatabaseFailure("Не вдалося створити повідомлення в Room")
-                        }
-                        createdMessage = userMsg.copy(id = msgId)
+                runner {
+                    val userMsg = ChatMessageEntity(
+                        plantId = plantId,
+                        role = MessageRole.USER,
+                        content = content,
+                        status = MessageStatus.SENDING,
+                        timestamp = timestamp
+                    )
+                    val msgId = msgDao.insertMessage(userMsg)
+                    if (msgId <= 0L) {
+                        throw ChatPhotoException.DatabaseFailure("Не вдалося створити повідомлення в Room")
+                    }
+                    createdMessage = userMsg.copy(id = msgId)
 
-                        val attachment = ChatAttachmentEntity(
-                            messageId = msgId,
-                            filePath = savedPhoto.canonicalPath,
-                            mimeType = savedPhoto.mimeType,
-                            fileSizeBytes = savedPhoto.fileSizeBytes,
-                            width = savedPhoto.width,
-                            height = savedPhoto.height,
-                            createdAt = savedPhoto.createdAt
-                        )
-                        val attId = attDao.insertAttachment(attachment)
-                        if (attId <= 0L) {
-                            throw ChatPhotoException.DatabaseFailure("Не вдалося створити запис вкладення в Room")
-                        }
-                        createdAttachment = attachment.copy(id = attId)
+                    val attachment = ChatAttachmentEntity(
+                        messageId = msgId,
+                        filePath = savedPhoto.canonicalPath,
+                        mimeType = savedPhoto.mimeType,
+                        fileSizeBytes = savedPhoto.fileSizeBytes,
+                        width = savedPhoto.width,
+                        height = savedPhoto.height,
+                        createdAt = savedPhoto.createdAt
+                    )
+                    val attId = attDao.insertAttachment(attachment)
+                    if (attId <= 0L) {
+                        throw ChatPhotoException.DatabaseFailure("Не вдалося створити запис вкладення в Room")
                     }
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (dbError: Throwable) {
-                    // Якщо використовується тестовий Fake DAO без реальної транзакції SQLite, очищуємо створене повідомлення
-                    if (transactionRunner == null && createdMessage != null && createdAttachment == null) {
-                        runCatching { msgDao.deleteAllForPlant(plantId) }
-                    }
-                    throw dbError
+                    createdAttachment = attachment.copy(id = attId)
                 }
 
                 Result.success(
@@ -380,7 +384,7 @@ class FlowersRepositoryImpl(
             }
             throw e
         } catch (t: Throwable) {
-            // При помилці Room негайно очищуємо щойно створений файл (або реєструємо для повторного очищення сиріт)
+            // При помилці транзакції Room негайно видаляємо ЛИШЕ щойно створений файл без жодного впливу на стару історію
             withContext(NonCancellable) {
                 chatPhotoManager.markInFlightSaveEnd(savedPhoto.canonicalPath)
                 chatPhotoManager.deletePhotoForPlant(plantId, savedPhoto.canonicalPath)
@@ -478,15 +482,31 @@ class FlowersRepositoryImpl(
 
     override suspend fun clearChatHistory(plantId: Long): Int = withContext(Dispatchers.IO) {
         val mutex = getPlantMutex(plantId)
-        val (deletedRows, filePaths) = mutex.withLock {
-            val paths = runCatching { chatAttachmentDao?.getAllFilePathsForPlant(plantId) }.getOrNull().orEmpty()
+        val (deletedRows, filePathsToDelete) = mutex.withLock {
+            val paths = runCatching { chatAttachmentDao?.getAllFilePathsForPlant(plantId) }
+                .getOrNull()
+                .orEmpty()
+                .distinct()
             val rows = chatMessageDao?.deleteAllForPlant(plantId) ?: 0
             Pair(rows, paths)
         }
-        for (path in filePaths) {
-            chatPhotoManager.deletePhotoForPlant(plantId, path)
+
+        onAfterClearDbBeforeFileDelete?.invoke(plantId)
+
+        // Видаляємо ВИКЛЮЧНО ті файли, які належали очищеним записам історії і не прив'язані до нових повідомлень у Room.
+        // Безумовний deleteAllPhotosForPlant тут НЕ викликається, щоб не видалити фото нових повідомлень,
+        // створених після завершення транзакції очищення Room.
+        for (path in filePathsToDelete) {
+            val isReferencedByNewRecord = mutex.withLock {
+                val activePaths = runCatching { chatAttachmentDao?.getAllFilePathsForPlant(plantId) }
+                    .getOrNull()
+                    .orEmpty()
+                activePaths.any { activePath -> pathsReferToSameFile(activePath, path) }
+            }
+            if (!isReferencedByNewRecord) {
+                chatPhotoManager.deletePhotoForPlant(plantId, path)
+            }
         }
-        chatPhotoManager.deleteAllPhotosForPlant(plantId)
         deletedRows
     }
 
